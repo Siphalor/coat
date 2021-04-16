@@ -73,7 +73,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry {
 
 		textRenderer.draw(matrices, trimmedName, x, y + (input.getHeight() - 8F) / 2F + Coat.MARGIN, Coat.TEXT_COLOR);
 		input.render(matrices, x + namePart + Coat.HALF_MARGIN, y + Coat.MARGIN, configEntryPart - Coat.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
-		defaultButton.y = y + Coat.MARGIN;
+		defaultButton.y = y;
 		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + Coat.HALF_MARGIN;
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
 
