@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "coat",
+	"version": "${version}",
+	"name": "Coat",
+	"description": "An alternative config UI library",
+	"authors": [
+		"Siphalor"
+	],
+	"contact": {
+		"website": "https://github.com/Siphalor/coat",
+		"repo": "https://github.com/Siphalor/coat"
+	},
+	"license": "MIT",
+	"icon": "assets/coat/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"de.siphalor.coat.Coat"
+		]
+	},
+	"mixins": [
+		"coat.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.11.3",
+		"fabric": "*",
+		"minecraft": "1.16.5"
+	}
+}

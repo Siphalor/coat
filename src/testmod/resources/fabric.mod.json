@@ -1,0 +1,12 @@
+{
+	"schemaVersion": 1,
+	"id": "coat_testmod",
+	"name": "Coat Testmod",
+	"version": "0.0.0-dev",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"de.siphalor.coat.testmod.CoatTestmod"
+		]
+	}
+}
