@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 
 import java.util.List;
 
-public class ConfigListTextEntry extends ConfigEntryListWidget.Entry<ConfigListTextEntry> {
+public class ConfigListTextEntry extends ConfigEntryListWidget.Entry {
 	private final TextRenderer textRenderer;
 	private final Text text;
 	private List<OrderedText> multilineText;

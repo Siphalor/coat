@@ -1,7 +1,6 @@
 package de.siphalor.coat;
 
 import de.siphalor.coat.list.ConfigEntryListWidget;
-import de.siphalor.coat.list.ConfigListCompoundEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -15,7 +14,7 @@ public class ConfigScreen extends Screen {
 	private final Collection<ConfigEntryListWidget.Entry> entries;
 	private Runnable onSave;
 
-	private ConfigEntryListWidget<ConfigEntryListWidget.Entry> listWidget;
+	private ConfigEntryListWidget listWidget;
 
 	public ConfigScreen(Screen parent, String modid, Collection<ConfigEntryListWidget.Entry> entries) {
 		super(new TranslatableText("coat.screen." + modid));
@@ -26,7 +25,7 @@ public class ConfigScreen extends Screen {
 
 	@Override
 	protected void init() {
-		listWidget = new ConfigEntryListWidget<>(client, width, height - 40, 20, height - 20, 260);
+		listWidget = new ConfigEntryListWidget(client, width, height - 40, 20, height - 20, 260);
 		children.add(listWidget);
 
 		for (ConfigEntryListWidget.Entry entry : entries) {
@@ -36,7 +35,7 @@ public class ConfigScreen extends Screen {
 		super.init();
 	}
 
-	public ConfigEntryListWidget<ConfigEntryListWidget.Entry> getListWidget() {
+	public ConfigEntryListWidget getListWidget() {
 		return listWidget;
 	}
 

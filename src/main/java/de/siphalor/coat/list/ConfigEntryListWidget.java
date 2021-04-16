@@ -26,12 +26,11 @@ import java.util.function.Predicate;
 
 /**
  * This is mostly a copy of {@link net.minecraft.client.gui.widget.EntryListWidget} to enable variable item heights.
- * @param <E>
  */
 @Environment(EnvType.CLIENT)
-public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extends AbstractParentElement implements Drawable, TickableElement {
+public class ConfigEntryListWidget extends AbstractParentElement implements Drawable, TickableElement {
 	protected final MinecraftClient client;
-	private final List<E> children = new Entries();
+	private final List<Entry> children = new Entries();
 	private final int rowWidth;
 	private IntList entryBottoms = new IntArrayList();
 	protected int width;
@@ -45,7 +44,7 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 	private boolean renderHeader;
 	protected int headerHeight;
 	private boolean scrolling;
-	private E selected;
+	private Entry selected;
 	private boolean renderBackground = true;
 	private boolean renderShadows = true;
 
@@ -78,11 +77,11 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 	}
 
 	@Nullable
-	public E getSelected() {
+	public Entry getSelected() {
 		return this.selected;
 	}
 
-	public void setSelected(@Nullable E entry) {
+	public void setSelected(@Nullable Entry entry) {
 		this.selected = entry;
 	}
 
@@ -95,12 +94,11 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 	}
 
 	@Nullable
-	public E getFocused() {
-		//noinspection unchecked
-		return (E) super.getFocused();
+	public Entry getFocused() {
+		return (Entry) super.getFocused();
 	}
 
-	public final List<E> children() {
+	public final List<Entry> children() {
 		return this.children;
 	}
 
@@ -108,16 +106,16 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 		this.children.clear();
 	}
 
-	protected void replaceEntries(Collection<E> newEntries) {
+	protected void replaceEntries(Collection<Entry> newEntries) {
 		this.children.clear();
 		this.children.addAll(newEntries);
 	}
 
-	protected E getEntry(int index) {
+	protected Entry getEntry(int index) {
 		return this.children().get(index);
 	}
 
-	public int addEntry(E entry) {
+	public int addEntry(Entry entry) {
 		children.add(entry);
 		entryBottoms.add(getMaxEntryPosition() + entry.getHeight());
 		return children.size() - 1;
@@ -132,7 +130,7 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 	}
 
 	@Nullable
-	protected final E getEntryAtPosition(double x, double y) {
+	protected final Entry getEntryAtPosition(double x, double y) {
 		int halfRowWidth = this.getRowWidth() / 2;
 		int screenCenter = this.left + this.width / 2;
 		int rowLeft = screenCenter - halfRowWidth;
@@ -280,12 +278,12 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 		RenderSystem.disableBlend();
 	}
 
-	protected void centerScrollOn(E entry) {
+	protected void centerScrollOn(Entry entry) {
 		int index = children.indexOf(entry);
 		setScrollAmount(entryBottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
 	}
 
-	protected void ensureVisible(E entry) {
+	protected void ensureVisible(Entry entry) {
 		int index = children.indexOf(entry);
 		int bottom = entryBottoms.getInt(index);
 		if (scrollAmount + height > bottom) {
@@ -328,7 +326,7 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 		if (!isMouseOver(mouseX, mouseY)) {
 			return false;
 		} else {
-			E entry = getEntryAtPosition(mouseX, mouseY);
+			Entry entry = getEntryAtPosition(mouseX, mouseY);
 			if (entry != null) {
 				if (entry.mouseClicked(mouseX, mouseY, button)) {
 					setFocused(entry);
@@ -399,14 +397,14 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 	}
 
 	protected void ensureSelectedEntryVisible() {
-		E entry = this.getSelected();
+		Entry entry = this.getSelected();
 		if (entry != null) {
 			this.setSelected(entry);
 			this.ensureVisible(entry);
 		}
 	}
 
-	protected void moveSelectionIf(MoveDirection direction, Predicate<E> predicate) {
+	protected void moveSelectionIf(MoveDirection direction, Predicate<Entry> predicate) {
 		int offset = direction == MoveDirection.UP ? -1 : 1;
 		if (!this.children().isEmpty()) {
 			int index = this.children().indexOf(this.getSelected());
@@ -417,7 +415,7 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 					break;
 				}
 
-				E entry = this.children().get(newIndex);
+				Entry entry = this.children().get(newIndex);
 				if (predicate.test(entry)) {
 					this.setSelected(entry);
 					this.ensureVisible(entry);
@@ -435,9 +433,9 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 
 	protected void renderList(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta) {
 		IntListIterator bottomIter = entryBottoms.iterator();
-		Iterator<E> entryIter = children.iterator();
+		Iterator<Entry> entryIter = children.iterator();
 		int relBottom = 0, relTop = 0;
-		E entry = null;
+		Entry entry = null;
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
@@ -450,7 +448,7 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 			}
 		}
 
-		E hoveredEntry = getEntryAtPosition(mouseX, mouseY);
+		Entry hoveredEntry = getEntryAtPosition(mouseX, mouseY);
 
 		int rowWidth = getRowWidth();
 		int rowLeft = this.left + this.width / 2 - rowWidth / 2;
@@ -523,23 +521,23 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 
 	@Override
 	public void setFocused(@Nullable Element focused) {
-		E old = getFocused();
+		Entry old = getFocused();
 		if (old != null) {
 			old.unfocus();
 		}
 		super.setFocused(focused);
 	}
 
-	protected E removeEntry(int index) {
-		E entry = this.children.get(index);
+	protected Entry removeEntry(int index) {
+		Entry entry = this.children.get(index);
 		return this.removeEntry(index, entry) ? entry : null;
 	}
 
-	protected boolean removeEntry(E entry) {
+	protected boolean removeEntry(Entry entry) {
 		return removeEntry(children.indexOf(entry), entry);
 	}
 
-	protected boolean removeEntry(int index, E entry) {
+	protected boolean removeEntry(int index, Entry entry) {
 		boolean success = this.children.remove(entry);
 		if (success) {
 			entryBottoms.removeInt(index);
@@ -551,26 +549,26 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 		return success;
 	}
 
-	private void setEntryParentList(E entry) {
+	private void setEntryParentList(Entry entry) {
 		entry.setParentList(this);
 	}
 
 	@Override
 	public void tick() {
-		for (E child : children()) {
+		for (Entry child : children()) {
 			child.tick();
 		}
 	}
 
 	@Environment(EnvType.CLIENT)
-	class Entries extends AbstractList<E> {
-		private final List<E> entries;
+	class Entries extends AbstractList<Entry> {
+		private final List<Entry> entries;
 
 		private Entries() {
 			this.entries = Lists.newArrayList();
 		}
 
-		public E get(int i) {
+		public Entry get(int i) {
 			return this.entries.get(i);
 		}
 
@@ -578,27 +576,27 @@ public class ConfigEntryListWidget<E extends ConfigEntryListWidget.Entry> extend
 			return this.entries.size();
 		}
 
-		public E set(int i, E entry) {
-			E entry2 = this.entries.set(i, entry);
+		public Entry set(int i, Entry entry) {
+			Entry entry2 = this.entries.set(i, entry);
 			ConfigEntryListWidget.this.setEntryParentList(entry);
 			return entry2;
 		}
 
-		public void add(int i, E entry) {
+		public void add(int i, Entry entry) {
 			this.entries.add(i, entry);
 			ConfigEntryListWidget.this.setEntryParentList(entry);
 		}
 
-		public E remove(int i) {
+		public Entry remove(int i) {
 			return this.entries.remove(i);
 		}
 	}
 
 	@Environment(EnvType.CLIENT)
-	public abstract static class Entry<E extends Entry<E>> implements Element, TickableElement {
-		protected ConfigEntryListWidget<E> parentList;
+	public abstract static class Entry implements Element, TickableElement {
+		protected ConfigEntryListWidget parentList;
 
-		protected void setParentList(ConfigEntryListWidget<E> parentList) {
+		protected void setParentList(ConfigEntryListWidget parentList) {
 			this.parentList = parentList;
 			widthChanged(parentList.rowWidth);
 		}

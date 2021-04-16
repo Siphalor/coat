@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ConfigListCompoundEntry extends ConfigEntryListWidget.Entry<ConfigListCompoundEntry> implements ParentElement {
+public abstract class ConfigListCompoundEntry extends ConfigEntryListWidget.Entry implements ParentElement {
 	private Element focused;
 
 	@Override
