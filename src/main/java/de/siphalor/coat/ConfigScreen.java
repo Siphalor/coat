@@ -53,6 +53,12 @@ public class ConfigScreen extends Screen {
 	}
 
 	@Override
+	public void tick() {
+		super.tick();
+		listWidget.tick();
+	}
+
+	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		renderBackground(matrices);
 
