@@ -522,7 +522,7 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	@Override
 	public void setFocused(@Nullable Element focused) {
 		Entry old = getFocused();
-		if (old != null) {
+		if (old != null && old != focused) {
 			old.unfocus();
 		}
 		super.setFocused(focused);
