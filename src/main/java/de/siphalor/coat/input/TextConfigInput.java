@@ -1,18 +1,14 @@
 package de.siphalor.coat.input;
 
 import de.siphalor.coat.Coat;
-import de.siphalor.coat.handler.ConfigEntryHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class TextConfigInput extends TextFieldWidget implements ConfigInput<String> {
-	private final ConfigEntryHandler<String> entryHandler;
-
-	public TextConfigInput(ConfigEntryHandler<String> entryHandler, Text placeholder) {
+	public TextConfigInput(Text placeholder) {
 		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, placeholder);
-		this.entryHandler = entryHandler;
 	}
 
 	@Override
@@ -31,8 +27,8 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	}
 
 	@Override
-	public ConfigEntryHandler<String> getEntryHandler() {
-		return entryHandler;
+	public void setChangeListener(InputChangeListener<String> changeListener) {
+		setChangedListener(changeListener);
 	}
 
 	@Override

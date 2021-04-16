@@ -5,11 +5,11 @@ import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.input.TextConfigInput;
 import de.siphalor.coat.list.ConfigEntryListWidget;
 import de.siphalor.coat.list.ConfigListConfigEntry;
-import de.siphalor.coat.list.ConfigListCompoundEntry;
 import de.siphalor.coat.list.ConfigListTextEntry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.text.LiteralText;
 
@@ -32,12 +32,14 @@ public class CoatTestmod implements ClientModInitializer {
 		list.add(new ConfigListConfigEntry<>(
 				new LiteralText("Blub"),
 				new LiteralText("This is a fine description"),
-				new TextConfigInput(new StringEntryHandler(), new LiteralText("Some placeholder"))
+				new StringEntryHandler(),
+				new TextConfigInput(new LiteralText("Some placeholder"))
 		));
 		list.add(new ConfigListConfigEntry<>(
 				new LiteralText("This is a really long title for a config entry"),
 				new LiteralText("This is a fine description"),
-				new TextConfigInput(new StringEntryHandler(), new LiteralText("Some placeholder"))
+				new StringEntryHandler(),
+				new TextConfigInput(new LiteralText("Some placeholder"))
 		));
 
 		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, MOD_ID, list);
@@ -52,7 +54,9 @@ public class CoatTestmod implements ClientModInitializer {
 
 		@Override
 		public boolean onPressedPriority() {
-			MinecraftClient.getInstance().openScreen(createScreen());
+			if (MinecraftClient.getInstance().currentScreen instanceof TitleScreen) {
+				MinecraftClient.getInstance().openScreen(createScreen());
+			}
 			return false;
 		}
 	}

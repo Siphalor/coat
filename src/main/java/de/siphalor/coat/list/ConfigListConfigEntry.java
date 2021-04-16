@@ -2,7 +2,9 @@ package de.siphalor.coat.list;
 
 import com.google.common.collect.ImmutableList;
 import de.siphalor.coat.Coat;
+import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.input.ConfigInput;
+import de.siphalor.coat.input.InputChangeListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -12,25 +14,31 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
-public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry {
+public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements InputChangeListener<V> {
 	private static final Text DEFAULT_TEXT = new TranslatableText(Coat.MOD_ID + ".default");
 	private final TextRenderer textRenderer;
 	private final Text name;
 	private Text trimmedName;
 	private final Text description;
+	private final ConfigEntryHandler<V> entryHandler;
 	private final ConfigInput<V> input;
 	private final ButtonWidget defaultButton;
+	private Collection<String> errors;
 
-	public ConfigListConfigEntry(Text name, Text description, ConfigInput<V> input) {
+	public ConfigListConfigEntry(Text name, Text description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
 		this.name = name;
 		this.trimmedName = name;
 		this.description = description;
+		this.entryHandler = entryHandler;
 		this.input = input;
+		input.setChangeListener(this);
 		defaultButton = new ButtonWidget(0, 0, 10, 20, DEFAULT_TEXT, button ->
-			input.setValue(input.getEntryHandler().getDefault())
+			input.setValue(entryHandler.getDefault())
 		);
 		textRenderer = MinecraftClient.getInstance().textRenderer;
 	}
@@ -50,10 +58,6 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry {
 
 		int controlsPart = (int) getControlsPart(newWidth);
 		defaultButton.setWidth(controlsPart - Coat.HALF_MARGIN);
-	}
-
-	public void inputChanged() {
-		defaultButton.active = !input.isDefault();
 	}
 
 	@Override
@@ -111,5 +115,11 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry {
 				input.setFocused(true);
 			}
 		}
+	}
+
+	@Override
+	public void inputChanged(V newValue) {
+		defaultButton.active = !Objects.equals(newValue, entryHandler.getDefault());
+		errors = entryHandler.validate(newValue);
 	}
 }
