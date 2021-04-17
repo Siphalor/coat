@@ -1,0 +1,32 @@
+package de.siphalor.coat.testmod;
+
+import de.siphalor.coat.handler.ConfigEntryHandler;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.function.Function;
+
+public class GenericEntryHandler<V> implements ConfigEntryHandler<V> {
+	private final V def;
+	private final Function<V, Collection<String>> validator;
+
+	public GenericEntryHandler(V def, Function<V, Collection<String>> validator) {
+		this.def = def;
+		this.validator = validator;
+	}
+
+	@Override
+	public V getDefault() {
+		return def;
+	}
+
+	@Override
+	public @NotNull Collection<String> validate(V value) {
+		return validator.apply(value);
+	}
+
+	@Override
+	public void save(V value) {
+
+	}
+}

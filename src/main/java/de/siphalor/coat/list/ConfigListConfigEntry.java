@@ -77,7 +77,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 		textRenderer.draw(matrices, trimmedName, x, y + (input.getHeight() - 8F) / 2F + Coat.MARGIN, Coat.TEXT_COLOR);
 		input.render(matrices, x + namePart + Coat.HALF_MARGIN, y + Coat.MARGIN, configEntryPart - Coat.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
-		defaultButton.y = y;
+		defaultButton.y = y + Coat.MARGIN;
 		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + Coat.HALF_MARGIN;
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
 
@@ -100,7 +100,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	@Override
 	public int getHeight() {
-		return Math.max(20, input.getHeight());
+		return Coat.MARGIN + Math.max(20, input.getHeight());
 	}
 
 	@Override
