@@ -31,8 +31,8 @@ import java.util.function.Predicate;
 public class ConfigEntryListWidget extends AbstractParentElement implements Drawable, TickableElement {
 	protected final MinecraftClient client;
 	private final List<Entry> children = new Entries();
+	private final IntList entryBottoms = new IntArrayList();
 	private final int rowWidth;
-	private IntList entryBottoms = new IntArrayList();
 	protected int width;
 	protected int height;
 	protected int top;
@@ -45,8 +45,6 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	protected int headerHeight;
 	private boolean scrolling;
 	private Entry selected;
-	private boolean renderBackground = true;
-	private boolean renderShadows = true;
 
 	public ConfigEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, int rowWidth) {
 		this.client = client;
@@ -83,14 +81,6 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 
 	public void setSelected(@Nullable Entry entry) {
 		this.selected = entry;
-	}
-
-	public void setRenderBackground(boolean bl) {
-		this.renderBackground = bl;
-	}
-
-	public void setRenderShadows(boolean renderShadows) {
-		this.renderShadows = renderShadows;
 	}
 
 	@Nullable
@@ -182,28 +172,58 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	protected void renderHeader(MatrixStack matrices, int x, int y, Tessellator tessellator) {
 	}
 
-	protected void renderBackground(MatrixStack matrices) {
+	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
+		this.client.getTextureManager().bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+		bufferBuilder.vertex(this.left, this.bottom, 0.0D).texture((float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
+		bufferBuilder.vertex(this.right, this.bottom, 0.0D).texture((float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
+		bufferBuilder.vertex(this.right, this.top, 0.0D).texture((float)this.right / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
+		bufferBuilder.vertex(this.left, this.top, 0.0D).texture((float)this.left / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
+		tessellator.draw();
 	}
 
-	protected void renderDecorations(MatrixStack matrices, int mouseX, int mouseY) {
+	protected void renderShadows(Tessellator tessellator, BufferBuilder bufferBuilder) {
+		this.client.getTextureManager().bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(519);
+		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+		bufferBuilder.vertex(this.left, this.top, -100.0D).texture(0.0F, (float)this.top / 32.0F).color(64, 64, 64, 255).next();
+		bufferBuilder.vertex(this.left + this.width, this.top, -100.0D).texture((float)this.width / 32.0F, (float)this.top / 32.0F).color(64, 64, 64, 255).next();
+		bufferBuilder.vertex(this.left + this.width, 0.0D, -100.0D).texture((float)this.width / 32.0F, 0.0F).color(64, 64, 64, 255).next();
+		bufferBuilder.vertex(this.left, 0.0D, -100.0D).texture(0.0F, 0.0F).color(64, 64, 64, 255).next();
+		bufferBuilder.vertex(this.left, this.height, -100.0D).texture(0.0F, (float)this.height / 32.0F).color(64, 64, 64, 255).next();
+		bufferBuilder.vertex(this.left + this.width, this.height, -100.0D).texture((float)this.width / 32.0F, (float)this.height / 32.0F).color(64, 64, 64, 255).next();
+		bufferBuilder.vertex(this.left + this.width, this.bottom, -100.0D).texture((float)this.width / 32.0F, (float)this.bottom / 32.0F).color(64, 64, 64, 255).next();
+		bufferBuilder.vertex(this.left, this.bottom, -100.0D).texture(0.0F, (float)this.bottom / 32.0F).color(64, 64, 64, 255).next();
+		tessellator.draw();
+		RenderSystem.depthFunc(515);
+		RenderSystem.disableDepthTest();
+		RenderSystem.enableBlend();
+		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
+		RenderSystem.disableAlphaTest();
+		RenderSystem.shadeModel(7425);
+		RenderSystem.disableTexture();
+		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+		bufferBuilder.vertex(this.left, this.top + 4, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(this.right, this.top + 4, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(this.right, this.top, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(this.left, this.top, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(this.left, this.bottom, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(this.right, this.bottom, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(this.right, this.bottom - 4, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(this.left, this.bottom - 4, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 0).next();
+		tessellator.draw();
+
 	}
 
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackground(matrices);
 		int i = this.getScrollbarPositionX();
 		int j = i + 6;
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		if (this.renderBackground) {
-			this.client.getTextureManager().bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-			bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-			bufferBuilder.vertex(this.left, this.bottom, 0.0D).texture((float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
-			bufferBuilder.vertex(this.right, this.bottom, 0.0D).texture((float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
-			bufferBuilder.vertex(this.right, this.top, 0.0D).texture((float)this.right / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
-			bufferBuilder.vertex(this.left, this.top, 0.0D).texture((float)this.left / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
-			tessellator.draw();
-		}
+
+		renderBackground(tessellator, bufferBuilder);
 
 		int k = this.getRowLeft();
 		int l = this.top + 4 - (int)this.getScrollAmount();
@@ -212,38 +232,8 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		}
 
 		this.renderList(matrices, k, l, mouseX, mouseY, delta);
-		if (this.renderShadows) {
-			this.client.getTextureManager().bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-			RenderSystem.enableDepthTest();
-			RenderSystem.depthFunc(519);
-			bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-			bufferBuilder.vertex(this.left, this.top, -100.0D).texture(0.0F, (float)this.top / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(this.left + this.width, this.top, -100.0D).texture((float)this.width / 32.0F, (float)this.top / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(this.left + this.width, 0.0D, -100.0D).texture((float)this.width / 32.0F, 0.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(this.left, 0.0D, -100.0D).texture(0.0F, 0.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(this.left, this.height, -100.0D).texture(0.0F, (float)this.height / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(this.left + this.width, this.height, -100.0D).texture((float)this.width / 32.0F, (float)this.height / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(this.left + this.width, this.bottom, -100.0D).texture((float)this.width / 32.0F, (float)this.bottom / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(this.left, this.bottom, -100.0D).texture(0.0F, (float)this.bottom / 32.0F).color(64, 64, 64, 255).next();
-			tessellator.draw();
-			RenderSystem.depthFunc(515);
-			RenderSystem.disableDepthTest();
-			RenderSystem.enableBlend();
-			RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-			RenderSystem.disableAlphaTest();
-			RenderSystem.shadeModel(7425);
-			RenderSystem.disableTexture();
-			bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-			bufferBuilder.vertex(this.left, this.top + 4, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 0).next();
-			bufferBuilder.vertex(this.right, this.top + 4, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 0).next();
-			bufferBuilder.vertex(this.right, this.top, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(this.left, this.top, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(this.left, this.bottom, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(this.right, this.bottom, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(this.right, this.bottom - 4, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 0).next();
-			bufferBuilder.vertex(this.left, this.bottom - 4, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 0).next();
-			tessellator.draw();
-		}
+
+		renderShadows(tessellator, bufferBuilder);
 
 		int o = this.getMaxScroll();
 		if (o > 0) {
@@ -271,7 +261,6 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 			tessellator.draw();
 		}
 
-		this.renderDecorations(matrices, mouseX, mouseY);
 		RenderSystem.enableTexture();
 		RenderSystem.shadeModel(7424);
 		RenderSystem.enableAlphaTest();
@@ -593,7 +582,7 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	}
 
 	@Environment(EnvType.CLIENT)
-	public abstract static class Entry implements Element, TickableElement {
+	public abstract static class Entry extends DrawableHelper implements Element, TickableElement {
 		protected ConfigEntryListWidget parentList;
 
 		protected void setParentList(ConfigEntryListWidget parentList) {
