@@ -41,6 +41,8 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 			input.setValue(entryHandler.getDefault())
 		);
 		textRenderer = MinecraftClient.getInstance().textRenderer;
+
+		inputChanged(input.getValue());
 	}
 
 	@Override
