@@ -6,6 +6,7 @@ import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.input.InputChangeListener;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -24,10 +25,14 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	private final Text name;
 	private Text trimmedName;
 	private final Text description;
+	private MultilineText descriptionMultiline;
 	private final ConfigEntryHandler<V> entryHandler;
 	private final ConfigInput<V> input;
 	private final ButtonWidget defaultButton;
 	private Collection<String> errors;
+	private boolean expanded;
+	protected int x;
+	protected int y;
 
 	public ConfigListConfigEntry(Text name, Text description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
@@ -45,6 +50,25 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		inputChanged(input.getValue());
 	}
 
+	public boolean isExpanded() {
+		return expanded;
+	}
+
+	public void setExpanded(boolean expanded) {
+		if (expanded) {
+			updateExpanded(parentList.getRowWidth());
+		}
+		boolean old = this.expanded;
+		this.expanded = expanded;
+		if (old != expanded) {
+			parentList.entryHeightChanged(this);
+		}
+	}
+
+	protected void updateExpanded(int width) {
+		descriptionMultiline = MultilineText.create(MinecraftClient.getInstance().textRenderer, description, width);
+	}
+
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
@@ -60,6 +84,21 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 		int controlsPart = (int) getControlsPart(newWidth);
 		defaultButton.setWidth(controlsPart - Coat.HALF_MARGIN);
+
+		if (isExpanded()) {
+			updateExpanded(newWidth);
+		}
+	}
+
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		if (!super.mouseClicked(mouseX, mouseY, button)) {
+			if (mouseX >= x && mouseX < x + getNamePart(parentList.getRowWidth())) {
+				Coat.playClickSound();
+				setExpanded(!isExpanded());
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -74,14 +113,29 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+		this.x = x;
+		this.y = y;
+
 		int namePart = (int) getNamePart(entryWidth);
 		int configEntryPart = (int) getConfigEntryPart(entryWidth);
+		int baseHeight = getBaseHeight();
+		int inputHeight = input.getHeight();
 
-		textRenderer.draw(matrices, trimmedName, x, y + (input.getHeight() - 8F) / 2F + Coat.MARGIN, Coat.TEXT_COLOR);
+		float textY = y + (inputHeight - 8F) / 2F+ Coat.MARGIN;
+
+		if (hovered && mouseX < x + namePart) {
+			fill(matrices, x - Coat.DOUBLE_MARGIN, y + Coat.MARGIN, x + namePart, y + inputHeight, 0x33ffffff);
+		}
+
+		textRenderer.draw(matrices, trimmedName, x, textY, Coat.TEXT_COLOR);
 		input.render(matrices, x + namePart + Coat.HALF_MARGIN, y + Coat.MARGIN, configEntryPart - Coat.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		defaultButton.y = y + Coat.MARGIN;
 		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + Coat.HALF_MARGIN;
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
+
+		if (isExpanded()) {
+			descriptionMultiline.draw(matrices, x + Coat.DOUBLE_MARGIN, y + baseHeight + Coat.MARGIN, 9, Coat.SECONDARY_TEXT_COLOR);
+		}
 
 		if (hovered && mouseX - x < namePart && trimmedName != name) {
 			MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, name, mouseX, mouseY);
@@ -100,9 +154,21 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		return width * 0.2;
 	}
 
+	public int getBaseHeight() {
+		return Coat.MARGIN + Math.max(20, input.getHeight());
+	}
+
+	public int getExpandedHeight() {
+		return Coat.MARGIN + descriptionMultiline.count() * 9 + Coat.MARGIN;
+	}
+
 	@Override
 	public int getHeight() {
-		return Coat.MARGIN + Math.max(20, input.getHeight());
+		if (isExpanded()) {
+			return getBaseHeight() + getExpandedHeight();
+		} else {
+			return getBaseHeight();
+		}
 	}
 
 	@Override

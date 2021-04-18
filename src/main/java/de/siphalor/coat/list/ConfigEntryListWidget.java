@@ -93,12 +93,13 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	}
 
 	protected final void clearEntries() {
-		this.children.clear();
+		children.clear();
+		entryBottoms.clear();
 	}
 
 	protected void replaceEntries(Collection<Entry> newEntries) {
-		this.children.clear();
-		this.children.addAll(newEntries);
+		clearEntries();
+		addEntries(newEntries);
 	}
 
 	protected Entry getEntry(int index) {
@@ -109,6 +110,16 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		children.add(entry);
 		entryBottoms.add(getMaxEntryPosition() + entry.getHeight());
 		return children.size() - 1;
+	}
+
+	public void addEntries(Collection<Entry> newEntries) {
+		int oldSize = newEntries.size();
+		int bottom = entryBottoms.size() == 0 ? 0 : entryBottoms.getInt(0);
+		children.addAll(newEntries);
+		for (int i = oldSize, l = children.size(); i < l; i++) {
+			bottom += children.get(i).getHeight();
+			entryBottoms.add(bottom);
+		}
 	}
 
 	protected int getEntryCount() {
@@ -139,6 +150,15 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 			}
 		}
 		return null;
+	}
+
+	public void entryHeightChanged(Entry entry) {
+		int index = children.indexOf(entry);
+		int bottom = index == 0 ? 0 : entryBottoms.getInt(index - 1);
+		for (int i = index, l = children.size(); i < l; i++) {
+			bottom += children.get(i).getHeight();
+			entryBottoms.set(i, bottom);
+		}
 	}
 
 	public void updateSize(int width, int height, int top, int bottom) {
