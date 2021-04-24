@@ -12,9 +12,11 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -42,10 +44,18 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		this.entryHandler = entryHandler;
 		this.input = input;
 		input.setChangeListener(this);
+		MinecraftClient client = MinecraftClient.getInstance();
+		textRenderer = client.textRenderer;
 		defaultButton = new ButtonWidget(0, 0, 10, 20, DEFAULT_TEXT, button ->
-			input.setValue(entryHandler.getDefault())
+				input.setValue(entryHandler.getDefault()),
+				(button, matrices, mouseX, mouseY) -> {
+					List<OrderedText> wrappedLines = Coat.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
+					ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
+					list.addAll(wrappedLines);
+					list.add(0, new TranslatableText(Coat.MOD_ID + ".default.hover").asOrderedText());
+					client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
+				}
 		);
-		textRenderer = MinecraftClient.getInstance().textRenderer;
 
 		inputChanged(input.getValue());
 	}
@@ -92,11 +102,13 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (!super.mouseClicked(mouseX, mouseY, button)) {
-			if (mouseX >= x && mouseX < x + getNamePart(parentList.getRowWidth())) {
-				Coat.playClickSound();
-				setExpanded(!isExpanded());
-			}
+		if (super.mouseClicked(mouseX, mouseY, button)) {
+			return true;
+		}
+		if (mouseX >= x && mouseX < x + getNamePart(parentList.getRowWidth())) {
+			Coat.playClickSound();
+			setExpanded(!isExpanded());
+			return true;
 		}
 		return false;
 	}
@@ -121,7 +133,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		int baseHeight = getBaseHeight();
 		int inputHeight = input.getHeight();
 
-		float textY = y + (inputHeight - 8F) / 2F+ Coat.MARGIN;
+		float textY = y + (inputHeight - 8F) / 2F + Coat.MARGIN;
 
 		if (hovered && mouseX < x + namePart) {
 			fill(matrices, x - Coat.DOUBLE_MARGIN, y + Coat.MARGIN, x + namePart, y + inputHeight, 0x33ffffff);
@@ -138,7 +150,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 
 		if (hovered && mouseX - x < namePart && trimmedName != name) {
-			MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, name, mouseX, mouseY);
+			Coat.renderTooltip(matrices, mouseX, mouseY, name);
 		}
 	}
 
