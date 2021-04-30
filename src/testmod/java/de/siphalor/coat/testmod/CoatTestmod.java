@@ -1,10 +1,12 @@
 package de.siphalor.coat.testmod;
 
+import com.google.common.collect.ImmutableList;
 import de.siphalor.amecs.api.PriorityKeyBinding;
 import de.siphalor.coat.ConfigScreen;
+import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
-import de.siphalor.coat.list.ConfigEntryListWidget;
+import de.siphalor.coat.list.ConfgListEntry;
 import de.siphalor.coat.list.ConfigListConfigEntry;
 import de.siphalor.coat.list.ConfigListTextEntry;
 import net.fabricmc.api.ClientModInitializer;
@@ -27,7 +29,7 @@ public class CoatTestmod implements ClientModInitializer {
 	}
 
 	public static ConfigScreen createScreen() {
-		LinkedList<ConfigEntryListWidget.Entry> list = new LinkedList<>();
+		LinkedList<ConfgListEntry> list = new LinkedList<>();
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text!")));
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text! this is even fucking hell longer.")));
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text!")));
@@ -47,7 +49,20 @@ public class CoatTestmod implements ClientModInitializer {
 		list.add(new ConfigListConfigEntry<>(
 				new LiteralText("This is a really long title for a config entry"),
 				new LiteralText("This is a fine description"),
-				new GenericEntryHandler<>("test", s -> StringUtils.isAllLowerCase(s) ? Collections.emptyList() : Collections.singleton("Must be all lowercase!")),
+				new GenericEntryHandler<>("test", s ->
+						StringUtils.isAllLowerCase(s)
+								? Collections.emptyList()
+								: ImmutableList.of(
+										new Message(Message.Level.INFO, new LiteralText("Some information about why this config aught to be lowercase letters only")),
+										new Message(Message.Level.ERROR, new LiteralText("Must be all lowercase!"))
+								)
+				),
+				new TextConfigInput(new LiteralText("Some placeholder"))
+		));
+		list.add(new ConfigListConfigEntry<>(
+				new LiteralText("Blub"),
+				new LiteralText("This is a fine description"),
+				new GenericEntryHandler<>("default", s -> Collections.emptyList()),
 				new TextConfigInput(new LiteralText("Some placeholder"))
 		));
 

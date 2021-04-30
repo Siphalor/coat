@@ -1,6 +1,7 @@
 package de.siphalor.coat.testmod;
 
 import de.siphalor.coat.handler.ConfigEntryHandler;
+import de.siphalor.coat.handler.Message;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
@@ -10,9 +11,9 @@ import java.util.function.Function;
 
 public class GenericEntryHandler<V> implements ConfigEntryHandler<V> {
 	private final V def;
-	private final Function<V, Collection<String>> validator;
+	private final Function<V, Collection<Message>> validator;
 
-	public GenericEntryHandler(V def, Function<V, Collection<String>> validator) {
+	public GenericEntryHandler(V def, Function<V, Collection<Message>> validator) {
 		this.def = def;
 		this.validator = validator;
 	}
@@ -23,7 +24,7 @@ public class GenericEntryHandler<V> implements ConfigEntryHandler<V> {
 	}
 
 	@Override
-	public @NotNull Collection<String> validate(V value) {
+	public @NotNull Collection<Message> getMessages(V value) {
 		return validator.apply(value);
 	}
 

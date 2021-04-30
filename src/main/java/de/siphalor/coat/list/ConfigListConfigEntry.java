@@ -3,6 +3,7 @@ package de.siphalor.coat.list;
 import com.google.common.collect.ImmutableList;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.ConfigEntryHandler;
+import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.input.InputChangeListener;
 import net.minecraft.client.MinecraftClient;
@@ -11,10 +12,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,19 +22,19 @@ import java.util.Objects;
 public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements InputChangeListener<V> {
 	private static final Text DEFAULT_TEXT = new TranslatableText(Coat.MOD_ID + ".default");
 	private final TextRenderer textRenderer;
-	private final Text name;
-	private Text trimmedName;
+	private final BaseText name;
+	private BaseText trimmedName;
 	private final Text description;
 	private MultilineText descriptionMultiline;
 	private final ConfigEntryHandler<V> entryHandler;
 	private final ConfigInput<V> input;
 	private final ButtonWidget defaultButton;
-	private Collection<String> errors;
+	private Collection<Message> messages;
 	private boolean expanded;
 	protected int x;
 	protected int y;
 
-	public ConfigListConfigEntry(Text name, Text description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
+	public ConfigListConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
 		this.name = name;
 		this.trimmedName = name;
@@ -66,7 +64,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	public void setExpanded(boolean expanded) {
 		if (expanded) {
-			updateExpanded(parentList.getRowWidth());
+			updateExpanded(parentList.getEntryWidth());
 		}
 		boolean old = this.expanded;
 		this.expanded = expanded;
@@ -87,9 +85,9 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		if (textRenderer.getWidth(name) > namePart) {
 			String rawName = name.getString();
 			int length = textRenderer.trimToWidth("..." + rawName, namePart).length() - 3;
-			trimmedName = new LiteralText(rawName.substring(0, length).trim() + "...");
+			setTrimmedName(new LiteralText(rawName.substring(0, length).trim() + "..."));
 		} else {
-			trimmedName = name;
+			setTrimmedName(name.copy());
 		}
 
 		int controlsPart = (int) getControlsPart(newWidth);
@@ -100,12 +98,20 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 	}
 
+	protected void setTrimmedName(BaseText trimmedName) {
+		this.trimmedName = trimmedName;
+		Message.Level level = getHighestMessageLevel();
+		if (level != null) {
+			trimmedName.setStyle(level.getTextStyle());
+		}
+	}
+
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (super.mouseClicked(mouseX, mouseY, button)) {
 			return true;
 		}
-		if (mouseX >= x && mouseX < x + getNamePart(parentList.getRowWidth())) {
+		if (mouseX < x + getNamePart(parentList.getEntryWidth()) && mouseY < y + input.getHeight()) {
 			Coat.playClickSound();
 			setExpanded(!isExpanded());
 			return true;
@@ -130,27 +136,52 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 		int namePart = (int) getNamePart(entryWidth);
 		int configEntryPart = (int) getConfigEntryPart(entryWidth);
-		int baseHeight = getBaseHeight();
 		int inputHeight = input.getHeight();
 
 		float textY = y + (inputHeight - 8F) / 2F + Coat.MARGIN;
 
-		if (hovered && mouseX < x + namePart) {
-			fill(matrices, x - Coat.DOUBLE_MARGIN, y + Coat.MARGIN, x + namePart, y + inputHeight, 0x33ffffff);
-		}
-
-		textRenderer.draw(matrices, trimmedName, x, textY, Coat.TEXT_COLOR);
+		TextColor color = trimmedName.getStyle().getColor();
+		textRenderer.draw(matrices, trimmedName, x, textY, color == null ? Coat.TEXT_COLOR : color.getRgb());
 		input.render(matrices, x + namePart + Coat.HALF_MARGIN, y + Coat.MARGIN, configEntryPart - Coat.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		defaultButton.y = y + Coat.MARGIN;
 		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + Coat.HALF_MARGIN;
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
 
-		if (isExpanded()) {
-			descriptionMultiline.draw(matrices, x + Coat.DOUBLE_MARGIN, y + baseHeight + Coat.MARGIN, 9, Coat.SECONDARY_TEXT_COLOR);
+		float curY = y + Coat.MARGIN + Math.max(20F, inputHeight) + Coat.MARGIN;
+		float msgX = x + Coat.DOUBLE_MARGIN;
+		int msgWidth = entryWidth - Coat.DOUBLE_MARGIN - Coat.DOUBLE_MARGIN;
+		for (Message message : messages) {
+			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
+				List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
+				for (OrderedText line : lines) {
+					textRenderer.draw(matrices, line, msgX, curY, 0xffffff);
+					curY += 9;
+				}
+				curY += Coat.MARGIN;
+			}
 		}
 
-		if (hovered && mouseX - x < namePart && trimmedName != name) {
-			Coat.renderTooltip(matrices, mouseX, mouseY, name);
+		if (isExpanded()) {
+			for (Message message : messages) {
+				if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
+					List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
+					for (OrderedText line : lines) {
+						textRenderer.draw(matrices, line, msgX, curY, 0xffffff);
+						curY += 9;
+					}
+					curY += Coat.MARGIN;
+				}
+			}
+
+			curY += Coat.MARGIN;
+			descriptionMultiline.draw(matrices, x + Coat.DOUBLE_MARGIN, (int) curY, 9, Coat.SECONDARY_TEXT_COLOR);
+		}
+
+		if (hovered && mouseX - x < namePart && mouseY < y + inputHeight) {
+			fill(matrices, x - Coat.DOUBLE_MARGIN, y + Coat.MARGIN, x + namePart, y + inputHeight, 0x33ffffff);
+			if (trimmedName != name) {
+				Coat.renderTooltip(matrices, mouseX, mouseY, name);
+			}
 		}
 	}
 
@@ -167,11 +198,32 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	}
 
 	public int getBaseHeight() {
-		return Coat.MARGIN + Math.max(20, input.getHeight());
+		int msgHeight = 0;
+		for (Message message : messages) {
+			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
+				msgHeight += textRenderer.wrapLines(message.getText(), parentList.getEntryWidth()).size() * 9 + Coat.MARGIN;
+			}
+		}
+		if (msgHeight > 0) {
+			msgHeight += Coat.MARGIN;
+		}
+		return Coat.MARGIN + Math.max(20, input.getHeight()) + msgHeight;
 	}
 
 	public int getExpandedHeight() {
-		return Coat.MARGIN + descriptionMultiline.count() * 9 + Coat.MARGIN;
+		int height = 0;
+		if (descriptionMultiline != MultilineText.EMPTY) {
+			height += Coat.MARGIN + descriptionMultiline.count() * 9;
+		}
+		for (Message message : messages) {
+			if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
+				height += textRenderer.wrapLines(message.getText(), parentList.getEntryWidth()).size() * 9 + Coat.MARGIN;
+			}
+		}
+		if (height > 0) {
+			height += Coat.MARGIN;
+		}
+		return height;
 	}
 
 	@Override
@@ -200,6 +252,34 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	@Override
 	public void inputChanged(V newValue) {
 		defaultButton.active = !Objects.equals(newValue, entryHandler.getDefault());
-		errors = entryHandler.validate(newValue);
+		setMessages(entryHandler.getMessages(newValue));
+	}
+
+	public Message.Level getHighestMessageLevel() {
+		Message.Level highestLevel = null;
+		int highestSeverity = Integer.MIN_VALUE, severity;
+		for (Message message : messages) {
+			severity = message.getLevel().getSeverity();
+			if (severity > highestSeverity) {
+				highestSeverity = severity;
+				highestLevel = message.getLevel();
+			}
+		}
+		return highestLevel;
+	}
+
+	@Override
+	public Collection<Message> getMessages() {
+		return messages;
+	}
+
+	protected void setMessages(Collection<Message> messages) {
+		this.messages = messages;
+		if (parentList != null) {
+			parentList.entryHeightChanged(this);
+		}
+		if (!messages.isEmpty()) {
+			trimmedName.setStyle(getHighestMessageLevel().getTextStyle());
+		}
 	}
 }

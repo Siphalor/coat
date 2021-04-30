@@ -1,5 +1,6 @@
 package de.siphalor.coat;
 
+import de.siphalor.coat.list.ConfgListEntry;
 import de.siphalor.coat.list.ConfigEntryListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -11,12 +12,12 @@ import java.util.Collection;
 public class ConfigScreen extends Screen {
 	private final Screen parent;
 	private final String modid;
-	private final Collection<ConfigEntryListWidget.Entry> entries;
+	private final Collection<ConfgListEntry> entries;
 	private Runnable onSave;
 
 	private ConfigEntryListWidget listWidget;
 
-	public ConfigScreen(Screen parent, String modid, Collection<ConfigEntryListWidget.Entry> entries) {
+	public ConfigScreen(Screen parent, String modid, Collection<ConfgListEntry> entries) {
 		super(new TranslatableText("coat.screen." + modid));
 		this.parent = parent;
 		this.modid = modid;
@@ -25,10 +26,11 @@ public class ConfigScreen extends Screen {
 
 	@Override
 	protected void init() {
-		listWidget = new ConfigEntryListWidget(client, width, height - 40, 20, height - 20, 260);
+		listWidget = new ConfigEntryListWidget(client, width, height - 20, 20, height, 260);
+		listWidget.setRenderBackground(true);
 		children.add(listWidget);
 
-		for (ConfigEntryListWidget.Entry entry : entries) {
+		for (ConfgListEntry entry : entries) {
 			listWidget.addEntry(entry);
 		}
 

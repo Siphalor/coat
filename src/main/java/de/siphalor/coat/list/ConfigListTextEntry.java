@@ -1,15 +1,18 @@
 package de.siphalor.coat.list;
 
 import de.siphalor.coat.Coat;
+import de.siphalor.coat.handler.Message;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-public class ConfigListTextEntry extends ConfigEntryListWidget.Entry {
+public class ConfigListTextEntry extends ConfgListEntry {
 	private final TextRenderer textRenderer;
 	private final Text text;
 	private List<OrderedText> multilineText;
@@ -43,5 +46,10 @@ public class ConfigListTextEntry extends ConfigEntryListWidget.Entry {
 	@Override
 	public void tick() {
 
+	}
+
+	@Override
+	public Collection<Message> getMessages() {
+		return Collections.emptyList();
 	}
 }

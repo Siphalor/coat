@@ -3,13 +3,14 @@ package de.siphalor.coat.list;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import de.siphalor.coat.Coat;
+import de.siphalor.coat.handler.Message;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
@@ -23,14 +24,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * This is mostly a copy of {@link net.minecraft.client.gui.widget.EntryListWidget} to enable variable item heights.
  */
 @Environment(EnvType.CLIENT)
-public class ConfigEntryListWidget extends AbstractParentElement implements Drawable, TickableElement {
+public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Drawable, TickableElement {
 	protected final MinecraftClient client;
-	private final List<Entry> children = new Entries();
+	private final List<ConfgListEntry> children = new Entries();
 	private final IntList entryBottoms = new IntArrayList();
 	private final int rowWidth;
 	protected int width;
@@ -41,10 +43,9 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	protected int left;
 	private double scrollAmount;
 	private boolean renderSelection = true;
-	private boolean renderHeader;
-	protected int headerHeight;
+	private boolean renderBackground;
 	private boolean scrolling;
-	private Entry selected;
+	private ConfgListEntry selected;
 
 	public ConfigEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, int rowWidth) {
 		this.client = client;
@@ -61,34 +62,29 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		this.renderSelection = renderSelection;
 	}
 
-	protected void setRenderHeader(boolean renderHeader, int headerHeight) {
-		this.renderHeader = renderHeader;
-		this.headerHeight = headerHeight;
-		if (!renderHeader) {
-			this.headerHeight = 0;
-		}
-
+	public void setRenderBackground(boolean renderBackground) {
+		this.renderBackground = renderBackground;
 	}
 
-	public int getRowWidth() {
+	public int getEntryWidth() {
 		return rowWidth;
 	}
 
 	@Nullable
-	public Entry getSelected() {
+	public ConfgListEntry getSelected() {
 		return this.selected;
 	}
 
-	public void setSelected(@Nullable Entry entry) {
+	public void setSelected(@Nullable ConfgListEntry entry) {
 		this.selected = entry;
 	}
 
 	@Nullable
-	public Entry getFocused() {
-		return (Entry) super.getFocused();
+	public ConfgListEntry getFocused() {
+		return (ConfgListEntry) super.getFocused();
 	}
 
-	public final List<Entry> children() {
+	public final List<ConfgListEntry> children() {
 		return this.children;
 	}
 
@@ -97,22 +93,22 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		entryBottoms.clear();
 	}
 
-	protected void replaceEntries(Collection<Entry> newEntries) {
+	protected void replaceEntries(Collection<ConfgListEntry> newEntries) {
 		clearEntries();
 		addEntries(newEntries);
 	}
 
-	protected Entry getEntry(int index) {
+	protected ConfgListEntry getEntry(int index) {
 		return this.children().get(index);
 	}
 
-	public int addEntry(Entry entry) {
+	public int addEntry(ConfgListEntry entry) {
 		children.add(entry);
 		entryBottoms.add(getMaxEntryPosition() + entry.getHeight());
 		return children.size() - 1;
 	}
 
-	public void addEntries(Collection<Entry> newEntries) {
+	public void addEntries(Collection<ConfgListEntry> newEntries) {
 		int oldSize = newEntries.size();
 		int bottom = entryBottoms.size() == 0 ? 0 : entryBottoms.getInt(0);
 		children.addAll(newEntries);
@@ -131,8 +127,8 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	}
 
 	@Nullable
-	protected final Entry getEntryAtPosition(double x, double y) {
-		int halfRowWidth = this.getRowWidth() / 2;
+	protected final ConfgListEntry getEntryAtPosition(double x, double y) {
+		int halfRowWidth = this.getEntryWidth() / 2;
 		int screenCenter = this.left + this.width / 2;
 		int rowLeft = screenCenter - halfRowWidth;
 		int rowRight = screenCenter + halfRowWidth;
@@ -152,7 +148,7 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		return null;
 	}
 
-	public void entryHeightChanged(Entry entry) {
+	public void entryHeightChanged(ConfgListEntry entry) {
 		int index = children.indexOf(entry);
 		int bottom = index == 0 ? 0 : entryBottoms.getInt(index - 1);
 		for (int i = index, l = children.size(); i < l; i++) {
@@ -168,6 +164,10 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		this.bottom = bottom;
 		this.left = 0;
 		this.right = width;
+
+		for (ConfgListEntry entry : children) {
+			entry.widthChanged(getEntryWidth());
+		}
 	}
 
 	public void setLeftPos(int left) {
@@ -183,23 +183,17 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	}
 
 	protected int getMaxPosition() {
-		return headerHeight + getMaxEntryPosition();
-	}
-
-	protected void clickedHeader(int x, int y) {
-	}
-
-	protected void renderHeader(MatrixStack matrices, int x, int y, Tessellator tessellator) {
+		return getMaxEntryPosition();
 	}
 
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
 		this.client.getTextureManager().bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-		bufferBuilder.vertex(this.left, this.bottom, 0.0D).texture((float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
-		bufferBuilder.vertex(this.right, this.bottom, 0.0D).texture((float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
-		bufferBuilder.vertex(this.right, this.top, 0.0D).texture((float)this.right / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
-		bufferBuilder.vertex(this.left, this.top, 0.0D).texture((float)this.left / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).next();
+		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
+		bufferBuilder.vertex(left,  bottom, 0D).color(32, 32, 32, 255).texture(left / 32F,  (bottom + (int)getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, bottom, 0D).color(32, 32, 32, 255).texture(right / 32F, (bottom + (int)getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, top,    0D).color(32, 32, 32, 255).texture(right / 32F, (top    + (int)getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  top,    0D).color(32, 32, 32, 255).texture(left / 32F,  (top    + (int)getScrollAmount()) / 32F).next();
 		tessellator.draw();
 	}
 
@@ -207,16 +201,13 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		this.client.getTextureManager().bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(519);
-		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-		bufferBuilder.vertex(this.left, this.top, -100.0D).texture(0.0F, (float)this.top / 32.0F).color(64, 64, 64, 255).next();
-		bufferBuilder.vertex(this.left + this.width, this.top, -100.0D).texture((float)this.width / 32.0F, (float)this.top / 32.0F).color(64, 64, 64, 255).next();
-		bufferBuilder.vertex(this.left + this.width, 0.0D, -100.0D).texture((float)this.width / 32.0F, 0.0F).color(64, 64, 64, 255).next();
-		bufferBuilder.vertex(this.left, 0.0D, -100.0D).texture(0.0F, 0.0F).color(64, 64, 64, 255).next();
-		bufferBuilder.vertex(this.left, this.height, -100.0D).texture(0.0F, (float)this.height / 32.0F).color(64, 64, 64, 255).next();
-		bufferBuilder.vertex(this.left + this.width, this.height, -100.0D).texture((float)this.width / 32.0F, (float)this.height / 32.0F).color(64, 64, 64, 255).next();
-		bufferBuilder.vertex(this.left + this.width, this.bottom, -100.0D).texture((float)this.width / 32.0F, (float)this.bottom / 32.0F).color(64, 64, 64, 255).next();
-		bufferBuilder.vertex(this.left, this.bottom, -100.0D).texture(0.0F, (float)this.bottom / 32.0F).color(64, 64, 64, 255).next();
+		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
+		bufferBuilder.vertex(left,         height,        -100D).color(64, 64, 64, 255).texture(0F,          height / 32F).next();
+		bufferBuilder.vertex(left + width, height,        -100D).color(64, 64, 64, 255).texture(width / 32F, height / 32F).next();
+		bufferBuilder.vertex(left + width, bottom,        -100D).color(64, 64, 64, 255).texture(width / 32F, bottom / 32F).next();
+		bufferBuilder.vertex(left,         bottom,        -100D).color(64, 64, 64, 255).texture(0F,          bottom / 32F).next();
 		tessellator.draw();
+
 		RenderSystem.depthFunc(515);
 		RenderSystem.disableDepthTest();
 		RenderSystem.enableBlend();
@@ -224,60 +215,62 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		RenderSystem.disableAlphaTest();
 		RenderSystem.shadeModel(7425);
 		RenderSystem.disableTexture();
-		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-		bufferBuilder.vertex(this.left, this.top + 4, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(this.right, this.top + 4, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(this.right, this.top, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(this.left, this.top, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(this.left, this.bottom, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(this.right, this.bottom, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(this.right, this.bottom - 4, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(this.left, this.bottom - 4, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 0).next();
+		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+		bufferBuilder.vertex(left,  top + 4,    0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(right, top + 4,    0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(right, top,        0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(left,  top,        0D).color(0, 0, 0, 255).next();
+
+		bufferBuilder.vertex(left,  bottom,     0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(right, bottom,     0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(right, bottom - 4, 0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(left,  bottom - 4, 0D).color(0, 0, 0, 0).next();
 		tessellator.draw();
 
 	}
 
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		int i = this.getScrollbarPositionX();
-		int j = i + 6;
+		int scrollbarXBegin = this.getScrollbarPositionX();
+		int scrollbarXEnd = scrollbarXBegin + 6;
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-		renderBackground(tessellator, bufferBuilder);
-
-		int k = this.getRowLeft();
-		int l = this.top + 4 - (int)this.getScrollAmount();
-		if (this.renderHeader) {
-			this.renderHeader(matrices, k, l, tessellator);
+		if (renderBackground) {
+			renderBackground(tessellator, bufferBuilder);
 		}
+
+		int k = this.getEntryLeft();
+		int l = this.top + 4 - (int)this.getScrollAmount();
 
 		this.renderList(matrices, k, l, mouseX, mouseY, delta);
 
 		renderShadows(tessellator, bufferBuilder);
 
-		int o = this.getMaxScroll();
-		if (o > 0) {
+		int maxScroll = this.getMaxScroll();
+		if (maxScroll > 0) {
 			RenderSystem.disableTexture();
 			int p = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
 			p = MathHelper.clamp(p, 32, this.bottom - this.top - 8);
-			int q = (int)this.getScrollAmount() * (this.bottom - this.top - p) / o + this.top;
+			int q = (int)this.getScrollAmount() * (this.bottom - this.top - p) / maxScroll + this.top;
 			if (q < this.top) {
 				q = this.top;
 			}
 
-			bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-			bufferBuilder.vertex(i, this.bottom, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(j, this.bottom, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(j, this.top, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(i, this.top, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(i, q + p, 0.0D).texture(0.0F, 1.0F).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(j, q + p, 0.0D).texture(1.0F, 1.0F).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(j, q, 0.0D).texture(1.0F, 0.0F).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(i, q, 0.0D).texture(0.0F, 0.0F).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(i, q + p - 1, 0.0D).texture(0.0F, 1.0F).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(j - 1, q + p - 1, 0.0D).texture(1.0F, 1.0F).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(j - 1, q, 0.0D).texture(1.0F, 0.0F).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(i, q, 0.0D).texture(0.0F, 0.0F).color(192, 192, 192, 255).next();
+			bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
+			bufferBuilder.vertex(scrollbarXBegin,   bottom,    0D).color(0, 0, 0, 255).texture(0F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd,     bottom,    0D).color(0, 0, 0, 255).texture(1F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd,     top,       0D).color(0, 0, 0, 255).texture(1F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin,   top,       0D).color(0, 0, 0, 255).texture(0F, 0F).next();
+
+			bufferBuilder.vertex(scrollbarXBegin,   q + p,     0D).color(128, 128, 128, 255).texture(0F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd,     q + p,     0D).color(128, 128, 128, 255).texture(1F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd,     q,         0D).color(128, 128, 128, 255).texture(1F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin,   q,         0D).color(128, 128, 128, 255).texture(0F, 0F).next();
+
+			bufferBuilder.vertex(scrollbarXBegin,   q + p - 1, 0D).color(192, 192, 192, 255).texture(0F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd - 1, q + p - 1, 0D).color(192, 192, 192, 255).texture(1F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd - 1, q,         0D).color(192, 192, 192, 255).texture(1F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin,   q,         0D).color(192, 192, 192, 255).texture(0F, 0F).next();
 			tessellator.draw();
 		}
 
@@ -287,12 +280,12 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		RenderSystem.disableBlend();
 	}
 
-	protected void centerScrollOn(Entry entry) {
+	protected void centerScrollOn(ConfgListEntry entry) {
 		int index = children.indexOf(entry);
 		setScrollAmount(entryBottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
 	}
 
-	protected void ensureVisible(Entry entry) {
+	protected void ensureVisible(ConfgListEntry entry) {
 		int index = children.indexOf(entry);
 		int bottom = entryBottoms.getInt(index);
 		if (scrollAmount + height > bottom) {
@@ -319,7 +312,7 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	}
 
 	public int getMaxScroll() {
-		return Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4));
+		return Math.max(0, this.getMaxPosition() - (this.bottom - this.top) + 4 + Coat.DOUBLE_MARGIN);
 	}
 
 	protected void updateScrollingState(double mouseX, double mouseY, int button) {
@@ -327,7 +320,7 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	}
 
 	protected int getScrollbarPositionX() {
-		return this.width / 2 + 124;
+		return width / 2 + getEntryWidth() / 2 + Coat.MARGIN;
 	}
 
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -335,16 +328,13 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		if (!isMouseOver(mouseX, mouseY)) {
 			return false;
 		} else {
-			Entry entry = getEntryAtPosition(mouseX, mouseY);
+			ConfgListEntry entry = getEntryAtPosition(mouseX, mouseY);
 			if (entry != null) {
 				if (entry.mouseClicked(mouseX, mouseY, button)) {
 					setFocused(entry);
 					setDragging(true);
 					return true;
 				}
-			} else if (button == 0) {
-				clickedHeader((int)(mouseX - (double)(this.left + this.width / 2 - this.getRowWidth() / 2)), (int)(mouseY - (double)this.top) + (int)this.getScrollAmount() - 4);
-				return true;
 			}
 
 			return scrolling;
@@ -406,14 +396,14 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 	}
 
 	protected void ensureSelectedEntryVisible() {
-		Entry entry = this.getSelected();
+		ConfgListEntry entry = this.getSelected();
 		if (entry != null) {
 			this.setSelected(entry);
 			this.ensureVisible(entry);
 		}
 	}
 
-	protected void moveSelectionIf(MoveDirection direction, Predicate<Entry> predicate) {
+	protected void moveSelectionIf(MoveDirection direction, Predicate<ConfgListEntry> predicate) {
 		int offset = direction == MoveDirection.UP ? -1 : 1;
 		if (!this.children().isEmpty()) {
 			int index = this.children().indexOf(this.getSelected());
@@ -424,7 +414,7 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 					break;
 				}
 
-				Entry entry = this.children().get(newIndex);
+				ConfgListEntry entry = this.children().get(newIndex);
 				if (predicate.test(entry)) {
 					this.setSelected(entry);
 					this.ensureVisible(entry);
@@ -436,15 +426,32 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		}
 	}
 
+	@Override
+	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+		this.left = x;
+		this.top = y;
+		render(matrices, mouseX, mouseY, tickDelta);
+	}
+
 	public boolean isMouseOver(double mouseX, double mouseY) {
 		return mouseY >= (double)this.top && mouseY <= (double)this.bottom && mouseX >= (double)this.left && mouseX <= (double)this.right;
 	}
 
+	@Override
+	public int getHeight() {
+		return height;
+	}
+
+	@Override
+	public Collection<Message> getMessages() {
+		return children.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
+	}
+
 	protected void renderList(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta) {
 		IntListIterator bottomIter = entryBottoms.iterator();
-		Iterator<Entry> entryIter = children.iterator();
+		Iterator<ConfgListEntry> entryIter = children.iterator();
 		int relBottom = 0, relTop = 0;
-		Entry entry = null;
+		ConfgListEntry entry = null;
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
@@ -457,9 +464,9 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 			}
 		}
 
-		Entry hoveredEntry = getEntryAtPosition(mouseX, mouseY);
+		ConfgListEntry hoveredEntry = getEntryAtPosition(mouseX, mouseY);
 
-		int rowWidth = getRowWidth();
+		int rowWidth = getEntryWidth();
 		int rowLeft = this.left + this.width / 2 - rowWidth / 2;
 		int rowRight = this.left + this.width / 2 + rowWidth / 2;
 		while(true) {
@@ -474,17 +481,17 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 				float f = this.isFocused() ? 1.0F : 0.5F;
 				RenderSystem.color4f(f, f, f, 1.0F);
 				bufferBuilder.begin(7, VertexFormats.POSITION);
-				bufferBuilder.vertex(rowLeft, rowTop + selectionHeight + 2, 0.0D).next();
+				bufferBuilder.vertex(rowLeft,  rowTop + selectionHeight + 2, 0.0D).next();
 				bufferBuilder.vertex(rowRight, rowTop + selectionHeight + 2, 0.0D).next();
-				bufferBuilder.vertex(rowRight, rowTop - 2, 0.0D).next();
-				bufferBuilder.vertex(rowLeft, rowTop - 2, 0.0D).next();
+				bufferBuilder.vertex(rowRight, rowTop - 2,                   0.0D).next();
+				bufferBuilder.vertex(rowLeft,  rowTop - 2,                   0.0D).next();
 				tessellator.draw();
 				RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
 				bufferBuilder.begin(7, VertexFormats.POSITION);
-				bufferBuilder.vertex(rowLeft + 1, rowTop + selectionHeight + 1, 0.0D).next();
+				bufferBuilder.vertex(rowLeft + 1,  rowTop + selectionHeight + 1, 0.0D).next();
 				bufferBuilder.vertex(rowRight - 1, rowTop + selectionHeight + 1, 0.0D).next();
-				bufferBuilder.vertex(rowRight - 1, rowTop - 1, 0.0D).next();
-				bufferBuilder.vertex(rowLeft + 1, rowTop - 1, 0.0D).next();
+				bufferBuilder.vertex(rowRight - 1, rowTop - 1,                   0.0D).next();
+				bufferBuilder.vertex(rowLeft + 1,  rowTop - 1,                   0.0D).next();
 				tessellator.draw();
 				RenderSystem.enableTexture();
 			}
@@ -501,26 +508,26 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		}
 	}
 
-	public int getRowLeft() {
-		return this.left + this.width / 2 - this.getRowWidth() / 2 + 2;
+	public int getEntryLeft() {
+		return this.left + this.width / 2 - this.getEntryWidth() / 2 + 2;
 	}
 
-	public int getRowRight() {
-		return this.getRowLeft() + this.getRowWidth();
+	public int getEntryRight() {
+		return this.getEntryLeft() + this.getEntryWidth();
 	}
 
 	protected int getEntryAreaTop() {
-		return top + 4 - (int) scrollAmount + headerHeight;
+		return top + 4 - (int) scrollAmount;
 	}
 
-	protected int getRowTop(int index) {
+	protected int getEntryTop(int index) {
 		if (index == 0) {
 			return getEntryAreaTop();
 		}
 		return getEntryAreaTop() + entryBottoms.getInt(index - 1);
 	}
 
-	private int getRowBottom(int index) {
+	private int getEntryBottom(int index) {
 		return getEntryAreaTop() + entryBottoms.getInt(index);
 	}
 
@@ -530,23 +537,23 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 
 	@Override
 	public void setFocused(@Nullable Element focused) {
-		Entry old = getFocused();
+		ConfgListEntry old = getFocused();
 		if (old != null && old != focused) {
-			old.unfocus();
+			old.focusLost();
 		}
 		super.setFocused(focused);
 	}
 
-	protected Entry removeEntry(int index) {
-		Entry entry = this.children.get(index);
+	protected ConfgListEntry removeEntry(int index) {
+		ConfgListEntry entry = this.children.get(index);
 		return this.removeEntry(index, entry) ? entry : null;
 	}
 
-	protected boolean removeEntry(Entry entry) {
+	protected boolean removeEntry(ConfgListEntry entry) {
 		return removeEntry(children.indexOf(entry), entry);
 	}
 
-	protected boolean removeEntry(int index, Entry entry) {
+	protected boolean removeEntry(int index, ConfgListEntry entry) {
 		boolean success = this.children.remove(entry);
 		if (success) {
 			entryBottoms.removeInt(index);
@@ -558,26 +565,26 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 		return success;
 	}
 
-	private void setEntryParentList(Entry entry) {
+	private void setEntryParentList(ConfgListEntry entry) {
 		entry.setParentList(this);
 	}
 
 	@Override
 	public void tick() {
-		for (Entry child : children()) {
+		for (ConfgListEntry child : children()) {
 			child.tick();
 		}
 	}
 
 	@Environment(EnvType.CLIENT)
-	class Entries extends AbstractList<Entry> {
-		private final List<Entry> entries;
+	class Entries extends AbstractList<ConfgListEntry> {
+		private final List<ConfgListEntry> entries;
 
 		private Entries() {
 			this.entries = Lists.newArrayList();
 		}
 
-		public Entry get(int i) {
+		public ConfgListEntry get(int i) {
 			return this.entries.get(i);
 		}
 
@@ -585,56 +592,19 @@ public class ConfigEntryListWidget extends AbstractParentElement implements Draw
 			return this.entries.size();
 		}
 
-		public Entry set(int i, Entry entry) {
-			Entry entry2 = this.entries.set(i, entry);
+		public ConfgListEntry set(int i, ConfgListEntry entry) {
+			ConfgListEntry entry2 = this.entries.set(i, entry);
 			ConfigEntryListWidget.this.setEntryParentList(entry);
 			return entry2;
 		}
 
-		public void add(int i, Entry entry) {
+		public void add(int i, ConfgListEntry entry) {
 			this.entries.add(i, entry);
 			ConfigEntryListWidget.this.setEntryParentList(entry);
 		}
 
-		public Entry remove(int i) {
+		public ConfgListEntry remove(int i) {
 			return this.entries.remove(i);
-		}
-	}
-
-	@Environment(EnvType.CLIENT)
-	public abstract static class Entry extends DrawableHelper implements Element, TickableElement {
-		protected ConfigEntryListWidget parentList;
-
-		protected void setParentList(ConfigEntryListWidget parentList) {
-			this.parentList = parentList;
-			widthChanged(parentList.rowWidth);
-		}
-
-		/**
-		 * Renders an entry in a list.
-		 *  @param matrices the matrix stack used for rendering
-		 * @param x the X coordinate of the entry
-		 * @param y the Y coordinate of the entry
-		 * @param entryWidth The width of the entry
-		 * @param entryHeight The height of the entry
-		 * @param mouseX the X coordinate of the mouse
-		 * @param mouseY the Y coordinate of the mouse
-		 * @param hovered whether the mouse is hovering over the entry
-		 */
-		public abstract void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
-
-		public boolean isMouseOver(double mouseX, double mouseY) {
-			return Objects.equals(this.parentList.getEntryAtPosition(mouseX, mouseY), this);
-		}
-
-		public abstract int getHeight();
-
-		public void widthChanged(int newWidth) {
-
-		}
-
-		public void unfocus() {
-
 		}
 	}
 

@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ConfigListCompoundEntry extends ConfigEntryListWidget.Entry implements ParentElement {
+public abstract class ConfigListCompoundEntry extends ConfgListEntry implements ParentElement {
 	private Element focused;
 
 	@Override
@@ -29,8 +29,8 @@ public abstract class ConfigListCompoundEntry extends ConfigEntryListWidget.Entr
 	}
 
 	@Override
-	public void unfocus() {
+	public void focusLost() {
 		setFocused(null);
-		super.unfocus();
+		super.focusLost();
 	}
 }

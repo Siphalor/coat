@@ -1,4 +1,8 @@
 {
 	"coat.default": "Default",
-	"coat.default.hover": "Reset to:"
+	"coat.default.hover": "Reset to:",
+
+	"coat.message.level.info": "Info",
+	"coat.message.level.warning": "Warning",
+	"coat.message.level.error": "Error"
 }

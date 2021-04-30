@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public interface ConfigEntryHandler<V> {
 	V getDefault();
-	@NotNull Collection<String> validate(V value);
+	@NotNull Collection<Message> getMessages(V value);
 	void save(V value);
 	Text asText(V value);
 }
