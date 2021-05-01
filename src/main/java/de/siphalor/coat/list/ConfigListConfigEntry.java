@@ -37,7 +37,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	public ConfigListConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
 		this.name = name;
-		this.trimmedName = name;
+		setTrimmedName(name.copy());
 		this.description = description;
 		this.entryHandler = entryHandler;
 		this.input = input;
@@ -101,7 +101,9 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	protected void setTrimmedName(BaseText trimmedName) {
 		this.trimmedName = trimmedName;
 		Message.Level level = getHighestMessageLevel();
-		if (level != null) {
+		if (level == null) {
+			trimmedName.setStyle(Style.EMPTY);
+		} else {
 			trimmedName.setStyle(level.getTextStyle());
 		}
 	}
@@ -140,8 +142,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 		float textY = y + (inputHeight - 8F) / 2F + Coat.MARGIN;
 
-		TextColor color = trimmedName.getStyle().getColor();
-		textRenderer.draw(matrices, trimmedName, x, textY, color == null ? Coat.TEXT_COLOR : color.getRgb());
+		textRenderer.draw(matrices, trimmedName, x, textY, 0xffffff);
 		input.render(matrices, x + namePart + Coat.HALF_MARGIN, y + Coat.MARGIN, configEntryPart - Coat.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		defaultButton.y = y + Coat.MARGIN;
 		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + Coat.HALF_MARGIN;
@@ -256,6 +257,10 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	}
 
 	public Message.Level getHighestMessageLevel() {
+		if (messages == null) {
+			return null;
+		}
+
 		Message.Level highestLevel = null;
 		int highestSeverity = Integer.MIN_VALUE, severity;
 		for (Message message : messages) {
@@ -278,7 +283,9 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		if (parentList != null) {
 			parentList.entryHeightChanged(this);
 		}
-		if (!messages.isEmpty()) {
+		if (messages.isEmpty()) {
+			trimmedName.setStyle(Style.EMPTY);
+		} else {
 			trimmedName.setStyle(getHighestMessageLevel().getTextStyle());
 		}
 	}
