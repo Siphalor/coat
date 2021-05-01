@@ -6,7 +6,7 @@ import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
-import de.siphalor.coat.list.ConfgListEntry;
+import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigListConfigEntry;
 import de.siphalor.coat.list.ConfigListTextEntry;
 import net.fabricmc.api.ClientModInitializer;
@@ -29,7 +29,7 @@ public class CoatTestmod implements ClientModInitializer {
 	}
 
 	public static ConfigScreen createScreen() {
-		LinkedList<ConfgListEntry> list = new LinkedList<>();
+		LinkedList<ConfigListEntry> list = new LinkedList<>();
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text!")));
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text! this is even fucking hell longer.")));
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text!")));

@@ -1,7 +1,7 @@
 package de.siphalor.coat;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import de.siphalor.coat.list.ConfgListEntry;
+import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigEntryListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -17,12 +17,12 @@ import java.util.Collection;
 public class ConfigScreen extends Screen {
 	private final Screen parent;
 	private final String modid;
-	private final Collection<ConfgListEntry> entries;
+	private final Collection<ConfigListEntry> entries;
 	private Runnable onSave;
 
 	private ConfigEntryListWidget listWidget;
 
-	public ConfigScreen(Screen parent, String modid, Collection<ConfgListEntry> entries) {
+	public ConfigScreen(Screen parent, String modid, Collection<ConfigListEntry> entries) {
 		super(new TranslatableText("coat.screen." + modid));
 		this.parent = parent;
 		this.modid = modid;
@@ -36,7 +36,7 @@ public class ConfigScreen extends Screen {
 		listWidget.setBackground(new Identifier("textures/block/bricks.png"));
 		children.add(listWidget);
 
-		for (ConfgListEntry entry : entries) {
+		for (ConfigListEntry entry : entries) {
 			listWidget.addEntry(entry);
 		}
 

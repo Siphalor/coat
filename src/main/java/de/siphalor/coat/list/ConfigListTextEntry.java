@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ConfigListTextEntry extends ConfgListEntry {
+public class ConfigListTextEntry extends ConfigListEntry {
 	private final TextRenderer textRenderer;
 	private final Text text;
 	private List<OrderedText> multilineText;

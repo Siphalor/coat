@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
-public abstract class ConfgListEntry extends DrawableHelper implements Element, TickableElement {
+public abstract class ConfigListEntry extends DrawableHelper implements Element, TickableElement {
 	protected ConfigEntryListWidget parentList;
 
 	protected void setParentList(ConfigEntryListWidget parentList) {

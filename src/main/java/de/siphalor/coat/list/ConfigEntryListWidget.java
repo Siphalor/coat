@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Drawable, TickableElement {
 	protected final MinecraftClient client;
-	private final List<ConfgListEntry> children = new Entries();
+	private final List<ConfigListEntry> children = new Entries();
 	private final IntList entryBottoms = new IntArrayList();
 	private final int rowWidth;
 	protected int width;
@@ -47,7 +47,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	private boolean renderBackground;
 	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
 	private boolean scrolling;
-	private ConfgListEntry selected;
+	private ConfigListEntry selected;
 
 	public ConfigEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, int rowWidth) {
 		this.client = client;
@@ -81,20 +81,20 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	@Nullable
-	public ConfgListEntry getSelected() {
+	public ConfigListEntry getSelected() {
 		return this.selected;
 	}
 
-	public void setSelected(@Nullable ConfgListEntry entry) {
+	public void setSelected(@Nullable ConfigListEntry entry) {
 		this.selected = entry;
 	}
 
 	@Nullable
-	public ConfgListEntry getFocused() {
-		return (ConfgListEntry) super.getFocused();
+	public ConfigListEntry getFocused() {
+		return (ConfigListEntry) super.getFocused();
 	}
 
-	public final List<ConfgListEntry> children() {
+	public final List<ConfigListEntry> children() {
 		return this.children;
 	}
 
@@ -103,22 +103,22 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		entryBottoms.clear();
 	}
 
-	protected void replaceEntries(Collection<ConfgListEntry> newEntries) {
+	protected void replaceEntries(Collection<ConfigListEntry> newEntries) {
 		clearEntries();
 		addEntries(newEntries);
 	}
 
-	protected ConfgListEntry getEntry(int index) {
+	protected ConfigListEntry getEntry(int index) {
 		return this.children().get(index);
 	}
 
-	public int addEntry(ConfgListEntry entry) {
+	public int addEntry(ConfigListEntry entry) {
 		children.add(entry);
 		entryBottoms.add(getMaxEntryPosition() + entry.getHeight());
 		return children.size() - 1;
 	}
 
-	public void addEntries(Collection<ConfgListEntry> newEntries) {
+	public void addEntries(Collection<ConfigListEntry> newEntries) {
 		int oldSize = newEntries.size();
 		int bottom = entryBottoms.size() == 0 ? 0 : entryBottoms.getInt(0);
 		children.addAll(newEntries);
@@ -137,7 +137,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	@Nullable
-	protected final ConfgListEntry getEntryAtPosition(double x, double y) {
+	protected final ConfigListEntry getEntryAtPosition(double x, double y) {
 		int halfRowWidth = this.getEntryWidth() / 2;
 		int screenCenter = this.left + this.width / 2;
 		int rowLeft = screenCenter - halfRowWidth;
@@ -158,7 +158,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return null;
 	}
 
-	public void entryHeightChanged(ConfgListEntry entry) {
+	public void entryHeightChanged(ConfigListEntry entry) {
 		int index = children.indexOf(entry);
 		int bottom = index == 0 ? 0 : entryBottoms.getInt(index - 1);
 		for (int i = index, l = children.size(); i < l; i++) {
@@ -175,7 +175,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		this.left = 0;
 		this.right = width;
 
-		for (ConfgListEntry entry : children) {
+		for (ConfigListEntry entry : children) {
 			entry.widthChanged(getEntryWidth());
 		}
 	}
@@ -280,12 +280,12 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		RenderSystem.disableBlend();
 	}
 
-	protected void centerScrollOn(ConfgListEntry entry) {
+	protected void centerScrollOn(ConfigListEntry entry) {
 		int index = children.indexOf(entry);
 		setScrollAmount(entryBottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
 	}
 
-	protected void ensureVisible(ConfgListEntry entry) {
+	protected void ensureVisible(ConfigListEntry entry) {
 		int index = children.indexOf(entry);
 		int bottom = entryBottoms.getInt(index);
 		if (scrollAmount + height > bottom) {
@@ -328,7 +328,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		if (!isMouseOver(mouseX, mouseY)) {
 			return false;
 		} else {
-			ConfgListEntry entry = getEntryAtPosition(mouseX, mouseY);
+			ConfigListEntry entry = getEntryAtPosition(mouseX, mouseY);
 			if (entry != null) {
 				if (entry.mouseClicked(mouseX, mouseY, button)) {
 					setFocused(entry);
@@ -396,14 +396,14 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected void ensureSelectedEntryVisible() {
-		ConfgListEntry entry = this.getSelected();
+		ConfigListEntry entry = this.getSelected();
 		if (entry != null) {
 			this.setSelected(entry);
 			this.ensureVisible(entry);
 		}
 	}
 
-	protected void moveSelectionIf(MoveDirection direction, Predicate<ConfgListEntry> predicate) {
+	protected void moveSelectionIf(MoveDirection direction, Predicate<ConfigListEntry> predicate) {
 		int offset = direction == MoveDirection.UP ? -1 : 1;
 		if (!this.children().isEmpty()) {
 			int index = this.children().indexOf(this.getSelected());
@@ -414,7 +414,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 					break;
 				}
 
-				ConfgListEntry entry = this.children().get(newIndex);
+				ConfigListEntry entry = this.children().get(newIndex);
 				if (predicate.test(entry)) {
 					this.setSelected(entry);
 					this.ensureVisible(entry);
@@ -449,9 +449,9 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 	protected void renderList(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta) {
 		IntListIterator bottomIter = entryBottoms.iterator();
-		Iterator<ConfgListEntry> entryIter = children.iterator();
+		Iterator<ConfigListEntry> entryIter = children.iterator();
 		int relBottom = 0, relTop = 0;
-		ConfgListEntry entry = null;
+		ConfigListEntry entry = null;
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
@@ -464,7 +464,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 			}
 		}
 
-		ConfgListEntry hoveredEntry = getEntryAtPosition(mouseX, mouseY);
+		ConfigListEntry hoveredEntry = getEntryAtPosition(mouseX, mouseY);
 
 		int rowWidth = getEntryWidth();
 		int rowLeft = this.left + this.width / 2 - rowWidth / 2;
@@ -537,23 +537,23 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 	@Override
 	public void setFocused(@Nullable Element focused) {
-		ConfgListEntry old = getFocused();
+		ConfigListEntry old = getFocused();
 		if (old != null && old != focused) {
 			old.focusLost();
 		}
 		super.setFocused(focused);
 	}
 
-	protected ConfgListEntry removeEntry(int index) {
-		ConfgListEntry entry = this.children.get(index);
+	protected ConfigListEntry removeEntry(int index) {
+		ConfigListEntry entry = this.children.get(index);
 		return this.removeEntry(index, entry) ? entry : null;
 	}
 
-	protected boolean removeEntry(ConfgListEntry entry) {
+	protected boolean removeEntry(ConfigListEntry entry) {
 		return removeEntry(children.indexOf(entry), entry);
 	}
 
-	protected boolean removeEntry(int index, ConfgListEntry entry) {
+	protected boolean removeEntry(int index, ConfigListEntry entry) {
 		boolean success = this.children.remove(entry);
 		if (success) {
 			entryBottoms.removeInt(index);
@@ -565,26 +565,26 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return success;
 	}
 
-	private void setEntryParentList(ConfgListEntry entry) {
+	private void setEntryParentList(ConfigListEntry entry) {
 		entry.setParentList(this);
 	}
 
 	@Override
 	public void tick() {
-		for (ConfgListEntry child : children()) {
+		for (ConfigListEntry child : children()) {
 			child.tick();
 		}
 	}
 
 	@Environment(EnvType.CLIENT)
-	class Entries extends AbstractList<ConfgListEntry> {
-		private final List<ConfgListEntry> entries;
+	class Entries extends AbstractList<ConfigListEntry> {
+		private final List<ConfigListEntry> entries;
 
 		private Entries() {
 			this.entries = Lists.newArrayList();
 		}
 
-		public ConfgListEntry get(int i) {
+		public ConfigListEntry get(int i) {
 			return this.entries.get(i);
 		}
 
@@ -592,18 +592,18 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 			return this.entries.size();
 		}
 
-		public ConfgListEntry set(int i, ConfgListEntry entry) {
-			ConfgListEntry entry2 = this.entries.set(i, entry);
+		public ConfigListEntry set(int i, ConfigListEntry entry) {
+			ConfigListEntry entry2 = this.entries.set(i, entry);
 			ConfigEntryListWidget.this.setEntryParentList(entry);
 			return entry2;
 		}
 
-		public void add(int i, ConfgListEntry entry) {
+		public void add(int i, ConfigListEntry entry) {
 			this.entries.add(i, entry);
 			ConfigEntryListWidget.this.setEntryParentList(entry);
 		}
 
-		public ConfgListEntry remove(int i) {
+		public ConfigListEntry remove(int i) {
 			return this.entries.remove(i);
 		}
 	}
