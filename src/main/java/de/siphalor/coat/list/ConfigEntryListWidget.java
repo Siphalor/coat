@@ -19,6 +19,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +45,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	private double scrollAmount;
 	private boolean renderSelection = true;
 	private boolean renderBackground;
+	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
 	private boolean scrolling;
 	private ConfgListEntry selected;
 
@@ -60,6 +62,14 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 	public void setRenderSelection(boolean renderSelection) {
 		this.renderSelection = renderSelection;
+	}
+
+	public Identifier getBackground() {
+		return background;
+	}
+
+	public void setBackground(Identifier background) {
+		this.background = background;
 	}
 
 	public void setRenderBackground(boolean renderBackground) {
@@ -187,27 +197,17 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
-		this.client.getTextureManager().bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		this.client.getTextureManager().bindTexture(background);
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(left,  bottom, 0D).color(32, 32, 32, 255).texture(left / 32F,  (bottom + (int)getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, bottom, 0D).color(32, 32, 32, 255).texture(right / 32F, (bottom + (int)getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, top,    0D).color(32, 32, 32, 255).texture(right / 32F, (top    + (int)getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(left,  top,    0D).color(32, 32, 32, 255).texture(left / 32F,  (top    + (int)getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (bottom + (int)getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int)getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, top,    0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top    + (int)getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  top,    0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (top    + (int)getScrollAmount()) / 32F).next();
 		tessellator.draw();
 	}
 
 	protected void renderShadows(Tessellator tessellator, BufferBuilder bufferBuilder) {
-		this.client.getTextureManager().bindTexture(DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(519);
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(left,         height,        -100D).color(64, 64, 64, 255).texture(0F,          height / 32F).next();
-		bufferBuilder.vertex(left + width, height,        -100D).color(64, 64, 64, 255).texture(width / 32F, height / 32F).next();
-		bufferBuilder.vertex(left + width, bottom,        -100D).color(64, 64, 64, 255).texture(width / 32F, bottom / 32F).next();
-		bufferBuilder.vertex(left,         bottom,        -100D).color(64, 64, 64, 255).texture(0F,          bottom / 32F).next();
-		tessellator.draw();
-
 		RenderSystem.depthFunc(515);
 		RenderSystem.disableDepthTest();
 		RenderSystem.enableBlend();
