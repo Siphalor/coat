@@ -180,7 +180,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 		if (hovered && mouseX - x < namePart && mouseY < y + inputHeight) {
 			fill(matrices, x - Coat.DOUBLE_MARGIN, y + Coat.MARGIN, x + namePart, y + inputHeight, 0x33ffffff);
-			if (trimmedName != name) {
+			if (!trimmedName.equals(name)) {
 				Coat.renderTooltip(matrices, mouseX, mouseY, name);
 			}
 		}
@@ -283,10 +283,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		if (parentList != null) {
 			parentList.entryHeightChanged(this);
 		}
-		if (messages.isEmpty()) {
-			trimmedName.setStyle(Style.EMPTY);
-		} else {
-			trimmedName.setStyle(getHighestMessageLevel().getTextStyle());
-		}
+		// shallow copy is required because the OrderedText in BaseText is cached, so the style needs to be force updated
+		setTrimmedName((BaseText) trimmedName.shallowCopy());
 	}
 }
