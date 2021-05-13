@@ -1,4 +1,4 @@
-package de.siphalor.coat.list;
+package de.siphalor.coat.list.entry;
 
 import com.google.common.collect.ImmutableList;
 import de.siphalor.coat.Coat;
@@ -6,6 +6,7 @@ import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.input.InputChangeListener;
+import de.siphalor.coat.list.ConfigListCompoundEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
@@ -211,7 +212,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		return Coat.MARGIN + Math.max(20, input.getHeight()) + msgHeight;
 	}
 
-	public int getExpandedHeight() {
+	public int getExpansionHeight() {
 		int height = 0;
 		if (descriptionMultiline != MultilineText.EMPTY) {
 			height += Coat.MARGIN + descriptionMultiline.count() * 9;
@@ -230,7 +231,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	@Override
 	public int getHeight() {
 		if (isExpanded()) {
-			return getBaseHeight() + getExpandedHeight();
+			return getBaseHeight() + getExpansionHeight();
 		} else {
 			return getBaseHeight();
 		}

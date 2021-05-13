@@ -1,0 +1,115 @@
+package de.siphalor.coat.list.category;
+
+import de.siphalor.coat.Coat;
+import de.siphalor.coat.handler.Message;
+import de.siphalor.coat.list.ConfigListCompoundEntry;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+public class ConfigTreeEntry extends ConfigListCompoundEntry {
+	private final TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+	private final Text name;
+	private final List<ConfigTreeEntry> subTrees = new ArrayList<>();
+	private int focusIndex = -1;
+	private int y;
+	private boolean expanded;
+
+	public ConfigTreeEntry(Text name) {
+		this.name = name;
+	}
+
+	public void addSubTree(ConfigTreeEntry entry) {
+		subTrees.add(entry);
+	}
+
+	@Override
+	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+		this.y = y;
+		textRenderer.drawTrimmed(name, x, y, entryWidth, 0xffffff);
+
+		if (expanded) {
+			int curY = y + 8 + Coat.MARGIN;
+			boolean hoverFound = false;
+			for (ConfigTreeEntry entry : children()) {
+				if (!hoverFound && mouseY > curY) {
+					hoverFound = true;
+					entry.render(matrices, x + Coat.DOUBLE_MARGIN, curY, entryWidth - Coat.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, true, tickDelta);
+				} else {
+					entry.render(matrices, x + Coat.DOUBLE_MARGIN, curY, entryWidth - Coat.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, false, tickDelta);
+				}
+				curY += entry.getHeight() + Coat.MARGIN;
+			}
+		}
+	}
+
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		if (mouseY < y + 8 && mouseY > y) {
+			setExpanded(!isExpanded());
+			return true;
+		}
+		return super.mouseClicked(mouseX, mouseY, button);
+	}
+
+	public void setExpanded(boolean expanded) {
+		this.expanded = expanded;
+		if (parentList != null) {
+			parentList.entryHeightChanged(this);
+		}
+	}
+
+	public boolean isExpanded() {
+		return expanded;
+	}
+
+	@Override
+	public int getHeight() {
+		if (expanded) {
+			return getBaseHeight() + getExpansionHeight();
+		} else {
+			return getBaseHeight();
+		}
+	}
+
+	public int getBaseHeight() {
+		return Coat.MARGIN + 8;
+	}
+
+	public int getExpansionHeight() {
+		int height = 0;
+		for (ConfigTreeEntry child : children()) {
+			height += child.getHeight();
+		}
+		if (height > 0) {
+			height += Coat.MARGIN;
+		}
+		return height;
+	}
+
+	@Override
+	public Collection<Message> getMessages() {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<ConfigTreeEntry> children() {
+		return subTrees;
+	}
+
+	@Override
+	public void tick() {
+
+	}
+
+	@Override
+	public void focusLost() {
+		super.focusLost();
+	}
+}

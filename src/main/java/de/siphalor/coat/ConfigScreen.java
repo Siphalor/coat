@@ -3,6 +3,7 @@ package de.siphalor.coat;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigEntryListWidget;
+import de.siphalor.coat.list.category.ConfigTreeEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
@@ -18,19 +19,28 @@ public class ConfigScreen extends Screen {
 	private final Screen parent;
 	private final String modid;
 	private final Collection<ConfigListEntry> entries;
+	private final Collection<ConfigTreeEntry> trees;
 	private Runnable onSave;
 
+	private int panelWidth;
+	private ConfigEntryListWidget treeWidget;
 	private ConfigEntryListWidget listWidget;
 
-	public ConfigScreen(Screen parent, String modid, Collection<ConfigListEntry> entries) {
+	public ConfigScreen(Screen parent, String modid, Collection<ConfigListEntry> entries, Collection<ConfigTreeEntry> trees) {
 		super(new TranslatableText("coat.screen." + modid));
 		this.parent = parent;
 		this.modid = modid;
 		this.entries = entries;
+		this.trees = trees;
 	}
 
 	@Override
 	protected void init() {
+		panelWidth = 200;
+		treeWidget = new ConfigEntryListWidget(client, panelWidth, height - 60, 20, height - 40, (int) (panelWidth * 0.8F));
+		treeWidget.setRenderBackground(true);
+		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
+		children.add(treeWidget);
 		listWidget = new ConfigEntryListWidget(client, width, height - 20, 20, height, 260);
 		listWidget.setRenderBackground(true);
 		listWidget.setBackground(new Identifier("textures/block/bricks.png"));
@@ -40,7 +50,15 @@ public class ConfigScreen extends Screen {
 			listWidget.addEntry(entry);
 		}
 
+		for (ConfigTreeEntry tree : trees) {
+			treeWidget.addEntry(tree);
+		}
+
 		super.init();
+	}
+
+	public ConfigEntryListWidget getTreeWidget() {
+		return treeWidget;
 	}
 
 	public ConfigEntryListWidget getListWidget() {
@@ -61,6 +79,17 @@ public class ConfigScreen extends Screen {
 	}
 
 	@Override
+	public void resize(MinecraftClient client, int width, int height) {
+		this.width = width;
+		this.height = height;
+
+		panelWidth = Math.max(64, (int) (width * 0.3));
+		treeWidget.widthChanged(panelWidth);
+		listWidget.setLeftPos(panelWidth);
+		listWidget.widthChanged(width - panelWidth);
+	}
+
+	@Override
 	public void tick() {
 		super.tick();
 		listWidget.tick();
@@ -68,6 +97,7 @@ public class ConfigScreen extends Screen {
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		treeWidget.render(matrices, mouseX, mouseY, delta);
 		listWidget.render(matrices, mouseX, mouseY, delta);
 
 		client.getTextureManager().bindTexture(listWidget.getBackground());

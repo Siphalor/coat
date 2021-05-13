@@ -77,7 +77,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	public int getEntryWidth() {
-		return rowWidth;
+		return Math.min(rowWidth, width);
 	}
 
 	@Nullable
@@ -115,6 +115,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	public int addEntry(ConfigListEntry entry) {
 		children.add(entry);
 		entryBottoms.add(getMaxEntryPosition() + entry.getHeight());
+		entry.setParentList(this);
 		return children.size() - 1;
 	}
 
@@ -167,13 +168,11 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		}
 	}
 
-	public void updateSize(int width, int height, int top, int bottom) {
-		this.width = width;
-		this.height = height;
-		this.top = top;
-		this.bottom = bottom;
-		this.left = 0;
-		this.right = width;
+	@Override
+	public void widthChanged(int newWidth) {
+		super.widthChanged(newWidth);
+		width = newWidth;
+		right = left + newWidth;
 
 		for (ConfigListEntry entry : children) {
 			entry.widthChanged(getEntryWidth());
@@ -320,7 +319,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected int getScrollbarPositionX() {
-		return width / 2 + getEntryWidth() / 2 + Coat.MARGIN;
+		return left + width / 2 + getEntryWidth() / 2 + Coat.MARGIN;
 	}
 
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -565,10 +564,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return success;
 	}
 
-	private void setEntryParentList(ConfigListEntry entry) {
-		entry.setParentList(this);
-	}
-
 	@Override
 	public void tick() {
 		for (ConfigListEntry child : children()) {
@@ -594,13 +589,13 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 		public ConfigListEntry set(int i, ConfigListEntry entry) {
 			ConfigListEntry entry2 = this.entries.set(i, entry);
-			ConfigEntryListWidget.this.setEntryParentList(entry);
+			entry.setParentList(ConfigEntryListWidget.this);
 			return entry2;
 		}
 
 		public void add(int i, ConfigListEntry entry) {
 			this.entries.add(i, entry);
-			ConfigEntryListWidget.this.setEntryParentList(entry);
+			entry.setParentList(ConfigEntryListWidget.this);
 		}
 
 		public ConfigListEntry remove(int i) {

@@ -7,8 +7,9 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
 import de.siphalor.coat.list.ConfigListEntry;
-import de.siphalor.coat.list.ConfigListConfigEntry;
-import de.siphalor.coat.list.ConfigListTextEntry;
+import de.siphalor.coat.list.category.ConfigTreeEntry;
+import de.siphalor.coat.list.entry.ConfigListConfigEntry;
+import de.siphalor.coat.list.entry.ConfigListTextEntry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
@@ -66,7 +67,12 @@ public class CoatTestmod implements ClientModInitializer {
 				new TextConfigInput(new LiteralText("Some placeholder"))
 		));
 
-		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, MOD_ID, list);
+		ConfigTreeEntry tree1 = new ConfigTreeEntry(new LiteralText("Hi"));
+
+		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("a")));
+		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("b")));
+
+		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, MOD_ID, list, ImmutableList.of(tree1));
 
 		return screen;
 	}

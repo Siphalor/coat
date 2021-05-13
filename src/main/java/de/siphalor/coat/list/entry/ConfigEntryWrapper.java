@@ -1,4 +1,4 @@
-package de.siphalor.coat.list;
+package de.siphalor.coat.list.entry;
 
 public interface ConfigEntryWrapper {
 	String getDescription();

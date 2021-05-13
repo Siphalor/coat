@@ -1,7 +1,8 @@
-package de.siphalor.coat.list;
+package de.siphalor.coat.list.entry;
 
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
+import de.siphalor.coat.list.ConfigListEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
