@@ -9,34 +9,26 @@ import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.Collection;
-import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
 public abstract class ConfigListEntry extends DrawableHelper implements Element, TickableElement {
-	protected ConfigEntryListWidget parentList;
+	protected ConfigListCompoundEntry parent;
 
-	protected void setParentList(ConfigEntryListWidget parentList) {
-		this.parentList = parentList;
-		widthChanged(parentList.getEntryWidth());
+	protected void setParent(ConfigListCompoundEntry parent) {
+		this.parent = parent;
 	}
 
 	/**
 	 * Renders an entry in a list.
-	 *
-	 * @param matrices    the matrix stack used for rendering
+	 *  @param matrices    the matrix stack used for rendering
 	 * @param x           the X coordinate of the entry
 	 * @param y           the Y coordinate of the entry
-	 * @param entryWidth  The width of the entry
 	 * @param entryHeight The height of the entry
 	 * @param mouseX      the X coordinate of the mouse
 	 * @param mouseY      the Y coordinate of the mouse
 	 * @param hovered     whether the mouse is hovering over the entry
 	 */
-	public abstract void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
-
-	public boolean isMouseOver(double mouseX, double mouseY) {
-		return Objects.equals(this.parentList.getEntryAtPosition(mouseX, mouseY), this);
-	}
+	public abstract void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 
 	public abstract int getHeight();
 

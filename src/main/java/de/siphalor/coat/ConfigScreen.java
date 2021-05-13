@@ -41,7 +41,8 @@ public class ConfigScreen extends Screen {
 		treeWidget.setRenderBackground(true);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		children.add(treeWidget);
-		listWidget = new ConfigEntryListWidget(client, width, height - 20, 20, height, 260);
+		listWidget = new ConfigEntryListWidget(client, width - panelWidth, height - 20, 20, height, 260);
+		listWidget.setLeftPos(panelWidth);
 		listWidget.setRenderBackground(true);
 		listWidget.setBackground(new Identifier("textures/block/bricks.png"));
 		children.add(listWidget);

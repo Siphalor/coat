@@ -33,4 +33,10 @@ public abstract class ConfigListCompoundEntry extends ConfigListEntry implements
 		setFocused(null);
 		super.focusLost();
 	}
+
+	public void entryHeightChanged(Element element) {
+		parent.entryHeightChanged(this);
+	}
+
+	public abstract int getEntryWidth();
 }

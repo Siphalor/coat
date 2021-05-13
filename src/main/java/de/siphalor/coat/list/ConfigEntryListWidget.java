@@ -115,7 +115,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	public int addEntry(ConfigListEntry entry) {
 		children.add(entry);
 		entryBottoms.add(getMaxEntryPosition() + entry.getHeight());
-		entry.setParentList(this);
+		entry.setParent(this);
 		return children.size() - 1;
 	}
 
@@ -159,8 +159,9 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return null;
 	}
 
-	public void entryHeightChanged(ConfigListEntry entry) {
-		int index = children.indexOf(entry);
+	public void entryHeightChanged(Element element) {
+		//noinspection SuspiciousMethodCalls
+		int index = children.indexOf(element);
 		int bottom = index == 0 ? 0 : entryBottoms.getInt(index - 1);
 		for (int i = index, l = children.size(); i < l; i++) {
 			bottom += children.get(i).getHeight();
@@ -426,7 +427,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.left = x;
 		this.top = y;
 		render(matrices, mouseX, mouseY, tickDelta);
@@ -495,7 +496,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 				RenderSystem.enableTexture();
 			}
 
-			entry.render(matrices, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
+			entry.render(matrices, rowLeft, rowTop, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
 
 			if (bottomIter.hasNext()) {
 				relTop = relBottom;
@@ -589,13 +590,13 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 		public ConfigListEntry set(int i, ConfigListEntry entry) {
 			ConfigListEntry entry2 = this.entries.set(i, entry);
-			entry.setParentList(ConfigEntryListWidget.this);
+			entry.setParent(ConfigEntryListWidget.this);
 			return entry2;
 		}
 
 		public void add(int i, ConfigListEntry entry) {
 			this.entries.add(i, entry);
-			entry.setParentList(ConfigEntryListWidget.this);
+			entry.setParent(ConfigEntryListWidget.this);
 		}
 
 		public ConfigListEntry remove(int i) {

@@ -16,7 +16,7 @@ import java.util.List;
 public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	private final TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 	private final Text name;
-	private final List<ConfigTreeEntry> subTrees = new ArrayList<>();
+	private final List<ConfigTreeEntry> entries = new ArrayList<>();
 	private int focusIndex = -1;
 	private int y;
 	private boolean expanded;
@@ -26,13 +26,14 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	}
 
 	public void addSubTree(ConfigTreeEntry entry) {
-		subTrees.add(entry);
+		entries.add(entry);
+		entry.setParent(this);
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.y = y;
-		textRenderer.drawTrimmed(name, x, y, entryWidth, 0xffffff);
+		textRenderer.drawTrimmed(name, x, y, parent.getEntryWidth() - Coat.MARGIN, 0xffffff);
 
 		if (expanded) {
 			int curY = y + 8 + Coat.MARGIN;
@@ -40,9 +41,9 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 			for (ConfigTreeEntry entry : children()) {
 				if (!hoverFound && mouseY > curY) {
 					hoverFound = true;
-					entry.render(matrices, x + Coat.DOUBLE_MARGIN, curY, entryWidth - Coat.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, true, tickDelta);
+					entry.render(matrices, x + Coat.DOUBLE_MARGIN, curY, entryHeight, mouseX, mouseY, true, tickDelta);
 				} else {
-					entry.render(matrices, x + Coat.DOUBLE_MARGIN, curY, entryWidth - Coat.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, false, tickDelta);
+					entry.render(matrices, x + Coat.DOUBLE_MARGIN, curY, entryHeight, mouseX, mouseY, false, tickDelta);
 				}
 				curY += entry.getHeight() + Coat.MARGIN;
 			}
@@ -60,8 +61,8 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	public void setExpanded(boolean expanded) {
 		this.expanded = expanded;
-		if (parentList != null) {
-			parentList.entryHeightChanged(this);
+		if (parent != null) {
+			parent.entryHeightChanged(this);
 		}
 	}
 
@@ -79,7 +80,11 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	}
 
 	public int getBaseHeight() {
-		return Coat.MARGIN + 8;
+		int height = 0;
+		for (ConfigTreeEntry entry : entries) {
+			height += entry.getHeight() + Coat.MARGIN;
+		}
+		return height + Coat.MARGIN + 8;
 	}
 
 	public int getExpansionHeight() {
@@ -100,7 +105,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	@Override
 	public List<ConfigTreeEntry> children() {
-		return subTrees;
+		return entries;
 	}
 
 	@Override
@@ -111,5 +116,10 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	@Override
 	public void focusLost() {
 		super.focusLost();
+	}
+
+	@Override
+	public int getEntryWidth() {
+		return parent.getEntryWidth() - Coat.MARGIN;
 	}
 }

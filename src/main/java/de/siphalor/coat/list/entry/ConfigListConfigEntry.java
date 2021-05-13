@@ -65,12 +65,12 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	public void setExpanded(boolean expanded) {
 		if (expanded) {
-			updateExpanded(parentList.getEntryWidth());
+			updateExpanded(parent.getEntryWidth());
 		}
 		boolean old = this.expanded;
 		this.expanded = expanded;
 		if (old != expanded) {
-			parentList.entryHeightChanged(this);
+			parent.entryHeightChanged(this);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		if (super.mouseClicked(mouseX, mouseY, button)) {
 			return true;
 		}
-		if (mouseX < x + getNamePart(parentList.getEntryWidth()) && mouseY < y + input.getHeight()) {
+		if (mouseX < x + getNamePart(parent.getEntryWidth()) && mouseY < y + input.getHeight()) {
 			Coat.playClickSound();
 			setExpanded(!isExpanded());
 			return true;
@@ -133,10 +133,11 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x;
 		this.y = y;
 
+		int entryWidth = parent.getEntryWidth();
 		int namePart = (int) getNamePart(entryWidth);
 		int configEntryPart = (int) getConfigEntryPart(entryWidth);
 		int inputHeight = input.getHeight();
@@ -203,7 +204,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		int msgHeight = 0;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
-				msgHeight += textRenderer.wrapLines(message.getText(), parentList.getEntryWidth()).size() * 9 + Coat.MARGIN;
+				msgHeight += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + Coat.MARGIN;
 			}
 		}
 		if (msgHeight > 0) {
@@ -219,7 +220,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
-				height += textRenderer.wrapLines(message.getText(), parentList.getEntryWidth()).size() * 9 + Coat.MARGIN;
+				height += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + Coat.MARGIN;
 			}
 		}
 		if (height > 0) {
@@ -252,6 +253,11 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	}
 
 	@Override
+	public int getEntryWidth() {
+		return (int) getConfigEntryPart(parent.getEntryWidth());
+	}
+
+	@Override
 	public void inputChanged(V newValue) {
 		defaultButton.active = !Objects.equals(newValue, entryHandler.getDefault());
 		setMessages(entryHandler.getMessages(newValue));
@@ -281,8 +287,8 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	protected void setMessages(Collection<Message> messages) {
 		this.messages = messages;
-		if (parentList != null) {
-			parentList.entryHeightChanged(this);
+		if (parent != null) {
+			parent.entryHeightChanged(this);
 		}
 		// shallow copy is required because the OrderedText in BaseText is cached, so the style needs to be force updated
 		setTrimmedName((BaseText) trimmedName.shallowCopy());
