@@ -56,6 +56,7 @@ public class ConfigScreen extends Screen {
 		}
 
 		super.init();
+		resize(client, width, height);
 	}
 
 	public ConfigEntryListWidget getTreeWidget() {

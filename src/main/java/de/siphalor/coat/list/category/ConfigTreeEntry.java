@@ -26,8 +26,8 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	}
 
 	public void addSubTree(ConfigTreeEntry entry) {
-		entries.add(entry);
 		entry.setParent(this);
+		entries.add(entry);
 	}
 
 	@Override

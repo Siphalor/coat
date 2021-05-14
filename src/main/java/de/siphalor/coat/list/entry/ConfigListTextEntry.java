@@ -30,6 +30,7 @@ public class ConfigListTextEntry extends ConfigListEntry {
 		super.widthChanged(newWidth);
 		multilineText = textRenderer.wrapLines(text, newWidth);
 		height = multilineText.size() * 9 + Coat.MARGIN + Coat.MARGIN;
+		parent.entryHeightChanged(this);
 	}
 
 	@Override

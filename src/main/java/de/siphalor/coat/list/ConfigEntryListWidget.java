@@ -33,8 +33,7 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Drawable, TickableElement {
 	protected final MinecraftClient client;
-	private final List<ConfigListEntry> children = new Entries();
-	private final IntList entryBottoms = new IntArrayList();
+	private final Entries children = new Entries();
 	private final int rowWidth;
 	protected int width;
 	protected int height;
@@ -98,13 +97,8 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return this.children;
 	}
 
-	protected final void clearEntries() {
-		children.clear();
-		entryBottoms.clear();
-	}
-
 	protected void replaceEntries(Collection<ConfigListEntry> newEntries) {
-		clearEntries();
+		children.clear();
 		addEntries(newEntries);
 	}
 
@@ -113,20 +107,13 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	public int addEntry(ConfigListEntry entry) {
-		children.add(entry);
-		entryBottoms.add(getMaxEntryPosition() + entry.getHeight());
 		entry.setParent(this);
+		children.add(entry);
 		return children.size() - 1;
 	}
 
 	public void addEntries(Collection<ConfigListEntry> newEntries) {
-		int oldSize = newEntries.size();
-		int bottom = entryBottoms.size() == 0 ? 0 : entryBottoms.getInt(0);
 		children.addAll(newEntries);
-		for (int i = oldSize, l = children.size(); i < l; i++) {
-			bottom += children.get(i).getHeight();
-			entryBottoms.add(bottom);
-		}
 	}
 
 	protected int getEntryCount() {
@@ -150,7 +137,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		if (y < 0 || y > getMaxEntryPosition()) {
 			return null;
 		}
-		IntListIterator iterator = entryBottoms.iterator();
+		IntListIterator iterator = children.bottoms.iterator();
 		while (iterator.hasNext()) {
 			if (y < iterator.nextInt()) {
 				return getEntry(iterator.nextIndex() - 1);
@@ -162,10 +149,10 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	public void entryHeightChanged(Element element) {
 		//noinspection SuspiciousMethodCalls
 		int index = children.indexOf(element);
-		int bottom = index == 0 ? 0 : entryBottoms.getInt(index - 1);
+		int bottom = index == 0 ? 0 : children.bottoms.getInt(index - 1);
 		for (int i = index, l = children.size(); i < l; i++) {
 			bottom += children.get(i).getHeight();
-			entryBottoms.set(i, bottom);
+			children.bottoms.set(i, bottom);
 		}
 	}
 
@@ -186,10 +173,10 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected int getMaxEntryPosition() {
-		if (entryBottoms.isEmpty()) {
+		if (children.isEmpty()) {
 			return 0;
 		}
-		return entryBottoms.getInt(entryBottoms.size() - 1);
+		return children.bottoms.getInt(children.bottoms.size() - 1);
 	}
 
 	protected int getMaxPosition() {
@@ -220,11 +207,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		bufferBuilder.vertex(right, top + 4,    0D).color(0, 0, 0, 0).next();
 		bufferBuilder.vertex(right, top,        0D).color(0, 0, 0, 255).next();
 		bufferBuilder.vertex(left,  top,        0D).color(0, 0, 0, 255).next();
-
-		bufferBuilder.vertex(left,  bottom,     0D).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(right, bottom,     0D).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(right, bottom - 4, 0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(left,  bottom - 4, 0D).color(0, 0, 0, 0).next();
 		tessellator.draw();
 
 	}
@@ -282,17 +264,17 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 	protected void centerScrollOn(ConfigListEntry entry) {
 		int index = children.indexOf(entry);
-		setScrollAmount(entryBottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
+		setScrollAmount(children.bottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
 	}
 
 	protected void ensureVisible(ConfigListEntry entry) {
 		int index = children.indexOf(entry);
-		int bottom = entryBottoms.getInt(index);
+		int bottom = children.bottoms.getInt(index);
 		if (scrollAmount + height > bottom) {
 			setScrollAmount(bottom - height);
 		}
 
-		int top = index == 0 ? 0 : entryBottoms.getInt(index - 1);
+		int top = index == 0 ? 0 : children.bottoms.getInt(index - 1);
 
 		if (scrollAmount > top) {
 			setScrollAmount(top);
@@ -448,7 +430,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected void renderList(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta) {
-		IntListIterator bottomIter = entryBottoms.iterator();
+		IntListIterator bottomIter = children.bottoms.iterator();
 		Iterator<ConfigListEntry> entryIter = children.iterator();
 		int relBottom = 0, relTop = 0;
 		ConfigListEntry entry = null;
@@ -524,11 +506,11 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		if (index == 0) {
 			return getEntryAreaTop();
 		}
-		return getEntryAreaTop() + entryBottoms.getInt(index - 1);
+		return getEntryAreaTop() + children.bottoms.getInt(index - 1);
 	}
 
 	private int getEntryBottom(int index) {
-		return getEntryAreaTop() + entryBottoms.getInt(index);
+		return getEntryAreaTop() + children.bottoms.getInt(index);
 	}
 
 	protected boolean isFocused() {
@@ -544,25 +526,12 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		super.setFocused(focused);
 	}
 
+	protected ConfigListEntry removeEntry(ConfigListEntry entry) {
+		return removeEntry(children.indexOf(entry));
+	}
+
 	protected ConfigListEntry removeEntry(int index) {
-		ConfigListEntry entry = this.children.get(index);
-		return this.removeEntry(index, entry) ? entry : null;
-	}
-
-	protected boolean removeEntry(ConfigListEntry entry) {
-		return removeEntry(children.indexOf(entry), entry);
-	}
-
-	protected boolean removeEntry(int index, ConfigListEntry entry) {
-		boolean success = this.children.remove(entry);
-		if (success) {
-			entryBottoms.removeInt(index);
-		}
-		if (success && entry == this.getSelected()) {
-			this.setSelected(null);
-		}
-
-		return success;
+		return children.remove(index);
 	}
 
 	@Override
@@ -575,6 +544,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	@Environment(EnvType.CLIENT)
 	class Entries extends AbstractList<ConfigListEntry> {
 		private final List<ConfigListEntry> entries;
+		protected final IntList bottoms = new IntArrayList();
 
 		private Entries() {
 			this.entries = Lists.newArrayList();
@@ -588,19 +558,47 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 			return this.entries.size();
 		}
 
+		@Override
+		public boolean isEmpty() {
+			return entries.isEmpty();
+		}
+
 		public ConfigListEntry set(int i, ConfigListEntry entry) {
-			ConfigListEntry entry2 = this.entries.set(i, entry);
 			entry.setParent(ConfigEntryListWidget.this);
-			return entry2;
+			return this.entries.set(i, entry);
 		}
 
 		public void add(int i, ConfigListEntry entry) {
-			this.entries.add(i, entry);
+			bottoms.add(getMaxEntryPosition() + entry.getHeight());
 			entry.setParent(ConfigEntryListWidget.this);
+			entries.add(i, entry);
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends ConfigListEntry> newEntries) {
+			int oldSize = newEntries.size();
+			int bottom = bottoms.size() == 0 ? 0 : bottoms.getInt(0);
+			children.addAll(newEntries);
+			for (int i = oldSize, l = children.size(); i < l; i++) {
+				bottom += children.get(i).getHeight();
+				bottoms.add(bottom);
+			}
+			return true;
 		}
 
 		public ConfigListEntry remove(int i) {
-			return this.entries.remove(i);
+			ConfigListEntry entry = entries.remove(i);
+			bottoms.removeInt(i);
+			if (entry == getSelected()) {
+				setSelected(null);
+			}
+			return entry;
+		}
+
+		@Override
+		public void clear() {
+			entries.clear();
+			bottoms.clear();
 		}
 	}
 
