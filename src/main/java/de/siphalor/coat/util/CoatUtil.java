@@ -10,6 +10,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
@@ -21,9 +22,21 @@ public class CoatUtil {
 	public static final int MARGIN = 2;
 	public static final int DOUBLE_MARGIN = MARGIN * 2;
 	public static final int HALF_MARGIN = MARGIN / 2;
+	public static final String ELLIPSIS = "...";
 
 	public static void playClickSound() {
 		MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1F));
+	}
+
+	public static Text intelliTrim(TextRenderer textRenderer, Text baseText, int width) {
+		int textWidth = textRenderer.getWidth(baseText);
+		if (textWidth > width) {
+			textWidth = textRenderer.getWidth(ELLIPSIS);
+			String trimmed = textRenderer.trimToWidth(baseText.getString(), width - textWidth);
+			return new LiteralText(trimmed.trim() + ELLIPSIS);
+		} else {
+			return baseText;
+		}
 	}
 
 	public static List<OrderedText> wrapTooltip(TextRenderer textRenderer, MinecraftClient minecraftClient, Text text) {

@@ -4,16 +4,16 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.BaseText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 public class TextButtonWidget extends ButtonWidget {
-	public TextButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress) {
-		super(x, y, width, height, message, onPress);
-	}
+	private Text originalMessage;
 
-	public TextButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress, TooltipSupplier tooltipSupplier) {
-		super(x, y, width, height, message, onPress, tooltipSupplier);
+	public TextButtonWidget(int x, int y, int width, int height, BaseText message, PressAction onPress) {
+		super(x, y, width, height, message, onPress);
+		setMessage(message);
 	}
 
 	@Override
@@ -26,6 +26,21 @@ public class TextButtonWidget extends ButtonWidget {
 		}
 		if (hovered) {
 			fill(matrices, x - 1, y - 1, x + width + 1, y + height + 1, 0x33ffffff);
+			if (originalMessage != getMessage()) {
+				CoatUtil.renderTooltip(matrices, mouseX, mouseY, originalMessage);
+			}
 		}
+	}
+
+	@Override
+	public void setMessage(Text text) {
+		originalMessage = text;
+		super.setMessage(CoatUtil.intelliTrim(MinecraftClient.getInstance().textRenderer, originalMessage, width));
+	}
+
+	@Override
+	public void setWidth(int value) {
+		super.setWidth(value);
+		super.setMessage(CoatUtil.intelliTrim(MinecraftClient.getInstance().textRenderer, originalMessage, width));
 	}
 }
