@@ -21,6 +21,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -42,7 +43,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	protected int right;
 	protected int left;
 	private double scrollAmount;
-	private boolean renderSelection = true;
 	private boolean renderBackground;
 	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
 	private boolean scrolling;
@@ -57,10 +57,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		this.left = 0;
 		this.right = width;
 		this.rowWidth = rowWidth;
-	}
-
-	public void setRenderSelection(boolean renderSelection) {
-		this.renderSelection = renderSelection;
 	}
 
 	public Identifier getBackground() {
@@ -97,7 +93,8 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return this.children;
 	}
 
-	protected void replaceEntries(Collection<ConfigListEntry> newEntries) {
+	public void replaceEntries(Collection<ConfigListEntry> newEntries) {
+		focusLost();
 		children.clear();
 		addEntries(newEntries);
 	}
@@ -156,6 +153,11 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		}
 	}
 
+	public void resize(int newWidth, int newHeight) {
+		height = newHeight;
+		widthChanged(newWidth);
+	}
+
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
@@ -187,10 +189,10 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		this.client.getTextureManager().bindTexture(background);
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(left,  bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (bottom + (int)getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int)getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, top,    0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top    + (int)getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(left,  top,    0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (top    + (int)getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left, bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, top, 0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left, top, 0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F, (top + (int) getScrollAmount()) / 32F).next();
 		tessellator.draw();
 	}
 
@@ -203,10 +205,10 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		RenderSystem.shadeModel(7425);
 		RenderSystem.disableTexture();
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(left,  top + 4,    0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(right, top + 4,    0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(right, top,        0D).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(left,  top,        0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(left, top + 4, 0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(right, top + 4, 0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(right, top, 0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(left, top, 0D).color(0, 0, 0, 255).next();
 		tessellator.draw();
 
 	}
@@ -222,7 +224,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		}
 
 		int k = this.getEntryLeft();
-		int l = this.top + 4 - (int)this.getScrollAmount();
+		int l = this.top + 4 - (int) this.getScrollAmount();
 
 		this.renderList(matrices, k, l, mouseX, mouseY, delta);
 
@@ -231,28 +233,28 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
 			RenderSystem.disableTexture();
-			int p = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
+			int p = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getMaxPosition());
 			p = MathHelper.clamp(p, 32, this.bottom - this.top - 8);
-			int q = (int)this.getScrollAmount() * (this.bottom - this.top - p) / maxScroll + this.top;
+			int q = (int) this.getScrollAmount() * (this.bottom - this.top - p) / maxScroll + this.top;
 			if (q < this.top) {
 				q = this.top;
 			}
 
 			bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-			bufferBuilder.vertex(scrollbarXBegin,   bottom,    0D).color(0, 0, 0, 255).texture(0F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd,     bottom,    0D).color(0, 0, 0, 255).texture(1F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd,     top,       0D).color(0, 0, 0, 255).texture(1F, 0F).next();
-			bufferBuilder.vertex(scrollbarXBegin,   top,       0D).color(0, 0, 0, 255).texture(0F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin, bottom, 0D).color(0, 0, 0, 255).texture(0F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd, bottom, 0D).color(0, 0, 0, 255).texture(1F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd, top, 0D).color(0, 0, 0, 255).texture(1F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin, top, 0D).color(0, 0, 0, 255).texture(0F, 0F).next();
 
-			bufferBuilder.vertex(scrollbarXBegin,   q + p,     0D).color(128, 128, 128, 255).texture(0F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd,     q + p,     0D).color(128, 128, 128, 255).texture(1F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd,     q,         0D).color(128, 128, 128, 255).texture(1F, 0F).next();
-			bufferBuilder.vertex(scrollbarXBegin,   q,         0D).color(128, 128, 128, 255).texture(0F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin, q + p, 0D).color(128, 128, 128, 255).texture(0F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd, q + p, 0D).color(128, 128, 128, 255).texture(1F, 1F).next();
+			bufferBuilder.vertex(scrollbarXEnd, q, 0D).color(128, 128, 128, 255).texture(1F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin, q, 0D).color(128, 128, 128, 255).texture(0F, 0F).next();
 
-			bufferBuilder.vertex(scrollbarXBegin,   q + p - 1, 0D).color(192, 192, 192, 255).texture(0F, 1F).next();
+			bufferBuilder.vertex(scrollbarXBegin, q + p - 1, 0D).color(192, 192, 192, 255).texture(0F, 1F).next();
 			bufferBuilder.vertex(scrollbarXEnd - 1, q + p - 1, 0D).color(192, 192, 192, 255).texture(1F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd - 1, q,         0D).color(192, 192, 192, 255).texture(1F, 0F).next();
-			bufferBuilder.vertex(scrollbarXBegin,   q,         0D).color(192, 192, 192, 255).texture(0F, 0F).next();
+			bufferBuilder.vertex(scrollbarXEnd - 1, q, 0D).color(192, 192, 192, 255).texture(1F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin, q, 0D).color(192, 192, 192, 255).texture(0F, 0F).next();
 			tessellator.draw();
 		}
 
@@ -298,7 +300,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected void updateScrollingState(double mouseX, double mouseY, int button) {
-		this.scrolling = button == 0 && mouseX >= (double)this.getScrollbarPositionX() && mouseX < (double)(this.getScrollbarPositionX() + 6);
+		this.scrolling = button == 0 && mouseX >= (double) this.getScrollbarPositionX() && mouseX < (double) (this.getScrollbarPositionX() + 6);
 	}
 
 	protected int getScrollbarPositionX() {
@@ -335,15 +337,15 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
 			return true;
 		} else if (button == 0 && this.scrolling) {
-			if (mouseY < (double)this.top) {
+			if (mouseY < (double) this.top) {
 				this.setScrollAmount(0.0D);
-			} else if (mouseY > (double)this.bottom) {
+			} else if (mouseY > (double) this.bottom) {
 				this.setScrollAmount(this.getMaxScroll());
 			} else {
 				double d = Math.max(1, this.getMaxScroll());
 				int i = this.bottom - this.top;
-				int j = MathHelper.clamp((int)((float)(i * i) / (float)this.getMaxPosition()), 32, i - 8);
-				double e = Math.max(1.0D, d / (double)(i - j));
+				int j = MathHelper.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
+				double e = Math.max(1.0D, d / (double) (i - j));
 				this.setScrollAmount(this.getScrollAmount() + deltaY * e);
 			}
 
@@ -390,7 +392,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		if (!this.children().isEmpty()) {
 			int index = this.children().indexOf(this.getSelected());
 
-			while(true) {
+			while (true) {
 				int newIndex = MathHelper.clamp(index + offset, 0, this.getEntryCount() - 1);
 				if (index == newIndex) {
 					break;
@@ -416,7 +418,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	public boolean isMouseOver(double mouseX, double mouseY) {
-		return mouseY >= (double)this.top && mouseY <= (double)this.bottom && mouseX >= (double)this.left && mouseX <= (double)this.right;
+		return mouseY >= (double) this.top && mouseY <= (double) this.bottom && mouseX >= (double) this.left && mouseX <= (double) this.right;
 	}
 
 	@Override
@@ -451,32 +453,12 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		int rowWidth = getEntryWidth();
 		int rowLeft = this.left + this.width / 2 - rowWidth / 2;
 		int rowRight = this.left + this.width / 2 + rowWidth / 2;
-		while(true) {
+		while (true) {
 			if (entry == null) {
 				break;
 			}
 
 			int rowTop = relTop + getEntryAreaTop();
-			if (this.renderSelection && getSelected() == entry) {
-				int selectionHeight = (relTop - relBottom) - 4;
-				RenderSystem.disableTexture();
-				float f = this.isFocused() ? 1.0F : 0.5F;
-				RenderSystem.color4f(f, f, f, 1.0F);
-				bufferBuilder.begin(7, VertexFormats.POSITION);
-				bufferBuilder.vertex(rowLeft,  rowTop + selectionHeight + 2, 0.0D).next();
-				bufferBuilder.vertex(rowRight, rowTop + selectionHeight + 2, 0.0D).next();
-				bufferBuilder.vertex(rowRight, rowTop - 2,                   0.0D).next();
-				bufferBuilder.vertex(rowLeft,  rowTop - 2,                   0.0D).next();
-				tessellator.draw();
-				RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
-				bufferBuilder.begin(7, VertexFormats.POSITION);
-				bufferBuilder.vertex(rowLeft + 1,  rowTop + selectionHeight + 1, 0.0D).next();
-				bufferBuilder.vertex(rowRight - 1, rowTop + selectionHeight + 1, 0.0D).next();
-				bufferBuilder.vertex(rowRight - 1, rowTop - 1,                   0.0D).next();
-				bufferBuilder.vertex(rowLeft + 1,  rowTop - 1,                   0.0D).next();
-				tessellator.draw();
-				RenderSystem.enableTexture();
-			}
 
 			entry.render(matrices, rowLeft, rowTop, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
 
@@ -572,16 +554,21 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 			bottoms.add(getMaxEntryPosition() + entry.getHeight());
 			entry.setParent(ConfigEntryListWidget.this);
 			entries.add(i, entry);
+			entry.widthChanged(getEntryWidth());
 		}
 
 		@Override
-		public boolean addAll(Collection<? extends ConfigListEntry> newEntries) {
-			int oldSize = newEntries.size();
+		public boolean addAll(@NotNull Collection<? extends ConfigListEntry> newEntries) {
+			int oldSize = entries.size();
 			int bottom = bottoms.size() == 0 ? 0 : bottoms.getInt(0);
-			children.addAll(newEntries);
-			for (int i = oldSize, l = children.size(); i < l; i++) {
-				bottom += children.get(i).getHeight();
+			entries.addAll(newEntries);
+			for (int i = oldSize, l = entries.size(); i < l; i++) {
+				bottom += entries.get(i).getHeight();
 				bottoms.add(bottom);
+			}
+			for (ConfigListEntry newEntry : newEntries) {
+				newEntry.setParent(ConfigEntryListWidget.this);
+				newEntry.widthChanged(getEntryWidth());
 			}
 			return true;
 		}

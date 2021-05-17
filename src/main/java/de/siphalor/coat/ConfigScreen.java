@@ -38,7 +38,7 @@ public class ConfigScreen extends Screen {
 	protected void init() {
 		panelWidth = 200;
 		treeWidget = new ConfigEntryListWidget(client, panelWidth, height - 60, 20, height - 40, (int) (panelWidth * 0.8F));
-		treeWidget.setRenderBackground(true);
+		treeWidget.setRenderBackground(false);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		children.add(treeWidget);
 		listWidget = new ConfigEntryListWidget(client, width - panelWidth, height - 20, 20, height, 260);
@@ -86,9 +86,9 @@ public class ConfigScreen extends Screen {
 		this.height = height;
 
 		panelWidth = Math.max(64, (int) (width * 0.3));
-		treeWidget.widthChanged(panelWidth);
+		treeWidget.resize(panelWidth, height);
 		listWidget.setLeftPos(panelWidth);
-		listWidget.widthChanged(width - panelWidth);
+		listWidget.resize(width - panelWidth, height);
 	}
 
 	@Override
@@ -99,15 +99,24 @@ public class ConfigScreen extends Screen {
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		treeWidget.render(matrices, mouseX, mouseY, delta);
-		listWidget.render(matrices, mouseX, mouseY, delta);
-
-		client.getTextureManager().bindTexture(listWidget.getBackground());
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(519);
+
+		client.getTextureManager().bindTexture(treeWidget.getBackground());
+		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
+		bufferBuilder.vertex(0D,         height, -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, height / 32F).next();
+		bufferBuilder.vertex(panelWidth, height, -100D).color(0x77, 0x77, 0x77, 0xff).texture(panelWidth / 32F, height / 32F).next();
+		bufferBuilder.vertex(panelWidth, 20D,    -100D).color(0x77, 0x77, 0x77, 0xff).texture(panelWidth / 32F, 0F).next();
+		bufferBuilder.vertex(0D,         20D,    -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
+		tessellator.draw();
+
+		treeWidget.render(matrices, mouseX, mouseY, delta);
+		listWidget.render(matrices, mouseX, mouseY, delta);
+
+		client.getTextureManager().bindTexture(listWidget.getBackground());
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
 		bufferBuilder.vertex(0D,    20D, -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
 		bufferBuilder.vertex(width, 20D, -100D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
@@ -120,4 +129,8 @@ public class ConfigScreen extends Screen {
 		super.render(matrices, mouseX, mouseY, delta);
 	}
 
+	@Override
+	public boolean changeFocus(boolean lookForwards) {
+		return super.changeFocus(lookForwards);
+	}
 }

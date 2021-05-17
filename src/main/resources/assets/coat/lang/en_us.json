@@ -4,5 +4,8 @@
 
 	"coat.message.level.info": "Info",
 	"coat.message.level.warning": "Warning",
-	"coat.message.level.error": "Error"
+	"coat.message.level.error": "Error",
+
+	"coat.tree.expand": "+",
+	"coat.tree.collapse": "-"
 }

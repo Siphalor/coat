@@ -67,10 +67,13 @@ public class CoatTestmod implements ClientModInitializer {
 				new TextConfigInput(new LiteralText("Some placeholder"))
 		));
 
-		ConfigTreeEntry tree1 = new ConfigTreeEntry(new LiteralText("Hi"));
+		ConfigTreeEntry tree1 = new ConfigTreeEntry(new LiteralText("Hi"), list);
 
-		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("a")));
-		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("b")));
+		LinkedList<ConfigListEntry> list1 = new LinkedList<>();
+		list1.add(new ConfigListTextEntry(new LiteralText("Heyho")));
+
+		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("a"), null));
+		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("b"), list1));
 
 		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, MOD_ID, list, ImmutableList.of(tree1));
 
