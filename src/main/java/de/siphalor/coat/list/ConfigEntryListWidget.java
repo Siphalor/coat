@@ -223,10 +223,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 			renderBackground(tessellator, bufferBuilder);
 		}
 
-		int k = this.getEntryLeft();
-		int l = this.top + 4 - (int) this.getScrollAmount();
-
-		this.renderList(matrices, k, l, mouseX, mouseY, delta);
+		this.renderList(matrices, mouseX, mouseY, delta);
 
 		renderShadows(tessellator, bufferBuilder);
 
@@ -431,13 +428,11 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return children.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
 	}
 
-	protected void renderList(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta) {
+	protected void renderList(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		IntListIterator bottomIter = children.bottoms.iterator();
 		Iterator<ConfigListEntry> entryIter = children.iterator();
 		int relBottom = 0, relTop = 0;
 		ConfigListEntry entry = null;
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
 		while (bottomIter.hasNext()) {
 			relTop = relBottom;
@@ -452,7 +447,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 		int rowWidth = getEntryWidth();
 		int rowLeft = this.left + this.width / 2 - rowWidth / 2;
-		int rowRight = this.left + this.width / 2 + rowWidth / 2;
 		while (true) {
 			if (entry == null) {
 				break;
