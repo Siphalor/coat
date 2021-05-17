@@ -16,6 +16,10 @@ public class TextButtonWidget extends ButtonWidget {
 		setMessage(message);
 	}
 
+	public Text getOriginalMessage() {
+		return originalMessage;
+	}
+
 	@Override
 	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		final int color = CoatUtil.TEXT_COLOR | MathHelper.ceil(alpha * 255F) << 24;

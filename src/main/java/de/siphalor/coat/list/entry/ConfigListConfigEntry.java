@@ -8,6 +8,7 @@ import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.input.InputChangeListener;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
 import de.siphalor.coat.util.CoatUtil;
+import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
@@ -24,8 +25,7 @@ import java.util.Objects;
 public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements InputChangeListener<V> {
 	private static final Text DEFAULT_TEXT = new TranslatableText(Coat.MOD_ID + ".default");
 	private final TextRenderer textRenderer;
-	private final BaseText name;
-	private BaseText trimmedName;
+	private final TextButtonWidget nameWidget;
 	private final Text description;
 	private MultilineText descriptionMultiline;
 	private final ConfigEntryHandler<V> entryHandler;
@@ -38,8 +38,8 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	public ConfigListConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
-		this.name = name;
-		setTrimmedName(name.copy());
+		nameWidget = new TextButtonWidget(x, y, 100, 8, name, button -> setExpanded(!isExpanded()));
+		setName(name.copy());
 		this.description = description;
 		this.entryHandler = entryHandler;
 		this.input = input;
@@ -84,13 +84,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		super.widthChanged(newWidth);
 
 		int namePart = (int) getNamePart(newWidth) - CoatUtil.MARGIN;
-		if (textRenderer.getWidth(name) > namePart) {
-			String rawName = name.getString();
-			int length = textRenderer.trimToWidth("..." + rawName, namePart).length() - 3;
-			setTrimmedName(new LiteralText(rawName.substring(0, length).trim() + "..."));
-		} else {
-			setTrimmedName(name.copy());
-		}
+		nameWidget.setWidth(namePart);
 
 		int controlsPart = (int) getControlsPart(newWidth);
 		defaultButton.setWidth(controlsPart - CoatUtil.HALF_MARGIN);
@@ -100,32 +94,19 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 	}
 
-	protected void setTrimmedName(BaseText trimmedName) {
-		this.trimmedName = trimmedName;
+	protected void setName(BaseText name) {
+		nameWidget.setMessage(name);
 		Message.Level level = getHighestMessageLevel();
 		if (level == null) {
-			trimmedName.setStyle(Style.EMPTY);
+			name.setStyle(Style.EMPTY);
 		} else {
-			trimmedName.setStyle(level.getTextStyle());
+			name.setStyle(level.getTextStyle());
 		}
-	}
-
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (super.mouseClicked(mouseX, mouseY, button)) {
-			return true;
-		}
-		if (mouseX < x + getNamePart(parent.getEntryWidth()) && mouseY < y + input.getHeight()) {
-			CoatUtil.playClickSound();
-			setExpanded(!isExpanded());
-			return true;
-		}
-		return false;
 	}
 
 	@Override
 	public List<? extends Element> children() {
-		return ImmutableList.of(input, defaultButton);
+		return ImmutableList.of(nameWidget, input, defaultButton);
 	}
 
 	@Override
@@ -143,13 +124,15 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		int configEntryPart = (int) getConfigEntryPart(entryWidth);
 		int inputHeight = input.getHeight();
 
-		float textY = y + (inputHeight - 8F) / 2F + CoatUtil.MARGIN;
+		int textY = y + (int)((inputHeight - 8) / 2F) + CoatUtil.MARGIN;
 
-		textRenderer.draw(matrices, trimmedName, x, textY, 0xffffff);
 		input.render(matrices, x + namePart + CoatUtil.HALF_MARGIN, y + CoatUtil.MARGIN, configEntryPart - CoatUtil.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		defaultButton.y = y + CoatUtil.MARGIN;
 		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + CoatUtil.HALF_MARGIN;
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
+		nameWidget.x = x;
+		nameWidget.y = textY;
+		nameWidget.render(matrices, mouseX, mouseY, tickDelta);
 
 		float curY = y + CoatUtil.MARGIN + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
 		float msgX = x + CoatUtil.DOUBLE_MARGIN;
@@ -179,13 +162,6 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 			curY += CoatUtil.MARGIN;
 			descriptionMultiline.draw(matrices, x + CoatUtil.DOUBLE_MARGIN, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
-		}
-
-		if (hovered && mouseX - x < namePart && mouseY < y + inputHeight) {
-			fill(matrices, x - CoatUtil.DOUBLE_MARGIN, y + CoatUtil.MARGIN, x + namePart, y + inputHeight, 0x33ffffff);
-			if (!trimmedName.equals(name)) {
-				CoatUtil.renderTooltip(matrices, mouseX, mouseY, name);
-			}
 		}
 	}
 
@@ -292,6 +268,6 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 			parent.entryHeightChanged(this);
 		}
 		// shallow copy is required because the OrderedText in BaseText is cached, so the style needs to be force updated
-		setTrimmedName((BaseText) trimmedName.shallowCopy());
+		setName((BaseText) nameWidget.getOriginalMessage().shallowCopy());
 	}
 }

@@ -33,7 +33,7 @@ public class CoatUtil {
 		if (textWidth > width) {
 			textWidth = textRenderer.getWidth(ELLIPSIS);
 			String trimmed = textRenderer.trimToWidth(baseText.getString(), width - textWidth);
-			return new LiteralText(trimmed.trim() + ELLIPSIS);
+			return new LiteralText(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
 		} else {
 			return baseText;
 		}

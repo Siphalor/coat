@@ -296,7 +296,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	public int getMaxScroll() {
-		return Math.max(0, this.getMaxPosition() - (this.bottom - this.top) + 4 + CoatUtil.DOUBLE_MARGIN);
+		return Math.max(0, this.getMaxPosition() - height + 4);
 	}
 
 	protected void updateScrollingState(double mouseX, double mouseY, int button) {
