@@ -1,8 +1,8 @@
 package de.siphalor.coat.list.entry;
 
-import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListEntry;
+import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -29,7 +29,7 @@ public class ConfigListTextEntry extends ConfigListEntry {
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
 		multilineText = textRenderer.wrapLines(text, newWidth);
-		height = multilineText.size() * 9 + Coat.MARGIN + Coat.MARGIN;
+		height = multilineText.size() * 9 + CoatUtil.MARGIN + CoatUtil.MARGIN;
 		parent.entryHeightChanged(this);
 	}
 
@@ -41,7 +41,7 @@ public class ConfigListTextEntry extends ConfigListEntry {
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		for (int i = 0; i < multilineText.size(); i++) {
-			textRenderer.draw(matrices, multilineText.get(i), x, y + i * 9, Coat.TEXT_COLOR);
+			textRenderer.draw(matrices, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR);
 		}
 	}
 

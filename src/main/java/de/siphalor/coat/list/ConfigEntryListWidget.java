@@ -3,8 +3,8 @@ package de.siphalor.coat.list;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
+import de.siphalor.coat.util.CoatUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
@@ -155,6 +155,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 	public void resize(int newWidth, int newHeight) {
 		height = newHeight;
+		bottom = top + height;
 		widthChanged(newWidth);
 	}
 
@@ -205,12 +206,11 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		RenderSystem.shadeModel(7425);
 		RenderSystem.disableTexture();
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(left, top + 4, 0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(right, top + 4, 0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(right, top, 0D).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(left, top, 0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(left,  top + 8D, 0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(right, top + 8D, 0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(right, top,      0D).color(0, 0, 0, 200).next();
+		bufferBuilder.vertex(left,  top,      0D).color(0, 0, 0, 200).next();
 		tessellator.draw();
-
 	}
 
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -296,7 +296,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	public int getMaxScroll() {
-		return Math.max(0, this.getMaxPosition() - (this.bottom - this.top) + 4 + Coat.DOUBLE_MARGIN);
+		return Math.max(0, this.getMaxPosition() - (this.bottom - this.top) + 4 + CoatUtil.DOUBLE_MARGIN);
 	}
 
 	protected void updateScrollingState(double mouseX, double mouseY, int button) {
@@ -304,7 +304,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected int getScrollbarPositionX() {
-		return left + width / 2 + getEntryWidth() / 2 + Coat.MARGIN;
+		return left + width / 2 + getEntryWidth() / 2 + CoatUtil.MARGIN;
 	}
 
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {

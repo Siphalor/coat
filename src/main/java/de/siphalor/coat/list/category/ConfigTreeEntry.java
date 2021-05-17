@@ -3,16 +3,15 @@ package de.siphalor.coat.list.category;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigEntryListWidget;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
 import de.siphalor.coat.list.ConfigListEntry;
+import de.siphalor.coat.util.CoatUtil;
+import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.BaseText;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,34 +21,27 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConfigTreeEntry extends ConfigListCompoundEntry {
-	private static final BaseText EXPAND_PREFIX = new TranslatableText(Coat.MOD_ID + ".tree.expand");
-	private static final BaseText COLLAPSE_PREFIX = new TranslatableText(Coat.MOD_ID + ".tree.collapse");
+	private static final BaseText EXPAND_TEXT   = new TranslatableText(Coat.MOD_ID + ".tree.expand");
+	private static final BaseText COLLAPSE_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.collapse");
 
-	private final TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-	private final BaseText name;
-	private final List<ConfigTreeEntry> entries = new ArrayList<>();
+	private final TextButtonWidget collapseButton;
+	private final TextButtonWidget nameButton;
+	private final List<ConfigTreeEntry> subTrees = new ArrayList<>();
 	private final List<ConfigListEntry> configListEntries;
 	private int x;
 	private int y;
 	private boolean expanded;
-	protected ConfigTreeEntry focused;
+	protected Element focused;
 
 	public ConfigTreeEntry(BaseText name, List<ConfigListEntry> configListEntries) {
-		this.name = name;
 		this.configListEntries = configListEntries;
+		collapseButton = new TextButtonWidget(x, y, 7, 7, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
+		nameButton = new TextButtonWidget(x, y, 100, 7, name, button -> openCategory());
 	}
 
 	public void addSubTree(ConfigTreeEntry entry) {
 		entry.setParent(this);
-		entries.add(entry);
-	}
-
-	private BaseText getExpansionPrefix() {
-		return isExpanded() ? COLLAPSE_PREFIX : EXPAND_PREFIX;
-	}
-
-	private int getPrefixRight() {
-		return x + textRenderer.getWidth(getExpansionPrefix()) + Coat.DOUBLE_MARGIN - Coat.HALF_MARGIN;
+		subTrees.add(entry);
 	}
 
 	@Override
@@ -58,56 +50,42 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		this.y = y;
 
 		boolean hoverFound = false;
-		BaseText expansionPrefix = getExpansionPrefix();
-		int prefixRight = getPrefixRight();
+		int indent = x + 8 + CoatUtil.DOUBLE_MARGIN;
 
-		if (focused == this) {
-			fill(matrices, x, y - Coat.MARGIN, x + parent.getEntryWidth(), y + 8 + Coat.MARGIN, 0x33ffffff);
+		if (!subTrees.isEmpty()) {
+			collapseButton.x = x;
+			collapseButton.y = y;
+			collapseButton.render(matrices, mouseX, mouseY, tickDelta);
 		}
 
-		if (hovered && mouseY < y + 8) {
-			hoverFound = true;
-			if (mouseX < prefixRight) {
-				fill(matrices, x, y, prefixRight, y + 8, 0x33ffffff);
-			} else {
-				fill(matrices, prefixRight, y, x + parent.getEntryWidth() + Coat.HALF_MARGIN, y + 8, 0x33ffffff);
-			}
-		}
-
-		textRenderer.draw(matrices, expansionPrefix, x + Coat.MARGIN, y, 0xffffff);
-		textRenderer.drawTrimmed(name, prefixRight + Coat.HALF_MARGIN, y, parent.getEntryWidth() - Coat.MARGIN, 0xffffff);
+		nameButton.x = indent;
+		nameButton.y = y;
+		nameButton.setWidth(getEntryWidth() - 8 - CoatUtil.MARGIN);
+		nameButton.render(matrices, mouseX, mouseY, tickDelta);
 
 		if (expanded) {
-			int curY = y + 8 + Coat.MARGIN;
-			for (ConfigTreeEntry entry : children()) {
+			int curY = y + 8 + CoatUtil.MARGIN;
+			for (ConfigTreeEntry entry : subTrees) {
 				if (!hoverFound && mouseY > curY) {
 					hoverFound = true;
-					entry.render(matrices, x + Coat.DOUBLE_MARGIN, curY, entryHeight, mouseX, mouseY, true, tickDelta);
+					entry.render(matrices, indent, curY, entryHeight, mouseX, mouseY, true, tickDelta);
 				} else {
-					entry.render(matrices, x + Coat.DOUBLE_MARGIN, curY, entryHeight, mouseX, mouseY, false, tickDelta);
+					entry.render(matrices, indent, curY, entryHeight, mouseX, mouseY, false, tickDelta);
 				}
-				curY += entry.getHeight() + Coat.MARGIN;
+				curY += entry.getHeight() + CoatUtil.MARGIN;
 			}
 		}
-	}
-
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (mouseY < y + 8 && mouseY > y) {
-			if (mouseX < getPrefixRight()) {
-				setExpanded(!isExpanded());
-			} else {
-				openCategory();
-			}
-			return true;
-		}
-		return super.mouseClicked(mouseX, mouseY, button);
 	}
 
 	public void setExpanded(boolean expanded) {
 		this.expanded = expanded;
 		if (parent != null) {
 			parent.entryHeightChanged(this);
+		}
+		if (expanded) {
+			collapseButton.setMessage(COLLAPSE_TEXT);
+		} else {
+			collapseButton.setMessage(EXPAND_TEXT);
 		}
 	}
 
@@ -126,19 +104,19 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	public int getBaseHeight() {
 		int height = 0;
-		for (ConfigTreeEntry entry : entries) {
-			height += entry.getHeight() + Coat.MARGIN;
+		for (ConfigTreeEntry entry : subTrees) {
+			height += entry.getHeight() + CoatUtil.MARGIN;
 		}
-		return height + Coat.MARGIN + 8;
+		return height + CoatUtil.MARGIN + 8;
 	}
 
 	public int getExpansionHeight() {
 		int height = 0;
-		for (ConfigTreeEntry child : children()) {
+		for (ConfigTreeEntry child : subTrees) {
 			height += child.getHeight();
 		}
 		if (height > 0) {
-			height += Coat.MARGIN;
+			height += CoatUtil.MARGIN;
 		}
 		return height;
 	}
@@ -149,27 +127,21 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	}
 
 	@Override
-	public List<ConfigTreeEntry> children() {
-		return entries;
+	public List<Element> children() {
+		ArrayList<Element> children = new ArrayList<>(subTrees.size() + 2);
+		if (!subTrees.isEmpty()) {
+			children.add(collapseButton);
+		}
+		children.add(nameButton);
+		children.addAll(subTrees);
+		return children;
 	}
 
 	@Override
 	public void tick() {
-
-	}
-
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		switch (keyCode) {
-			case 262: // right arrow
-			case 32:  // space
-				setExpanded(!expanded);
-				break;
-			case 257:  // enter
-				openCategory();
-				break;
+		for (ConfigTreeEntry subTree : subTrees) {
+			subTree.tick();
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 	public void openCategory() {
@@ -183,17 +155,12 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	@Nullable
 	@Override
-	public ConfigTreeEntry getFocused() {
-		if (focused == this) {
-			return null;
-		}
+	public Element getFocused() {
 		return focused;
 	}
 
-	public void setFocused(ConfigTreeEntry focused) {
-		if (this.getFocused() != null) {
-			this.focused.focusLost();
-		}
+	@Override
+	public void setFocused(Element focused) {
 		this.focused = focused;
 	}
 
@@ -204,44 +171,6 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	@Override
 	public int getEntryWidth() {
-		return parent.getEntryWidth() - Coat.MARGIN;
-	}
-
-	@Override
-	public boolean changeFocus(boolean lookForwards) {
-		int index;
-		if (focused == this) {
-			index = 0;
-		} else {
-			index = entries.indexOf(focused);
-		}
-		if (lookForwards) {
-			if (index < 0) {
-				setFocused(this);
-				return true;
-			}
-
-			for (int i = index; i < entries.size(); i++) {
-				if (entries.get(i).changeFocus(true)) {
-					setFocused(entries.get(i));
-					return true;
-				}
-			}
-
-			focusLost();
-			return false;
-		} else {
-			if (!entries.isEmpty()) {
-				for (int i = index; i >= 0; i--) {
-					if (entries.get(i).changeFocus(false)) {
-						setFocused(entries.get(i));
-						return true;
-					}
-				}
-			}
-
-			setFocused(this);
-			return true;
-		}
+		return parent.getEntryWidth() - 8 - CoatUtil.MARGIN;
 	}
 }

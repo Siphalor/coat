@@ -7,6 +7,7 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.input.InputChangeListener;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
+import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
@@ -48,7 +49,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		defaultButton = new ButtonWidget(0, 0, 10, 20, DEFAULT_TEXT, button ->
 				input.setValue(entryHandler.getDefault()),
 				(button, matrices, mouseX, mouseY) -> {
-					List<OrderedText> wrappedLines = Coat.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
+					List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
 					ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
 					list.addAll(wrappedLines);
 					list.add(0, new TranslatableText(Coat.MOD_ID + ".default.hover").asOrderedText());
@@ -82,7 +83,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
 
-		int namePart = (int) getNamePart(newWidth) - Coat.MARGIN;
+		int namePart = (int) getNamePart(newWidth) - CoatUtil.MARGIN;
 		if (textRenderer.getWidth(name) > namePart) {
 			String rawName = name.getString();
 			int length = textRenderer.trimToWidth("..." + rawName, namePart).length() - 3;
@@ -92,7 +93,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 
 		int controlsPart = (int) getControlsPart(newWidth);
-		defaultButton.setWidth(controlsPart - Coat.HALF_MARGIN);
+		defaultButton.setWidth(controlsPart - CoatUtil.HALF_MARGIN);
 
 		if (isExpanded()) {
 			updateExpanded(newWidth);
@@ -115,7 +116,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 			return true;
 		}
 		if (mouseX < x + getNamePart(parent.getEntryWidth()) && mouseY < y + input.getHeight()) {
-			Coat.playClickSound();
+			CoatUtil.playClickSound();
 			setExpanded(!isExpanded());
 			return true;
 		}
@@ -142,17 +143,17 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		int configEntryPart = (int) getConfigEntryPart(entryWidth);
 		int inputHeight = input.getHeight();
 
-		float textY = y + (inputHeight - 8F) / 2F + Coat.MARGIN;
+		float textY = y + (inputHeight - 8F) / 2F + CoatUtil.MARGIN;
 
 		textRenderer.draw(matrices, trimmedName, x, textY, 0xffffff);
-		input.render(matrices, x + namePart + Coat.HALF_MARGIN, y + Coat.MARGIN, configEntryPart - Coat.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
-		defaultButton.y = y + Coat.MARGIN;
-		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + Coat.HALF_MARGIN;
+		input.render(matrices, x + namePart + CoatUtil.HALF_MARGIN, y + CoatUtil.MARGIN, configEntryPart - CoatUtil.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		defaultButton.y = y + CoatUtil.MARGIN;
+		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + CoatUtil.HALF_MARGIN;
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
 
-		float curY = y + Coat.MARGIN + Math.max(20F, inputHeight) + Coat.MARGIN;
-		float msgX = x + Coat.DOUBLE_MARGIN;
-		int msgWidth = entryWidth - Coat.DOUBLE_MARGIN - Coat.DOUBLE_MARGIN;
+		float curY = y + CoatUtil.MARGIN + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
+		float msgX = x + CoatUtil.DOUBLE_MARGIN;
+		int msgWidth = entryWidth - CoatUtil.DOUBLE_MARGIN - CoatUtil.DOUBLE_MARGIN;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
 				List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
@@ -160,7 +161,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 					textRenderer.draw(matrices, line, msgX, curY, 0xffffff);
 					curY += 9;
 				}
-				curY += Coat.MARGIN;
+				curY += CoatUtil.MARGIN;
 			}
 		}
 
@@ -172,18 +173,18 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 						textRenderer.draw(matrices, line, msgX, curY, 0xffffff);
 						curY += 9;
 					}
-					curY += Coat.MARGIN;
+					curY += CoatUtil.MARGIN;
 				}
 			}
 
-			curY += Coat.MARGIN;
-			descriptionMultiline.draw(matrices, x + Coat.DOUBLE_MARGIN, (int) curY, 9, Coat.SECONDARY_TEXT_COLOR);
+			curY += CoatUtil.MARGIN;
+			descriptionMultiline.draw(matrices, x + CoatUtil.DOUBLE_MARGIN, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
 		}
 
 		if (hovered && mouseX - x < namePart && mouseY < y + inputHeight) {
-			fill(matrices, x - Coat.DOUBLE_MARGIN, y + Coat.MARGIN, x + namePart, y + inputHeight, 0x33ffffff);
+			fill(matrices, x - CoatUtil.DOUBLE_MARGIN, y + CoatUtil.MARGIN, x + namePart, y + inputHeight, 0x33ffffff);
 			if (!trimmedName.equals(name)) {
-				Coat.renderTooltip(matrices, mouseX, mouseY, name);
+				CoatUtil.renderTooltip(matrices, mouseX, mouseY, name);
 			}
 		}
 	}
@@ -204,27 +205,27 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		int msgHeight = 0;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
-				msgHeight += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + Coat.MARGIN;
+				msgHeight += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + CoatUtil.MARGIN;
 			}
 		}
 		if (msgHeight > 0) {
-			msgHeight += Coat.MARGIN;
+			msgHeight += CoatUtil.MARGIN;
 		}
-		return Coat.MARGIN + Math.max(20, input.getHeight()) + msgHeight;
+		return CoatUtil.MARGIN + Math.max(20, input.getHeight()) + msgHeight;
 	}
 
 	public int getExpansionHeight() {
 		int height = 0;
 		if (descriptionMultiline != MultilineText.EMPTY) {
-			height += Coat.MARGIN + descriptionMultiline.count() * 9;
+			height += CoatUtil.MARGIN + descriptionMultiline.count() * 9;
 		}
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
-				height += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + Coat.MARGIN;
+				height += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + CoatUtil.MARGIN;
 			}
 		}
 		if (height > 0) {
-			height += Coat.MARGIN;
+			height += CoatUtil.MARGIN;
 		}
 		return height;
 	}

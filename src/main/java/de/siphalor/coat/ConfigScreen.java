@@ -1,5 +1,6 @@
 package de.siphalor.coat;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigEntryListWidget;
@@ -116,6 +117,22 @@ public class ConfigScreen extends Screen {
 		treeWidget.render(matrices, mouseX, mouseY, delta);
 		listWidget.render(matrices, mouseX, mouseY, delta);
 
+		RenderSystem.depthFunc(515);
+		RenderSystem.disableDepthTest();
+		RenderSystem.enableBlend();
+		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
+		RenderSystem.disableAlphaTest();
+		RenderSystem.shadeModel(7425);
+		RenderSystem.disableTexture();
+		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+		bufferBuilder.vertex(panelWidth,      height, -100D).color(0, 0, 0, 200).next();
+		bufferBuilder.vertex(panelWidth + 8D, height, -100D).color(0, 0, 0,   0).next();
+		bufferBuilder.vertex(panelWidth + 8D, 20D,    -100D).color(0, 0, 0,   0).next();
+		bufferBuilder.vertex(panelWidth,      20D,    -100D).color(0, 0, 0, 200).next();
+		tessellator.draw();
+
+		RenderSystem.disableBlend();
+		RenderSystem.enableTexture();
 		client.getTextureManager().bindTexture(listWidget.getBackground());
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
 		bufferBuilder.vertex(0D,    20D, -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
