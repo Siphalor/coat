@@ -95,6 +95,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	public void tick() {
 		super.tick();
+		treeWidget.tick();
 		listWidget.tick();
 	}
 
@@ -144,10 +145,5 @@ public class ConfigScreen extends Screen {
 		drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xffffff);
 
 		super.render(matrices, mouseX, mouseY, delta);
-	}
-
-	@Override
-	public boolean changeFocus(boolean lookForwards) {
-		return super.changeFocus(lookForwards);
 	}
 }
