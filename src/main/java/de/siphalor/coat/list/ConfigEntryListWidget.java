@@ -489,10 +489,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return getEntryAreaTop() + children.bottoms.getInt(index);
 	}
 
-	protected boolean isFocused() {
-		return false;
-	}
-
 	@Override
 	public void setFocused(@Nullable Element focused) {
 		ConfigListEntry old = getFocused();
