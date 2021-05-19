@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
  */
 @Environment(EnvType.CLIENT)
 public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Drawable, TickableElement {
+	private static final int TOP_PADDING = 8;
+	private static final int BOTTOM_PADDING = 6;
 	protected final MinecraftClient client;
 	private final Entries children = new Entries();
 	private final int rowWidth;
@@ -183,7 +185,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected int getMaxPosition() {
-		return getMaxEntryPosition();
+		return getMaxEntryPosition() + BOTTOM_PADDING;
 	}
 
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
@@ -206,10 +208,10 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		RenderSystem.shadeModel(7425);
 		RenderSystem.disableTexture();
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(left,  top + 8D, 0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(right, top + 8D, 0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(right, top,      0D).color(0, 0, 0, 200).next();
-		bufferBuilder.vertex(left,  top,      0D).color(0, 0, 0, 200).next();
+		bufferBuilder.vertex(left,  top + TOP_PADDING, 0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(right, top + TOP_PADDING, 0D).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(right, top,               0D).color(0, 0, 0, 200).next();
+		bufferBuilder.vertex(left,  top,               0D).color(0, 0, 0, 200).next();
 		tessellator.draw();
 	}
 
@@ -293,7 +295,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	public int getMaxScroll() {
-		return Math.max(0, this.getMaxPosition() - height + 4);
+		return Math.max(0, this.getMaxPosition() - height + TOP_PADDING);
 	}
 
 	protected void updateScrollingState(double mouseX, double mouseY, int button) {
@@ -475,7 +477,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	}
 
 	protected int getEntryAreaTop() {
-		return top + 4 - (int) scrollAmount;
+		return top + TOP_PADDING - (int) scrollAmount;
 	}
 
 	protected int getEntryTop(int index) {

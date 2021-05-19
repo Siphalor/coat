@@ -23,8 +23,9 @@ public class TextButtonWidget extends ButtonWidget {
 	@Override
 	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		final int color = CoatUtil.TEXT_COLOR | MathHelper.ceil(alpha * 255F) << 24;
+		int textY = y + (height - 7) / 2;
 		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-		textRenderer.drawTrimmed(getMessage(), x, y, width, color);
+		textRenderer.drawTrimmed(getMessage(), x, textY, width, color);
 		if (isFocused()) {
 			CoatUtil.drawStrokeRect(x - 2, y - 2, x + width + 2, y + height + 2, 1, color);
 		}

@@ -35,8 +35,8 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	public ConfigTreeEntry(BaseText name, List<ConfigListEntry> configListEntries) {
 		this.configListEntries = configListEntries;
-		collapseButton = new TextButtonWidget(x, y, 7, 7, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
-		nameButton = new TextButtonWidget(x, y, 100, 7, name, button -> openCategory());
+		collapseButton = new TextButtonWidget(x, y, 7, 9, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
+		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> openCategory());
 	}
 
 	public void addSubTree(ConfigTreeEntry entry) {
@@ -107,7 +107,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		for (ConfigTreeEntry entry : subTrees) {
 			height += entry.getHeight() + CoatUtil.MARGIN;
 		}
-		return height + CoatUtil.MARGIN + 8;
+		return height + CoatUtil.MARGIN + 9;
 	}
 
 	public int getExpansionHeight() {
