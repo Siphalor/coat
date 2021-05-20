@@ -3,7 +3,7 @@ package de.siphalor.coat.list.category;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigEntryListWidget;
+import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
 import de.siphalor.coat.list.entry.ConfigListSubtreeEntry;
 import de.siphalor.coat.util.CoatUtil;
@@ -30,14 +30,14 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	private final TextButtonWidget collapseButton;
 	private final TextButtonWidget nameButton;
 	private final List<ConfigTreeEntry> subTrees = new ArrayList<>();
-	private ConfigEntryListWidget configWidget;
+	private DynamicEntryListWidget configWidget;
 	private int x;
 	private int y;
 	private boolean open = false;
 	private boolean expanded;
 	protected Element focused;
 
-	public ConfigTreeEntry(BaseText name, ConfigEntryListWidget configWidget) {
+	public ConfigTreeEntry(BaseText name, DynamicEntryListWidget configWidget) {
 		this.configWidget = configWidget;
 		collapseButton = new TextButtonWidget(x, y, 7, 9, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
 		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(this));
@@ -171,14 +171,14 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		return nameButton.getOriginalMessage();
 	}
 
-	public ConfigEntryListWidget getConfigWidget(boolean linkSubtrees) {
+	public DynamicEntryListWidget getConfigWidget(boolean linkSubtrees) {
 		if (!linkSubtrees) {
 			return configWidget;
 		}
 
-		ConfigEntryListWidget widget = configWidget;
+		DynamicEntryListWidget widget = configWidget;
 		if (widget == null) {
-			widget = new ConfigEntryListWidget(MinecraftClient.getInstance(), 100, 100, 0, 100, getEntryWidth());
+			widget = new DynamicEntryListWidget(MinecraftClient.getInstance(), 100, 100, 0, 100, getEntryWidth());
 		}
 
 		for (int i = 0; i < subTrees.size(); i++) {

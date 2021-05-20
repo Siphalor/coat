@@ -24,15 +24,17 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.AbstractList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * This is mostly a copy of {@link net.minecraft.client.gui.widget.EntryListWidget} to enable variable item heights.
  */
 @Environment(EnvType.CLIENT)
-public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Drawable, TickableElement {
+public class DynamicEntryListWidget extends ConfigListCompoundEntry implements Drawable, TickableElement {
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
 	protected final MinecraftClient client;
@@ -48,9 +50,8 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	private boolean renderBackground;
 	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
 	private boolean scrolling;
-	private ConfigListEntry selected;
 
-	public ConfigEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, int rowWidth) {
+	public DynamicEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, int rowWidth) {
 		this.client = client;
 		this.width = width;
 		this.height = height;
@@ -61,13 +62,12 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		this.rowWidth = rowWidth;
 	}
 
-	public ConfigEntryListWidget(MinecraftClient client, Collection<ConfigListEntry> entries, Identifier background) {
+	public DynamicEntryListWidget(MinecraftClient client, Collection<ConfigListEntry> entries, Identifier background) {
 		this.client = client;
 		top = 20;
 		addEntries(entries);
 		this.background = background;
 		renderBackground = true;
-		this.rowWidth = rowWidth;
 	}
 
 	public Identifier getBackground() {
@@ -84,15 +84,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 	public int getEntryWidth() {
 		return Math.min(rowWidth, width);
-	}
-
-	@Nullable
-	public ConfigListEntry getSelected() {
-		return this.selected;
-	}
-
-	public void setSelected(@Nullable ConfigListEntry entry) {
-		this.selected = entry;
 	}
 
 	@Nullable
@@ -134,10 +125,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 	protected int getEntryCount() {
 		return this.children().size();
-	}
-
-	protected boolean isSelectedEntry(int index) {
-		return Objects.equals(this.getSelected(), this.children().get(index));
 	}
 
 	@Nullable
@@ -294,15 +281,15 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 
 	protected void ensureVisible(ConfigListEntry entry) {
 		int index = children.indexOf(entry);
-		int bottom = children.bottoms.getInt(index);
-		if (scrollAmount + height > bottom) {
-			setScrollAmount(bottom - height);
+		int entryBottom = children.bottoms.getInt(index);
+		if (getEntryAreaTop() + entryBottom > bottom) {
+			setScrollAmount(entryBottom - height);
 		}
 
-		int top = index == 0 ? 0 : children.bottoms.getInt(index - 1);
+		int entryTop = index == 0 ? 0 : children.bottoms.getInt(index - 1);
 
-		if (scrollAmount > top) {
-			setScrollAmount(top);
+		if (getEntryAreaTop() + entryTop < top) {
+			setScrollAmount(entryTop);
 		}
 	}
 
@@ -381,56 +368,6 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		this.setScrollAmount(this.getScrollAmount() - amount * 10.0D);
 		return true;
-	}
-
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (super.keyPressed(keyCode, scanCode, modifiers)) {
-			return true;
-		} else if (keyCode == 264) {
-			this.moveSelection(MoveDirection.DOWN);
-			return true;
-		} else if (keyCode == 265) {
-			this.moveSelection(MoveDirection.UP);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-
-	protected void moveSelection(MoveDirection direction) {
-		this.moveSelectionIf(direction, (entry) -> true);
-	}
-
-	protected void ensureSelectedEntryVisible() {
-		ConfigListEntry entry = this.getSelected();
-		if (entry != null) {
-			this.setSelected(entry);
-			this.ensureVisible(entry);
-		}
-	}
-
-	protected void moveSelectionIf(MoveDirection direction, Predicate<ConfigListEntry> predicate) {
-		int offset = direction == MoveDirection.UP ? -1 : 1;
-		if (!this.children().isEmpty()) {
-			int index = this.children().indexOf(this.getSelected());
-
-			while (true) {
-				int newIndex = MathHelper.clamp(index + offset, 0, this.getEntryCount() - 1);
-				if (index == newIndex) {
-					break;
-				}
-
-				ConfigListEntry entry = this.children().get(newIndex);
-				if (predicate.test(entry)) {
-					this.setSelected(entry);
-					this.ensureVisible(entry);
-					break;
-				}
-
-				index = newIndex;
-			}
-		}
 	}
 
 	@Override
@@ -521,6 +458,9 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		if (old != null && old != focused) {
 			old.focusLost();
 		}
+		if (focused != null) {
+			ensureVisible((ConfigListEntry) focused);
+		}
 		super.setFocused(focused);
 	}
 
@@ -562,13 +502,13 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		}
 
 		public ConfigListEntry set(int i, ConfigListEntry entry) {
-			entry.setParent(ConfigEntryListWidget.this);
+			entry.setParent(DynamicEntryListWidget.this);
 			return this.entries.set(i, entry);
 		}
 
 		public void add(int i, ConfigListEntry entry) {
 			bottoms.add(0);
-			entry.setParent(ConfigEntryListWidget.this);
+			entry.setParent(DynamicEntryListWidget.this);
 			entries.add(i, entry);
 			entryHeightChanged(entry);
 			entry.widthChanged(getEntryWidth());
@@ -584,7 +524,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 				bottoms.add(bottom);
 			}
 			for (ConfigListEntry newEntry : newEntries) {
-				newEntry.setParent(ConfigEntryListWidget.this);
+				newEntry.setParent(DynamicEntryListWidget.this);
 				newEntry.widthChanged(getEntryWidth());
 			}
 			return true;
@@ -593,8 +533,8 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		public ConfigListEntry remove(int i) {
 			ConfigListEntry entry = entries.remove(i);
 			bottoms.removeInt(i);
-			if (entry == getSelected()) {
-				setSelected(null);
+			if (entry == getFocused()) {
+				setFocused(null);
 			}
 			return entry;
 		}
@@ -604,10 +544,5 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 			entries.clear();
 			bottoms.clear();
 		}
-	}
-
-	@Environment(EnvType.CLIENT)
-	public enum MoveDirection {
-		UP, DOWN
 	}
 }

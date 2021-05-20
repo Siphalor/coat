@@ -3,7 +3,7 @@ package de.siphalor.coat;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.list.ConfigListEntry;
-import de.siphalor.coat.list.ConfigEntryListWidget;
+import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,8 +24,8 @@ public class ConfigScreen extends Screen {
 	private Runnable onSave;
 
 	private int panelWidth;
-	private ConfigEntryListWidget treeWidget;
-	private ConfigEntryListWidget listWidget;
+	private DynamicEntryListWidget treeWidget;
+	private DynamicEntryListWidget listWidget;
 
 	public ConfigScreen(Screen parent, String modid, Collection<ConfigListEntry> entries, Collection<ConfigTreeEntry> trees) {
 		super(new TranslatableText("coat.screen." + modid));
@@ -37,7 +37,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		panelWidth = 200;
-		treeWidget = new ConfigEntryListWidget(client, panelWidth, height - 60, 20, height - 40, (int) (panelWidth * 0.8F));
+		treeWidget = new DynamicEntryListWidget(client, panelWidth, height - 60, 20, height - 40, (int) (panelWidth * 0.8F));
 		treeWidget.setRenderBackground(false);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		children.add(treeWidget);
@@ -51,11 +51,11 @@ public class ConfigScreen extends Screen {
 		openCategory((ConfigTreeEntry) treeWidget.getEntry(0));
 	}
 
-	public ConfigEntryListWidget getTreeWidget() {
+	public DynamicEntryListWidget getTreeWidget() {
 		return treeWidget;
 	}
 
-	public ConfigEntryListWidget getListWidget() {
+	public DynamicEntryListWidget getListWidget() {
 		return listWidget;
 	}
 
@@ -77,9 +77,9 @@ public class ConfigScreen extends Screen {
 			openCategory.setOpen(false);
 			children.remove(openCategory);
 		}
-		children.add(category);
 		openCategory = category;
 		listWidget = category.getConfigWidget(true);
+		children.add(listWidget);
 		listWidget.setPosition(panelWidth, 20);
 		listWidget.setRowWidth(260);
 		resize(client, width, height);

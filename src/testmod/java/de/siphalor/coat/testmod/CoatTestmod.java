@@ -6,7 +6,7 @@ import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
-import de.siphalor.coat.list.ConfigEntryListWidget;
+import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.list.entry.ConfigListConfigEntry;
@@ -70,7 +70,7 @@ public class CoatTestmod implements ClientModInitializer {
 		));
 
 		ConfigTreeEntry tree1 = new ConfigTreeEntry(new LiteralText("Hi"),
-				new ConfigEntryListWidget(MinecraftClient.getInstance(), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE)
+				new DynamicEntryListWidget(MinecraftClient.getInstance(), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE)
 		);
 
 		LinkedList<ConfigListEntry> list1 = new LinkedList<>();
@@ -78,7 +78,7 @@ public class CoatTestmod implements ClientModInitializer {
 
 		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("a"), null));
 		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("b"),
-				new ConfigEntryListWidget(MinecraftClient.getInstance(), list1, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE)
+				new DynamicEntryListWidget(MinecraftClient.getInstance(), list1, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE)
 		));
 
 		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, MOD_ID, list, ImmutableList.of(tree1));
