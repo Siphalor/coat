@@ -19,8 +19,8 @@ import java.util.Collection;
 public class ConfigScreen extends Screen {
 	private final Screen parent;
 	private final String modid;
-	private final Collection<ConfigListEntry> entries;
 	private final Collection<ConfigTreeEntry> trees;
+	private ConfigTreeEntry openCategory;
 	private Runnable onSave;
 
 	private int panelWidth;
@@ -31,7 +31,6 @@ public class ConfigScreen extends Screen {
 		super(new TranslatableText("coat.screen." + modid));
 		this.parent = parent;
 		this.modid = modid;
-		this.entries = entries;
 		this.trees = trees;
 	}
 
@@ -42,22 +41,14 @@ public class ConfigScreen extends Screen {
 		treeWidget.setRenderBackground(false);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		children.add(treeWidget);
-		listWidget = new ConfigEntryListWidget(client, width - panelWidth, height - 20, 20, height, 260);
-		listWidget.setLeftPos(panelWidth);
-		listWidget.setRenderBackground(true);
-		listWidget.setBackground(new Identifier("textures/block/bricks.png"));
-		children.add(listWidget);
-
-		for (ConfigListEntry entry : entries) {
-			listWidget.addEntry(entry);
-		}
 
 		for (ConfigTreeEntry tree : trees) {
 			treeWidget.addEntry(tree);
 		}
 
 		super.init();
-		resize(client, width, height);
+
+		openCategory((ConfigTreeEntry) treeWidget.getEntry(0));
 	}
 
 	public ConfigEntryListWidget getTreeWidget() {
@@ -81,6 +72,19 @@ public class ConfigScreen extends Screen {
 		onSave.run();
 	}
 
+	public void openCategory(ConfigTreeEntry category) {
+		if (openCategory != null) {
+			openCategory.setOpen(false);
+			children.remove(openCategory);
+		}
+		children.add(category);
+		openCategory = category;
+		listWidget = category.getConfigWidget(true);
+		listWidget.setPosition(panelWidth, 20);
+		listWidget.setRowWidth(260);
+		resize(client, width, height);
+	}
+
 	@Override
 	public void resize(MinecraftClient client, int width, int height) {
 		this.width = width;
@@ -88,7 +92,7 @@ public class ConfigScreen extends Screen {
 
 		panelWidth = Math.max(64, (int) (width * 0.3));
 		treeWidget.resize(panelWidth, height - 20);
-		listWidget.setLeftPos(panelWidth);
+		listWidget.setPosition(panelWidth, 20);
 		listWidget.resize(width - panelWidth, height - 20);
 	}
 

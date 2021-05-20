@@ -6,6 +6,7 @@ import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
+import de.siphalor.coat.list.ConfigEntryListWidget;
 import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.list.entry.ConfigListConfigEntry;
@@ -13,6 +14,7 @@ import de.siphalor.coat.list.entry.ConfigListTextEntry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.text.LiteralText;
@@ -67,13 +69,17 @@ public class CoatTestmod implements ClientModInitializer {
 				new TextConfigInput(new LiteralText("Some placeholder"))
 		));
 
-		ConfigTreeEntry tree1 = new ConfigTreeEntry(new LiteralText("Hi"), list);
+		ConfigTreeEntry tree1 = new ConfigTreeEntry(new LiteralText("Hi"),
+				new ConfigEntryListWidget(MinecraftClient.getInstance(), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE)
+		);
 
 		LinkedList<ConfigListEntry> list1 = new LinkedList<>();
 		list1.add(new ConfigListTextEntry(new LiteralText("Heyho")));
 
 		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("a"), null));
-		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("b"), list1));
+		tree1.addSubTree(new ConfigTreeEntry(new LiteralText("b"),
+				new ConfigEntryListWidget(MinecraftClient.getInstance(), list1, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE)
+		));
 
 		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, MOD_ID, list, ImmutableList.of(tree1));
 

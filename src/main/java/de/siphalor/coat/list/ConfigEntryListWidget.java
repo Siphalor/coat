@@ -37,13 +37,13 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 	private static final int BOTTOM_PADDING = 6;
 	protected final MinecraftClient client;
 	private final Entries children = new Entries();
-	private final int rowWidth;
 	protected int width;
 	protected int height;
 	protected int top;
 	protected int bottom;
 	protected int right;
 	protected int left;
+	private int rowWidth;
 	private double scrollAmount;
 	private boolean renderBackground;
 	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
@@ -58,6 +58,15 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		this.bottom = bottom;
 		this.left = 0;
 		this.right = width;
+		this.rowWidth = rowWidth;
+	}
+
+	public ConfigEntryListWidget(MinecraftClient client, Collection<ConfigListEntry> entries, Identifier background) {
+		this.client = client;
+		top = 20;
+		addEntries(entries);
+		this.background = background;
+		renderBackground = true;
 		this.rowWidth = rowWidth;
 	}
 
@@ -101,7 +110,7 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		addEntries(newEntries);
 	}
 
-	protected ConfigListEntry getEntry(int index) {
+	public ConfigListEntry getEntry(int index) {
 		return this.children().get(index);
 	}
 
@@ -111,7 +120,15 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		return children.size() - 1;
 	}
 
+	public void addEntry(int position, ConfigListEntry entry) {
+		entry.setParent(this);
+		children.add(position, entry);
+	}
+
 	public void addEntries(Collection<ConfigListEntry> newEntries) {
+		for (ConfigListEntry newEntry : newEntries) {
+			newEntry.setParent(this);
+		}
 		children.addAll(newEntries);
 	}
 
@@ -172,9 +189,16 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		}
 	}
 
-	public void setLeftPos(int left) {
-		this.left = left;
-		this.right = left + this.width;
+	public void setPosition(int left, int top) {
+		this.left   = left;
+		this.top    = top;
+		this.right  = left + width;
+		this.bottom = top + height;
+	}
+
+	public void setRowWidth(int rowWidth) {
+		this.rowWidth = rowWidth;
+		widthChanged(width);
 	}
 
 	protected int getMaxEntryPosition() {
@@ -543,9 +567,10 @@ public class ConfigEntryListWidget extends ConfigListCompoundEntry implements Dr
 		}
 
 		public void add(int i, ConfigListEntry entry) {
-			bottoms.add(getMaxEntryPosition() + entry.getHeight());
+			bottoms.add(0);
 			entry.setParent(ConfigEntryListWidget.this);
 			entries.add(i, entry);
+			entryHeightChanged(entry);
 			entry.widthChanged(getEntryWidth());
 		}
 

@@ -7,5 +7,6 @@
 	"coat.message.level.error": "Error",
 
 	"coat.tree.expand": "+",
-	"coat.tree.collapse": "-"
+	"coat.tree.collapse": "-",
+	"coat.tree.open": "Open"
 }
