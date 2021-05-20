@@ -178,7 +178,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 		DynamicEntryListWidget widget = configWidget;
 		if (widget == null) {
-			widget = new DynamicEntryListWidget(MinecraftClient.getInstance(), 100, 100, 0, 100, getEntryWidth());
+			widget = new DynamicEntryListWidget(MinecraftClient.getInstance(), 100, 100, 0, getEntryWidth());
 		}
 
 		for (int i = 0; i < subTrees.size(); i++) {

@@ -37,7 +37,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		panelWidth = 200;
-		treeWidget = new DynamicEntryListWidget(client, panelWidth, height - 60, 20, height - 40, (int) (panelWidth * 0.8F));
+		treeWidget = new DynamicEntryListWidget(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setRenderBackground(false);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		children.add(treeWidget);

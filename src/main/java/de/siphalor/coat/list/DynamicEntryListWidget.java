@@ -51,12 +51,12 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
 	private boolean scrolling;
 
-	public DynamicEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, int rowWidth) {
+	public DynamicEntryListWidget(MinecraftClient client, int width, int height, int top, int rowWidth) {
 		this.client = client;
 		this.width = width;
 		this.height = height;
 		this.top = top;
-		this.bottom = bottom;
+		this.bottom = top + height;
 		this.left = 0;
 		this.right = width;
 		this.rowWidth = rowWidth;
