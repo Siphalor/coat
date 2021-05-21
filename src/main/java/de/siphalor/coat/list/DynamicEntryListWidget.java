@@ -1,10 +1,8 @@
 package de.siphalor.coat.list;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.util.CoatUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
@@ -99,20 +97,13 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		return entries;
 	}
 
-	public void replaceEntries(Collection<ConfigListEntry> newEntries) {
-		focusLost();
-		entries.clear();
-		addEntries(newEntries);
-	}
-
 	public ConfigListEntry getEntry(int index) {
 		return entries.get(index);
 	}
 
-	public int addEntry(ConfigListEntry entry) {
+	public void addEntry(ConfigListEntry entry) {
 		entry.setParent(this);
 		entries.add(entry);
-		return entries.size() - 1;
 	}
 
 	public void addEntry(int position, ConfigListEntry entry) {
@@ -205,28 +196,11 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
 		this.client.getTextureManager().bindTexture(background);
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(left, bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (bottom + (int) getScrollAmount()) / 32F).next();
 		bufferBuilder.vertex(right, bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, top, 0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(left, top, 0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F, (top + (int) getScrollAmount()) / 32F).next();
-		tessellator.draw();
-	}
-
-	protected void renderShadows(Tessellator tessellator, BufferBuilder bufferBuilder) {
-		RenderSystem.depthFunc(515);
-		RenderSystem.disableDepthTest();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-		RenderSystem.disableAlphaTest();
-		RenderSystem.shadeModel(7425);
-		RenderSystem.disableTexture();
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(left,  top + TOP_PADDING, 0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(right, top + TOP_PADDING, 0D).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(right, top,               0D).color(0, 0, 0, 200).next();
-		bufferBuilder.vertex(left,  top,               0D).color(0, 0, 0, 200).next();
+		bufferBuilder.vertex(right, top,    0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  top,    0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (top + (int) getScrollAmount()) / 32F).next();
 		tessellator.draw();
 	}
 
@@ -242,7 +216,8 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 
 		this.renderList(matrices, mouseX, mouseY, delta);
 
-		renderShadows(tessellator, bufferBuilder);
+		// render top shadow
+		fillGradient(matrices, left, top, right, top + TOP_PADDING, 0xcc000000, 0x00000000);
 
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
@@ -254,28 +229,23 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 				q = this.top;
 			}
 
-			bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-			bufferBuilder.vertex(scrollbarXBegin, bottom, 0D).color(0, 0, 0, 255).texture(0F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd, bottom, 0D).color(0, 0, 0, 255).texture(1F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd, top, 0D).color(0, 0, 0, 255).texture(1F, 0F).next();
-			bufferBuilder.vertex(scrollbarXBegin, top, 0D).color(0, 0, 0, 255).texture(0F, 0F).next();
+			bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+			bufferBuilder.vertex(scrollbarXBegin, bottom, 0D).color(0, 0, 0, 255).next();
+			bufferBuilder.vertex(scrollbarXEnd,   bottom, 0D).color(0, 0, 0, 255).next();
+			bufferBuilder.vertex(scrollbarXEnd,   top,    0D).color(0, 0, 0, 255).next();
+			bufferBuilder.vertex(scrollbarXBegin, top,    0D).color(0, 0, 0, 255).next();
 
-			bufferBuilder.vertex(scrollbarXBegin, q + p, 0D).color(128, 128, 128, 255).texture(0F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd, q + p, 0D).color(128, 128, 128, 255).texture(1F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd, q, 0D).color(128, 128, 128, 255).texture(1F, 0F).next();
-			bufferBuilder.vertex(scrollbarXBegin, q, 0D).color(128, 128, 128, 255).texture(0F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin, q + p, 0D).color(128, 128, 128, 255).next();
+			bufferBuilder.vertex(scrollbarXEnd,   q + p, 0D).color(128, 128, 128, 255).next();
+			bufferBuilder.vertex(scrollbarXEnd,   q,     0D).color(128, 128, 128, 255).next();
+			bufferBuilder.vertex(scrollbarXBegin, q,     0D).color(128, 128, 128, 255).next();
 
-			bufferBuilder.vertex(scrollbarXBegin, q + p - 1, 0D).color(192, 192, 192, 255).texture(0F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd - 1, q + p - 1, 0D).color(192, 192, 192, 255).texture(1F, 1F).next();
-			bufferBuilder.vertex(scrollbarXEnd - 1, q, 0D).color(192, 192, 192, 255).texture(1F, 0F).next();
-			bufferBuilder.vertex(scrollbarXBegin, q, 0D).color(192, 192, 192, 255).texture(0F, 0F).next();
+			bufferBuilder.vertex(scrollbarXBegin,   q + p - 1, 0D).color(192, 192, 192, 255).next();
+			bufferBuilder.vertex(scrollbarXEnd - 1, q + p - 1, 0D).color(192, 192, 192, 255).next();
+			bufferBuilder.vertex(scrollbarXEnd - 1, q,         0D).color(192, 192, 192, 255).next();
+			bufferBuilder.vertex(scrollbarXBegin,   q,         0D).color(192, 192, 192, 255).next();
 			tessellator.draw();
 		}
-
-		RenderSystem.enableTexture();
-		RenderSystem.shadeModel(7424);
-		RenderSystem.enableAlphaTest();
-		RenderSystem.disableBlend();
 	}
 
 	protected void centerScrollOn(ConfigListEntry entry) {
