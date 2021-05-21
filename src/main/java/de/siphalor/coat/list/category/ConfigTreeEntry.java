@@ -3,9 +3,9 @@ package de.siphalor.coat.list.category;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
-import de.siphalor.coat.list.entry.ConfigListSubtreeEntry;
+import de.siphalor.coat.list.ConfigListWidget;
+import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
@@ -29,23 +29,26 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	private final TextButtonWidget collapseButton;
 	private final TextButtonWidget nameButton;
-	private final List<ConfigTreeEntry> subTrees = new ArrayList<>();
-	private DynamicEntryListWidget configWidget;
+	private final List<ConfigTreeEntry> subTrees;
+	private final ConfigListWidget configWidget;
 	private int x;
 	private int y;
 	private boolean open = false;
 	private boolean expanded;
 	protected Element focused;
 
-	public ConfigTreeEntry(BaseText name, DynamicEntryListWidget configWidget) {
+	public ConfigTreeEntry(Text name, ConfigListWidget configWidget) {
 		this.configWidget = configWidget;
 		collapseButton = new TextButtonWidget(x, y, 7, 9, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
 		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(this));
-	}
 
-	public void addSubTree(ConfigTreeEntry entry) {
-		entry.setParent(this);
-		subTrees.add(entry);
+		List<ConfigTreeEntry> list = new ArrayList<>();
+		for (ConfigListWidget configListWidget : configWidget.getSubTrees()) {
+			ConfigTreeEntry treeEntry = configListWidget.getTreeEntry();
+			treeEntry.setParent(this);
+			list.add(treeEntry);
+		}
+		subTrees = list;
 	}
 
 	@Override
@@ -91,6 +94,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 				nameButton.setMessage(
 						nameButton.getOriginalMessage().copy().setStyle(Style.EMPTY.withFormatting(Formatting.ITALIC))
 				);
+				setExpanded(true);
 			} else {
 				nameButton.setMessage(
 						nameButton.getOriginalMessage().copy().setStyle(Style.EMPTY)
@@ -167,24 +171,8 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		}
 	}
 
-	public Text getName() {
-		return nameButton.getOriginalMessage();
-	}
-
-	public DynamicEntryListWidget getConfigWidget(boolean linkSubtrees) {
-		if (!linkSubtrees) {
-			return configWidget;
-		}
-
-		DynamicEntryListWidget widget = configWidget;
-		if (widget == null) {
-			widget = new DynamicEntryListWidget(MinecraftClient.getInstance(), 100, 100, 0, getEntryWidth());
-		}
-
-		for (int i = 0; i < subTrees.size(); i++) {
-			widget.addEntry(i, new ConfigListSubtreeEntry(subTrees.get(i)));
-		}
-		return widget;
+	public DynamicEntryListWidget getConfigWidget() {
+		return configWidget;
 	}
 
 	@Nullable

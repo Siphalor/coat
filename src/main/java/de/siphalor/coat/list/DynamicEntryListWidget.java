@@ -38,7 +38,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
 	protected final MinecraftClient client;
-	private final Entries children = new Entries();
+	private final Entries entries = new Entries();
 	protected int width;
 	protected int height;
 	protected int top;
@@ -91,36 +91,36 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		return (ConfigListEntry) super.getFocused();
 	}
 
-	public final List<ConfigListEntry> children() {
-		return this.children;
+	public List<ConfigListEntry> children() {
+		return entries;
 	}
 
 	public void replaceEntries(Collection<ConfigListEntry> newEntries) {
 		focusLost();
-		children.clear();
+		entries.clear();
 		addEntries(newEntries);
 	}
 
 	public ConfigListEntry getEntry(int index) {
-		return this.children().get(index);
+		return entries.get(index);
 	}
 
 	public int addEntry(ConfigListEntry entry) {
 		entry.setParent(this);
-		children.add(entry);
-		return children.size() - 1;
+		entries.add(entry);
+		return entries.size() - 1;
 	}
 
 	public void addEntry(int position, ConfigListEntry entry) {
 		entry.setParent(this);
-		children.add(position, entry);
+		entries.add(position, entry);
 	}
 
 	public void addEntries(Collection<ConfigListEntry> newEntries) {
 		for (ConfigListEntry newEntry : newEntries) {
 			newEntry.setParent(this);
 		}
-		children.addAll(newEntries);
+		entries.addAll(newEntries);
 	}
 
 	protected int getEntryCount() {
@@ -140,7 +140,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		if (y < 0 || y > getMaxEntryPosition()) {
 			return null;
 		}
-		IntListIterator iterator = children.bottoms.iterator();
+		IntListIterator iterator = entries.bottoms.iterator();
 		while (iterator.hasNext()) {
 			if (y < iterator.nextInt()) {
 				return getEntry(iterator.nextIndex() - 1);
@@ -151,11 +151,11 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 
 	public void entryHeightChanged(Element element) {
 		//noinspection SuspiciousMethodCalls
-		int index = children.indexOf(element);
-		int bottom = index == 0 ? 0 : children.bottoms.getInt(index - 1);
-		for (int i = index, l = children.size(); i < l; i++) {
-			bottom += children.get(i).getHeight();
-			children.bottoms.set(i, bottom);
+		int index = entries.indexOf(element);
+		int bottom = index == 0 ? 0 : entries.bottoms.getInt(index - 1);
+		for (int i = index, l = entries.size(); i < l; i++) {
+			bottom += entries.get(i).getHeight();
+			entries.bottoms.set(i, bottom);
 		}
 	}
 
@@ -171,7 +171,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		width = newWidth;
 		right = left + newWidth;
 
-		for (ConfigListEntry entry : children) {
+		for (ConfigListEntry entry : entries) {
 			entry.widthChanged(getEntryWidth());
 		}
 	}
@@ -189,10 +189,10 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	protected int getMaxEntryPosition() {
-		if (children.isEmpty()) {
+		if (entries.isEmpty()) {
 			return 0;
 		}
-		return children.bottoms.getInt(children.bottoms.size() - 1);
+		return entries.bottoms.getInt(entries.bottoms.size() - 1);
 	}
 
 	protected int getMaxPosition() {
@@ -275,18 +275,18 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	protected void centerScrollOn(ConfigListEntry entry) {
-		int index = children.indexOf(entry);
-		setScrollAmount(children.bottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
+		int index = entries.indexOf(entry);
+		setScrollAmount(entries.bottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
 	}
 
 	protected void ensureVisible(ConfigListEntry entry) {
-		int index = children.indexOf(entry);
-		int entryBottom = children.bottoms.getInt(index);
+		int index = entries.indexOf(entry);
+		int entryBottom = entries.bottoms.getInt(index);
 		if (getEntryAreaTop() + entryBottom > bottom) {
 			setScrollAmount(entryBottom - height);
 		}
 
-		int entryTop = index == 0 ? 0 : children.bottoms.getInt(index - 1);
+		int entryTop = index == 0 ? 0 : entries.bottoms.getInt(index - 1);
 
 		if (getEntryAreaTop() + entryTop < top) {
 			setScrollAmount(entryTop);
@@ -371,7 +371,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public final void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.left = x;
 		this.top = y;
 		render(matrices, mouseX, mouseY, tickDelta);
@@ -388,12 +388,12 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 
 	@Override
 	public Collection<Message> getMessages() {
-		return children.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
+		return entries.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
 	}
 
 	protected void renderList(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		IntListIterator bottomIter = children.bottoms.iterator();
-		Iterator<ConfigListEntry> entryIter = children.iterator();
+		IntListIterator bottomIter = entries.bottoms.iterator();
+		Iterator<ConfigListEntry> entryIter = entries.iterator();
 		int relBottom = 0, relTop = 0;
 		ConfigListEntry entry = null;
 
@@ -445,11 +445,11 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		if (index == 0) {
 			return getEntryAreaTop();
 		}
-		return getEntryAreaTop() + children.bottoms.getInt(index - 1);
+		return getEntryAreaTop() + entries.bottoms.getInt(index - 1);
 	}
 
 	private int getEntryBottom(int index) {
-		return getEntryAreaTop() + children.bottoms.getInt(index);
+		return getEntryAreaTop() + entries.bottoms.getInt(index);
 	}
 
 	@Override
@@ -465,16 +465,16 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	protected ConfigListEntry removeEntry(ConfigListEntry entry) {
-		return removeEntry(children.indexOf(entry));
+		return removeEntry(entries.indexOf(entry));
 	}
 
 	protected ConfigListEntry removeEntry(int index) {
-		return children.remove(index);
+		return entries.remove(index);
 	}
 
 	@Override
 	public void tick() {
-		for (ConfigListEntry child : children()) {
+		for (ConfigListEntry child : entries) {
 			child.tick();
 		}
 	}

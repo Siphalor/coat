@@ -14,6 +14,10 @@ import java.util.Collection;
 public abstract class ConfigListEntry extends DrawableHelper implements Element, TickableElement {
 	protected ConfigListCompoundEntry parent;
 
+	public ConfigListCompoundEntry getParent() {
+		return parent;
+	}
+
 	protected void setParent(ConfigListCompoundEntry parent) {
 		this.parent = parent;
 	}

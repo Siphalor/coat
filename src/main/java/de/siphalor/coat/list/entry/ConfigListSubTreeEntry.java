@@ -4,7 +4,7 @@ import de.siphalor.coat.Coat;
 import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
-import de.siphalor.coat.list.category.ConfigTreeEntry;
+import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -17,23 +17,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ConfigListSubtreeEntry extends ConfigListCompoundEntry {
-	private final TranslatableText OPEN_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.open");
+public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
+	private static final TranslatableText OPEN_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.open");
 
-	private final ConfigTreeEntry configTreeEntry;
+	private final ConfigListWidget configWidget;
 	private final ButtonWidget button;
 	private Text nameText;
 
-	public ConfigListSubtreeEntry(ConfigTreeEntry configTreeEntry) {
-		this.configTreeEntry = configTreeEntry;
-		button = new ButtonWidget(0, 0, 50, 20, OPEN_TEXT, button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(configTreeEntry));
+	public ConfigListSubTreeEntry(ConfigListWidget configWidget) {
+		this.configWidget = configWidget;
+		button = new ButtonWidget(0, 0, 50, 20, OPEN_TEXT,
+				button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(configWidget.getTreeEntry())
+		);
 	}
 
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
 		button.x = newWidth - button.getWidth();
-		nameText = CoatUtil.intelliTrim(MinecraftClient.getInstance().textRenderer, configTreeEntry.getName(), newWidth);
+		nameText = CoatUtil.intelliTrim(MinecraftClient.getInstance().textRenderer, configWidget.getName(), newWidth);
 	}
 
 	@Override

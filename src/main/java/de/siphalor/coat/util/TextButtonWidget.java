@@ -4,14 +4,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.BaseText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 public class TextButtonWidget extends ButtonWidget {
 	private Text originalMessage;
 
-	public TextButtonWidget(int x, int y, int width, int height, BaseText message, PressAction onPress) {
+	public TextButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress) {
 		super(x, y, width, height, message, onPress);
 		setMessage(message);
 	}
