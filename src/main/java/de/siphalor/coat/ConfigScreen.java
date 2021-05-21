@@ -12,26 +12,27 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.Collection;
 
 public class ConfigScreen extends Screen {
 	private final Screen parent;
-	private final String modid;
 	private final Collection<ConfigListWidget> widgets;
 	private ConfigTreeEntry openCategory;
 	private Runnable onSave;
+	private Text title;
 
 	private int panelWidth;
 	private DynamicEntryListWidget treeWidget;
-	private DynamicEntryListWidget listWidget;
+	private ConfigListWidget listWidget;
 
-	public ConfigScreen(Screen parent, String modid, Collection<ConfigListEntry> entries, Collection<ConfigListWidget> widgets) {
-		super(new TranslatableText("coat.screen." + modid));
+	public ConfigScreen(Screen parent, Text title, Collection<ConfigListEntry> entries, Collection<ConfigListWidget> widgets) {
+		super(LiteralText.EMPTY);
+		this.title = title.copy().append(" - ").append("missingno");
 		this.parent = parent;
-		this.modid = modid;
 		this.widgets = widgets;
 	}
 
@@ -56,7 +57,7 @@ public class ConfigScreen extends Screen {
 		return treeWidget;
 	}
 
-	public DynamicEntryListWidget getListWidget() {
+	public ConfigListWidget getListWidget() {
 		return listWidget;
 	}
 
@@ -90,6 +91,10 @@ public class ConfigScreen extends Screen {
 		children.add(listWidget);
 		listWidget.setPosition(panelWidth, 20);
 		listWidget.setRowWidth(260);
+
+		title.getSiblings().set(1, listWidget.getName());
+		title = title.shallowCopy(); // Required to force update the rendered text
+
 		resize(client, width, height);
 	}
 

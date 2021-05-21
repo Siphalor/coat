@@ -5,7 +5,6 @@ import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
 import de.siphalor.coat.list.ConfigListWidget;
-import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
@@ -172,7 +171,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		}
 	}
 
-	public DynamicEntryListWidget getConfigWidget() {
+	public ConfigListWidget getConfigWidget() {
 		return configWidget;
 	}
 
