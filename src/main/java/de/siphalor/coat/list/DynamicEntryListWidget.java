@@ -70,6 +70,10 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		renderBackground = true;
 	}
 
+	public int getHorizontalPadding() {
+		return 4;
+	}
+
 	public Identifier getBackground() {
 		return background;
 	}
@@ -83,7 +87,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	public int getEntryWidth() {
-		return Math.min(rowWidth, width);
+		return Math.min(rowWidth, width) - getHorizontalPadding() * 2;
 	}
 
 	@Nullable
@@ -314,7 +318,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	protected int getScrollbarPositionX() {
-		return left + width / 2 + getEntryWidth() / 2 + CoatUtil.MARGIN;
+		return getEntryRight() + getHorizontalPadding();
 	}
 
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -409,7 +413,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		ConfigListEntry hoveredEntry = getEntryAtPosition(mouseX, mouseY);
 
 		int rowWidth = getEntryWidth();
-		int rowLeft = this.left + this.width / 2 - rowWidth / 2;
+		int rowLeft = getEntryLeft();
 		while (true) {
 			if (entry == null) {
 				break;
@@ -430,11 +434,11 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	public int getEntryLeft() {
-		return this.left + this.width / 2 - this.getEntryWidth() / 2 + 2;
+		return this.left + this.width / 2 - this.getEntryWidth() / 2;
 	}
 
 	public int getEntryRight() {
-		return this.getEntryLeft() + this.getEntryWidth();
+		return this.right - this.width / 2 + this.getEntryWidth() / 2;
 	}
 
 	protected int getEntryAreaTop() {
