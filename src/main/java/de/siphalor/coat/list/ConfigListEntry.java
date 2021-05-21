@@ -24,15 +24,17 @@ public abstract class ConfigListEntry extends DrawableHelper implements Element,
 
 	/**
 	 * Renders an entry in a list.
-	 *  @param matrices    the matrix stack used for rendering
+	 * @param matrices    the matrix stack used for rendering
 	 * @param x           the X coordinate of the entry
 	 * @param y           the Y coordinate of the entry
+	 * @param entryWidth  the width of the entry.
+	 *                       Expensive calculations based on this should be done in {@link ConfigListEntry#widthChanged(int)}.
 	 * @param entryHeight The height of the entry
 	 * @param mouseX      the X coordinate of the mouse
 	 * @param mouseY      the Y coordinate of the mouse
 	 * @param hovered     whether the mouse is hovering over the entry
 	 */
-	public abstract void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+	public abstract void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 
 	public abstract int getHeight();
 

@@ -39,7 +39,7 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		button.x = x + getEntryWidth() - button.getWidth();
 		button.y = y;
 		MinecraftClient.getInstance().textRenderer.draw(matrices, nameText, x, y + 6, CoatUtil.TEXT_COLOR);

@@ -371,7 +371,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	@Override
-	public final void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public final void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.left = x;
 		this.top = y;
 		render(matrices, mouseX, mouseY, tickDelta);
@@ -417,7 +417,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 
 			int rowTop = relTop + getEntryAreaTop();
 
-			entry.render(matrices, rowLeft, rowTop, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
+			entry.render(matrices, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
 
 			if (bottomIter.hasNext()) {
 				relTop = relBottom;

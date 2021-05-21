@@ -39,7 +39,7 @@ public class ConfigListTextEntry extends ConfigListEntry {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		for (int i = 0; i < multilineText.size(); i++) {
 			textRenderer.draw(matrices, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR);
 		}

@@ -52,12 +52,13 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x;
 		this.y = y;
 
 		boolean hoverFound = false;
 		int indent = x + 8 + CoatUtil.DOUBLE_MARGIN;
+		int innerWidth = getEntryWidth();
 
 		if (!subTrees.isEmpty()) {
 			collapseButton.x = x;
@@ -67,7 +68,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 		nameButton.x = indent;
 		nameButton.y = y;
-		nameButton.setWidth(getEntryWidth() - 8 - CoatUtil.MARGIN);
+		nameButton.setWidth(innerWidth - 8 - CoatUtil.MARGIN);
 		nameButton.render(matrices, mouseX, mouseY, tickDelta);
 
 		if (expanded) {
@@ -75,9 +76,9 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 			for (ConfigTreeEntry entry : subTrees) {
 				if (!hoverFound && mouseY > curY) {
 					hoverFound = true;
-					entry.render(matrices, indent, curY, entryHeight, mouseX, mouseY, true, tickDelta);
+					entry.render(matrices, indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
 				} else {
-					entry.render(matrices, indent, curY, entryHeight, mouseX, mouseY, false, tickDelta);
+					entry.render(matrices, indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
 				}
 				curY += entry.getHeight() + CoatUtil.MARGIN;
 			}
