@@ -1,6 +1,7 @@
 package de.siphalor.coat.list;
 
 import de.siphalor.coat.list.category.ConfigTreeEntry;
+import de.siphalor.coat.list.entry.ConfigListHorizontalBreak;
 import de.siphalor.coat.list.entry.ConfigListSubTreeEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -28,6 +29,10 @@ public class ConfigListWidget extends DynamicEntryListWidget {
 	}
 
 	public void addSubTree(ConfigListWidget subWidget) {
+		if (subTrees.isEmpty()) {
+			children().add(0, new ConfigListHorizontalBreak());
+		}
+
 		subTrees.add(subWidget);
 		ConfigListSubTreeEntry treeEntry = new ConfigListSubTreeEntry(subWidget);
 		children().add(subTreeLinks.size(), treeEntry);

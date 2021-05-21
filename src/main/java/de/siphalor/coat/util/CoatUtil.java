@@ -17,8 +17,8 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 public class CoatUtil {
-	public static final int TEXT_COLOR = 0xdddddd;
-	public static final int SECONDARY_TEXT_COLOR = 0xaaaaaa;
+	public static final int TEXT_COLOR = 0xffdddddd;
+	public static final int SECONDARY_TEXT_COLOR = 0xffaaaaaa;
 	public static final int MARGIN = 2;
 	public static final int DOUBLE_MARGIN = MARGIN * 2;
 	public static final int HALF_MARGIN = MARGIN / 2;
