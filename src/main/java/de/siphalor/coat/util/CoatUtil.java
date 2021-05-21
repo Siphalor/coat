@@ -67,7 +67,7 @@ public class CoatUtil {
 		RenderSystem.disableBlend();
 	}
 
-	private static void addRect(BufferBuilder buffer, int x1, int y1, int x2, int y2, int red, int green, int blue, int alpha) {
+	public static void addRect(BufferBuilder buffer, int x1, int y1, int x2, int y2, int red, int green, int blue, int alpha) {
 		buffer.vertex(x1, y2, 0).color(red, green, blue, alpha).next();
 		buffer.vertex(x2, y2, 0).color(red, green, blue, alpha).next();
 		buffer.vertex(x2, y1, 0).color(red, green, blue, alpha).next();

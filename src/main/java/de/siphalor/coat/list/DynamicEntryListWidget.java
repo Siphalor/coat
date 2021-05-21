@@ -3,6 +3,7 @@ package de.siphalor.coat.list;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.handler.Message;
+import de.siphalor.coat.util.CoatUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
@@ -230,20 +231,9 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 			}
 
 			bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-			bufferBuilder.vertex(scrollbarXBegin, bottom, 0D).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(scrollbarXEnd,   bottom, 0D).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(scrollbarXEnd,   top,    0D).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(scrollbarXBegin, top,    0D).color(0, 0, 0, 255).next();
-
-			bufferBuilder.vertex(scrollbarXBegin, q + p, 0D).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(scrollbarXEnd,   q + p, 0D).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(scrollbarXEnd,   q,     0D).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(scrollbarXBegin, q,     0D).color(128, 128, 128, 255).next();
-
-			bufferBuilder.vertex(scrollbarXBegin,   q + p - 1, 0D).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(scrollbarXEnd - 1, q + p - 1, 0D).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(scrollbarXEnd - 1, q,         0D).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(scrollbarXBegin,   q,         0D).color(192, 192, 192, 255).next();
+			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, top, scrollbarXEnd, bottom, 0, 0, 0, 255);
+			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, 128, 128, 128, 255);
+			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, 192, 192, 192, 255);
 			tessellator.draw();
 		}
 	}
