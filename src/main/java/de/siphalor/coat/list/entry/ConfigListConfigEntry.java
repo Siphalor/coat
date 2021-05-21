@@ -38,7 +38,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	public ConfigListConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
-		nameWidget = new TextButtonWidget(x, y, 100, 8, name, button -> setExpanded(!isExpanded()));
+		nameWidget = new TextButtonWidget(x, y, 100, 12, name, button -> setExpanded(!isExpanded()));
 		setName(name.copy());
 		this.description = description;
 		this.entryHandler = entryHandler;
@@ -130,7 +130,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + CoatUtil.HALF_MARGIN;
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
 		nameWidget.x = x;
-		nameWidget.y = textY;
+		nameWidget.y = textY - 2;
 		nameWidget.render(matrices, mouseX, mouseY, tickDelta);
 
 		float curY = y + CoatUtil.MARGIN + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
@@ -235,7 +235,12 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	@Override
 	public void inputChanged(V newValue) {
-		defaultButton.active = !Objects.equals(newValue, entryHandler.getDefault());
+		if (!Objects.equals(newValue, entryHandler.getDefault())) {
+			defaultButton.active = true;
+		} else {
+			defaultButton.active = false;
+			changeFocus(false);
+		}
 		setMessages(entryHandler.getMessages(newValue));
 	}
 
