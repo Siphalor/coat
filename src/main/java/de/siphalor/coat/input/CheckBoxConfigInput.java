@@ -12,11 +12,6 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	}
 
 	@Override
-	public int getHeight() {
-		return super.getHeight();
-	}
-
-	@Override
 	public Boolean getValue() {
 		return isChecked();
 	}

@@ -2,7 +2,7 @@ package de.siphalor.coat.testmod;
 
 import com.google.common.collect.ImmutableList;
 import de.siphalor.amecs.api.PriorityKeyBinding;
-import de.siphalor.coat.ConfigScreen;
+import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
@@ -46,7 +46,9 @@ public class CoatTestmod implements ClientModInitializer {
 		list.add(new ConfigListConfigEntry<>(
 				new LiteralText("Blub"),
 				new LiteralText("This is a fine description"),
-				new GenericEntryHandler<>("default", s -> Collections.emptyList()),
+				new GenericEntryHandler<>("default", s ->
+						Collections.singleton(new Message(Message.Level.WARNING, new LiteralText("Requires restart!")))
+				),
 				new TextConfigInput(new LiteralText("Some placeholder"))
 		));
 		list.add(new ConfigListConfigEntry<>(

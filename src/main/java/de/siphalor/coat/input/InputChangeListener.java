@@ -8,5 +8,5 @@ public interface InputChangeListener<V> extends Consumer<V> {
 	@Override
 	default void accept(V v) {
 		inputChanged(v);
-	};
+	}
 }

@@ -9,6 +9,7 @@ import net.minecraft.util.Formatting;
 public class Message {
 	private final Level level;
 	private final BaseText text;
+	private Object origin;
 
 	public Message(Level level, BaseText text) {
 		this.level = level;
@@ -22,6 +23,14 @@ public class Message {
 
 	public BaseText getText() {
 		return text;
+	}
+
+	public Object getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(Object origin) {
+		this.origin = origin;
 	}
 
 	public static class Level {

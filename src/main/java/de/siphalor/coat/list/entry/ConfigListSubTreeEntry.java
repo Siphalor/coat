@@ -2,10 +2,10 @@ package de.siphalor.coat.list.entry;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.Coat;
-import de.siphalor.coat.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
 import de.siphalor.coat.list.ConfigListWidget;
+import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;

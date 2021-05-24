@@ -1,7 +1,7 @@
 package de.siphalor.coat.list.category;
 
 import de.siphalor.coat.Coat;
-import de.siphalor.coat.ConfigScreen;
+import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
 import de.siphalor.coat.list.ConfigListWidget;
@@ -150,7 +150,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	@Override
 	public Collection<Message> getMessages() {
-		return Collections.emptyList();
+		return configWidget.getMessages();
 	}
 
 	@Override

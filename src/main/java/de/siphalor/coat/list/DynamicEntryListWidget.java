@@ -238,12 +238,12 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		}
 	}
 
-	protected void centerScrollOn(ConfigListEntry entry) {
+	public void centerScrollOn(ConfigListEntry entry) {
 		int index = entries.indexOf(entry);
 		setScrollAmount(entries.bottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
 	}
 
-	protected void ensureVisible(ConfigListEntry entry) {
+	public void ensureVisible(ConfigListEntry entry) {
 		int index = entries.indexOf(entry);
 		int entryBottom = entries.bottoms.getInt(index);
 		if (getEntryAreaTop() + entryBottom > bottom) {

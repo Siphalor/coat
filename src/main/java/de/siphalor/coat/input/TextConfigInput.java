@@ -1,6 +1,5 @@
 package de.siphalor.coat.input;
 
-import de.siphalor.coat.Coat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;

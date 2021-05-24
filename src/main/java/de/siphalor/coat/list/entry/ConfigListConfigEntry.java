@@ -268,6 +268,9 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	protected void setMessages(Collection<Message> messages) {
 		this.messages = messages;
+		for (Message message : messages) {
+			message.setOrigin(this);
+		}
 		if (parent != null) {
 			parent.entryHeightChanged(this);
 		}
