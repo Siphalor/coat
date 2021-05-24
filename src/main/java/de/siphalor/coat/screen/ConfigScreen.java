@@ -42,7 +42,7 @@ public class ConfigScreen extends Screen {
 	private ButtonWidget saveButton;
 	private ConfigListWidget listWidget;
 
-	public ConfigScreen(Screen parent, Text title, Collection<ConfigListEntry> entries, Collection<ConfigListWidget> widgets) {
+	public ConfigScreen(Screen parent, Text title, Collection<ConfigListWidget> widgets) {
 		super(LiteralText.EMPTY);
 		this.title = title.copy().append(" - ").append("missingno");
 		this.parent = parent;

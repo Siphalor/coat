@@ -82,7 +82,7 @@ public class CoatTestmod implements ClientModInitializer {
 		list2.add(new ConfigListTextEntry(new LiteralText("Heyho")));
 		widget.addSubTree(new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("b"), list2, new Identifier("textures/block/end_stone.png")));
 
-		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, new LiteralText("Coat Test Mod"), list, ImmutableList.of(widget));
+		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, new LiteralText("Coat Test Mod"), ImmutableList.of(widget));
 
 		return screen;
 	}
