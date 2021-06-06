@@ -35,7 +35,7 @@ public class ConfigScreen extends Screen {
 	private final Collection<ConfigListWidget> widgets;
 	private ConfigTreeEntry openCategory;
 	private Runnable onSave = () -> {};
-	private Text title;
+	private Text visualTitle;
 
 	private int panelWidth;
 	private DynamicEntryListWidget treeWidget;
@@ -44,8 +44,8 @@ public class ConfigScreen extends Screen {
 	private ConfigListWidget listWidget;
 
 	public ConfigScreen(Screen parent, Text title, Collection<ConfigListWidget> widgets) {
-		super(LiteralText.EMPTY);
-		this.title = title.copy().append(" - ").append("missingno");
+		super(title);
+		this.visualTitle = title.copy().append(" - ").append("missingno");
 		this.parent = parent;
 		this.widgets = widgets;
 	}
@@ -163,8 +163,11 @@ public class ConfigScreen extends Screen {
 		listWidget.setPosition(panelWidth, 20);
 		listWidget.setRowWidth(260);
 
-		title.getSiblings().set(1, listWidget.getName());
-		title = title.shallowCopy(); // Required to force update the rendered text
+		if (listWidget.getName() != null && !listWidget.getName().getString().isEmpty()) {
+			visualTitle = title.copy().append(" - ").append(listWidget.getName());
+		} else {
+			visualTitle = title;
+		}
 
 		resize(client, width, height);
 	}
@@ -236,7 +239,7 @@ public class ConfigScreen extends Screen {
 		bufferBuilder.vertex(0D,     0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
 		tessellator.draw();
 
-		drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xffffff);
+		drawCenteredText(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
 
 		super.render(matrices, mouseX, mouseY, delta);
 	}
