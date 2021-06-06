@@ -71,7 +71,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		nameButton.render(matrices, mouseX, mouseY, tickDelta);
 
 		if (expanded) {
-			int curY = y + 8 + CoatUtil.MARGIN;
+			int curY = y + nameButton.getHeight() + CoatUtil.MARGIN;
 			for (ConfigTreeEntry entry : subTrees) {
 				if (!hoverFound && mouseY > curY) {
 					hoverFound = true;
@@ -134,7 +134,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		for (ConfigTreeEntry entry : subTrees) {
 			height += entry.getHeight() + CoatUtil.MARGIN;
 		}
-		return height + CoatUtil.MARGIN + 9;
+		return height + CoatUtil.MARGIN + nameButton.getHeight();
 	}
 
 	public int getExpansionHeight() {
