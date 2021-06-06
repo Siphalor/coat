@@ -22,6 +22,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 import java.util.AbstractList;
 import java.util.Collection;
@@ -196,12 +197,14 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(GL11.GL_LEQUAL);
 		this.client.getTextureManager().bindTexture(background);
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(left,  bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, bottom, 0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, top,    0D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(left,  top,    0D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (top + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  bottom, -100D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, bottom, -100D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, top,    -100D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  top,    -100D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (top + (int) getScrollAmount()) / 32F).next();
 		tessellator.draw();
 	}
 
@@ -214,11 +217,6 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		if (renderBackground) {
 			renderBackground(tessellator, bufferBuilder);
 		}
-
-		this.renderList(matrices, mouseX, mouseY, delta);
-
-		// render top shadow
-		fillGradient(matrices, left, top, right, top + TOP_PADDING, 0xcc000000, 0x00000000);
 
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
@@ -235,7 +233,14 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, 128, 128, 128, 255);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, 192, 192, 192, 255);
 			tessellator.draw();
+			RenderSystem.enableTexture();
 		}
+
+		this.renderList(matrices, mouseX, mouseY, delta);
+
+		// render top shadow
+		fillGradient(matrices, left, top, right, top + TOP_PADDING, 0xcc000000, 0x00000000);
+
 	}
 
 	public void centerScrollOn(ConfigListEntry entry) {

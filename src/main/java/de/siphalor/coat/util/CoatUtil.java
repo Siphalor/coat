@@ -1,5 +1,6 @@
 package de.siphalor.coat.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -11,6 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
@@ -39,6 +41,7 @@ public class CoatUtil {
 
 	public static void renderTooltip(MatrixStack matrices, int x, int y, Text text) {
 		MinecraftClient client = MinecraftClient.getInstance();
+		RenderSystem.depthFunc(GL11.GL_ALWAYS);
 		client.currentScreen.renderOrderedTooltip(
 				matrices,
 				wrapTooltip(client.textRenderer, client, text),

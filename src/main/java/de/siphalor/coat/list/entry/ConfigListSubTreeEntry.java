@@ -48,18 +48,20 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 		int r = entryHeight / 2;
 
 		MinecraftClient.getInstance().getTextureManager().bindTexture(configWidget.getBackground());
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(GL11.GL_LEQUAL);
 		RenderSystem.shadeModel(7425);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		buffer.begin(GL11.GL_TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE);
-		buffer.vertex(x,                  y,               0).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      0F               ).next();
-		buffer.vertex(x + r,              y + r,           0).color(0x77, 0x77, 0x77, 0xff).texture(r / 32F,                 r / 32F          ).next();
-		buffer.vertex(x + entryWidth,     y,               0).color(0x33, 0x33, 0x33, 0xff).texture(entryWidth / 32F,        0F               ).next();
-		buffer.vertex(x + entryWidth - r, y + r,           0).color(0x77, 0x77, 0x77, 0xff).texture((entryWidth - r) / 32F,  r / 32F          ).next();
-		buffer.vertex(x + entryWidth,     y + entryHeight, 0).color(0x33, 0x33, 0x33, 0xff).texture(entryWidth / 32F,        entryHeight / 32F).next();
-		buffer.vertex(x + r,              y + r,           0).color(0x77, 0x77, 0x77, 0xff).texture(r / 32F,                 r / 32F          ).next();
-		buffer.vertex(x,                  y + entryHeight, 0).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      entryHeight / 32F).next();
-		buffer.vertex(x,                  y,               0).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      0F               ).next();
+		buffer.vertex(x,                  y,               -100D).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      0F               ).next();
+		buffer.vertex(x + r,              y + r,           -100D).color(0x77, 0x77, 0x77, 0xff).texture(r / 32F,                 r / 32F          ).next();
+		buffer.vertex(x + entryWidth,     y,               -100D).color(0x33, 0x33, 0x33, 0xff).texture(entryWidth / 32F,        0F               ).next();
+		buffer.vertex(x + entryWidth - r, y + r,           -100D).color(0x77, 0x77, 0x77, 0xff).texture((entryWidth - r) / 32F,  r / 32F          ).next();
+		buffer.vertex(x + entryWidth,     y + entryHeight, -100D).color(0x33, 0x33, 0x33, 0xff).texture(entryWidth / 32F,        entryHeight / 32F).next();
+		buffer.vertex(x + r,              y + r,           -100D).color(0x77, 0x77, 0x77, 0xff).texture(r / 32F,                 r / 32F          ).next();
+		buffer.vertex(x,                  y + entryHeight, -100D).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      entryHeight / 32F).next();
+		buffer.vertex(x,                  y,               -100D).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      0F               ).next();
 		tessellator.draw();
 
 		button.x = x + getEntryWidth() - button.getWidth();

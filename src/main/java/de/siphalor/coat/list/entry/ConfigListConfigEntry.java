@@ -239,7 +239,9 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 			defaultButton.active = true;
 		} else {
 			defaultButton.active = false;
-			changeFocus(false);
+			if (defaultButton.isFocused()) {
+				changeFocus(false);
+			}
 		}
 		setMessages(entryHandler.getMessages(newValue));
 	}

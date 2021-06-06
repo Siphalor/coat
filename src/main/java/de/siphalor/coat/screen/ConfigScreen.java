@@ -21,6 +21,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -197,7 +198,7 @@ public class ConfigScreen extends Screen {
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
 		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(519);
+		RenderSystem.depthFunc(GL11.GL_LEQUAL);
 
 		client.getTextureManager().bindTexture(treeWidget.getBackground());
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
@@ -210,28 +211,29 @@ public class ConfigScreen extends Screen {
 		treeWidget.render(matrices, mouseX, mouseY, delta);
 		listWidget.render(matrices, mouseX, mouseY, delta);
 
-		RenderSystem.depthFunc(515);
-		RenderSystem.disableDepthTest();
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(GL11.GL_LEQUAL);
 		RenderSystem.enableBlend();
 		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
 		RenderSystem.disableAlphaTest();
 		RenderSystem.shadeModel(7425);
 		RenderSystem.disableTexture();
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(panelWidth,      height, -100D).color(0, 0, 0, 200).next();
-		bufferBuilder.vertex(panelWidth + 8D, height, -100D).color(0, 0, 0,   0).next();
-		bufferBuilder.vertex(panelWidth + 8D, 20D,    -100D).color(0, 0, 0,   0).next();
-		bufferBuilder.vertex(panelWidth,      20D,    -100D).color(0, 0, 0, 200).next();
+		bufferBuilder.vertex(panelWidth,      height, 0D).color(0, 0, 0, 200).next();
+		bufferBuilder.vertex(panelWidth + 8D, height, 0D).color(0, 0, 0,   0).next();
+		bufferBuilder.vertex(panelWidth + 8D, 20D,    0D).color(0, 0, 0,   0).next();
+		bufferBuilder.vertex(panelWidth,      20D,    0D).color(0, 0, 0, 200).next();
 		tessellator.draw();
 
+		RenderSystem.disableDepthTest();
 		RenderSystem.disableBlend();
 		RenderSystem.enableTexture();
 		client.getTextureManager().bindTexture(listWidget.getBackground());
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(0D,    20D, -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
-		bufferBuilder.vertex(width, 20D, -100D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
-		bufferBuilder.vertex(width,  0D, -100D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 0F).next();
-		bufferBuilder.vertex(0D,     0D, -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
+		bufferBuilder.vertex(0D,    20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
+		bufferBuilder.vertex(width, 20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
+		bufferBuilder.vertex(width,  0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 0F).next();
+		bufferBuilder.vertex(0D,     0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
 		tessellator.draw();
 
 		drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xffffff);
