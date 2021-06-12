@@ -3,11 +3,13 @@ package de.siphalor.coat.input;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public class TextConfigInput extends TextFieldWidget implements ConfigInput<String> {
-	public TextConfigInput(Text placeholder) {
-		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, placeholder);
+	public TextConfigInput(String value) {
+		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, LiteralText.EMPTY);
+		setValue(value);
 	}
 
 	@Override
@@ -23,6 +25,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	@Override
 	public void setValue(String value) {
 		setText(value);
+		setSelectionEnd(0);
 	}
 
 	@Override

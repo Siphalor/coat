@@ -49,7 +49,7 @@ public class CoatTestmod implements ClientModInitializer {
 				new GenericEntryHandler<>("default", s ->
 						Collections.singleton(new Message(Message.Level.WARNING, new LiteralText("Requires restart!")))
 				),
-				new TextConfigInput(new LiteralText("Some placeholder"))
+				new TextConfigInput("Some value")
 		));
 		list.add(new ConfigListConfigEntry<>(
 				new LiteralText("This is a really long title for a config entry"),
@@ -62,13 +62,13 @@ public class CoatTestmod implements ClientModInitializer {
 										new Message(Message.Level.ERROR, new LiteralText("Must be all lowercase!"))
 								)
 				),
-				new TextConfigInput(new LiteralText("Some placeholder"))
+				new TextConfigInput("Another value")
 		));
 		list.add(new ConfigListConfigEntry<>(
 				new LiteralText("Blub"),
 				new LiteralText("This is a fine description"),
 				new GenericEntryHandler<>("default", s -> Collections.emptyList()),
-				new TextConfigInput(new LiteralText("Some placeholder"))
+				new TextConfigInput("Blub")
 		));
 
 		ConfigListWidget widget = new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Hi"), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
