@@ -95,13 +95,13 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	}
 
 	protected void setName(BaseText name) {
-		nameWidget.setMessage(name);
 		Message.Level level = getHighestMessageLevel();
 		if (level == null) {
 			name.setStyle(Style.EMPTY);
 		} else {
 			name.setStyle(level.getTextStyle());
 		}
+		nameWidget.setMessage(name);
 	}
 
 	@Override
