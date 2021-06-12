@@ -39,8 +39,10 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
-		button.x = newWidth - button.getWidth();
-		nameText = CoatUtil.intelliTrim(MinecraftClient.getInstance().textRenderer, configWidget.getName(), newWidth);
+		nameText = CoatUtil.intelliTrim(
+				MinecraftClient.getInstance().textRenderer, configWidget.getName(),
+				newWidth - button.getWidth() - CoatUtil.DOUBLE_MARGIN - CoatUtil.MARGIN
+		);
 	}
 
 	@Override
@@ -64,10 +66,14 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 		buffer.vertex(x,                  y,               -100D).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      0F               ).next();
 		tessellator.draw();
 
-		button.x = x + getEntryWidth() - button.getWidth();
-		button.y = y + 2;
-		MinecraftClient.getInstance().textRenderer.draw(matrices, nameText, x + r, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
+		button.x = x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN;
+		button.y = y + CoatUtil.MARGIN;
+		MinecraftClient.getInstance().textRenderer.draw(matrices, nameText, x + CoatUtil.MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
 		button.render(matrices, mouseX, mouseY, tickDelta);
+
+		if (hovered && nameText != configWidget.getName() && !button.isMouseOver(mouseX, mouseY)) {
+			CoatUtil.renderTooltip(matrices, mouseX, mouseY, configWidget.getName());
+		}
 	}
 
 	@Override
