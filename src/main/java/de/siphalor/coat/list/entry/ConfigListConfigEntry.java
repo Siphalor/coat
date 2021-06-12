@@ -159,7 +159,6 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 				}
 			}
 
-			curY += CoatUtil.MARGIN;
 			descriptionMultiline.draw(matrices, x + CoatUtil.DOUBLE_MARGIN, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
 		}
 	}
@@ -198,9 +197,6 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 			if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
 				height += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + CoatUtil.MARGIN;
 			}
-		}
-		if (height > 0) {
-			height += CoatUtil.MARGIN;
 		}
 		return height;
 	}
