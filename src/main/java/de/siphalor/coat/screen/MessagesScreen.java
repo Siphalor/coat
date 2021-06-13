@@ -48,12 +48,12 @@ public class MessagesScreen extends Screen {
 				new TranslatableText(Coat.MOD_ID + ".action.accept_risk"),
 				button -> acceptRunnable.run()
 		);
-		addButton(abortButton);
-		addButton(acceptButton);
+		addDrawableChild(abortButton);
+		addDrawableChild(acceptButton);
 
 		messagesList = new DynamicEntryListWidget(MinecraftClient.getInstance(), width, height - 62, 62, 260);
 		messagesList.addEntries(messages.stream().map(MessageListEntry::new).collect(Collectors.toList()));
-		children.add(messagesList);
+		addDrawable(messagesList);
 
 		resize(MinecraftClient.getInstance(), width, height);
 	}
@@ -74,7 +74,7 @@ public class MessagesScreen extends Screen {
 		abortButton.x  = width / 2 - CoatUtil.MARGIN - abortButton.getWidth();
 		acceptButton.x = width / 2 + CoatUtil.MARGIN;
 		titleLines.draw(matrices, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR);
-		messagesList.render(matrices, mouseX, mouseY, delta);
+		// messagesList.render(matrices, mouseX, mouseY, delta);
 
 		super.render(matrices, mouseX, mouseY, delta);
 	}

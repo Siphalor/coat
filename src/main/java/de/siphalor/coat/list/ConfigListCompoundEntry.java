@@ -2,9 +2,11 @@ package de.siphalor.coat.list;
 
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
+import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ConfigListCompoundEntry extends ConfigListEntry implements ParentElement {
+public abstract class ConfigListCompoundEntry extends ConfigListEntry implements ParentElement, Selectable {
 	private Element focused;
 
 	@Override
@@ -39,4 +41,14 @@ public abstract class ConfigListCompoundEntry extends ConfigListEntry implements
 	}
 
 	public abstract int getEntryWidth();
+
+	@Override
+	public void appendNarrations(NarrationMessageBuilder builder) {
+		// TODO: narrations
+	}
+
+	@Override
+	public SelectionType getType() {
+		return focused != null ? SelectionType.FOCUSED : SelectionType.NONE;
+	}
 }

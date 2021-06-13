@@ -13,15 +13,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL32;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -56,7 +55,7 @@ public class ConfigScreen extends Screen {
 		treeWidget = new DynamicEntryListWidget(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setRenderBackground(false);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
-		children.add(treeWidget);
+		addDrawableChild(treeWidget);
 
 		for (ConfigListWidget widget : widgets) {
 			treeWidget.addEntry(widget.getTreeEntry());
@@ -64,8 +63,8 @@ public class ConfigScreen extends Screen {
 
 		abortButton = new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, ABORT_TEXT, button -> onClose());
 		saveButton =  new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, SAVE_TEXT, this::clickSave);
-		addButton(abortButton);
-		addButton(saveButton);
+		addDrawableChild(abortButton);
+		addDrawableChild(saveButton);
 
 		super.init();
 
@@ -148,7 +147,7 @@ public class ConfigScreen extends Screen {
 	public void openCategory(ConfigTreeEntry category) {
 		if (openCategory != null) {
 			openCategory.setOpen(false);
-			children.remove(openCategory);
+			remove(listWidget);
 		}
 		openCategory = category;
 		category.setOpen(true);
@@ -159,7 +158,7 @@ public class ConfigScreen extends Screen {
 		}
 
 		listWidget = category.getConfigWidget();
-		children.add(listWidget);
+		addDrawableChild(listWidget);
 		listWidget.setPosition(panelWidth, 20);
 		listWidget.setRowWidth(260);
 
@@ -197,42 +196,41 @@ public class ConfigScreen extends Screen {
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		super.render(matrices, mouseX, mouseY, delta);
 
 		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LEQUAL);
+		RenderSystem.depthFunc(GL32.GL_LEQUAL);
 
-		client.getTextureManager().bindTexture(treeWidget.getBackground());
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		RenderSystem.setShaderTexture(0, treeWidget.getBackground());
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
 		bufferBuilder.vertex(0D,         height, -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, height / 32F).next();
 		bufferBuilder.vertex(panelWidth, height, -100D).color(0x77, 0x77, 0x77, 0xff).texture(panelWidth / 32F, height / 32F).next();
 		bufferBuilder.vertex(panelWidth, 20D,    -100D).color(0x77, 0x77, 0x77, 0xff).texture(panelWidth / 32F, 0F).next();
 		bufferBuilder.vertex(0D,         20D,    -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
 		tessellator.draw();
 
-		treeWidget.render(matrices, mouseX, mouseY, delta);
-		listWidget.render(matrices, mouseX, mouseY, delta);
-
 		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-		RenderSystem.disableAlphaTest();
-		RenderSystem.shadeModel(7425);
+		RenderSystem.depthFunc(GL32.GL_LEQUAL);
 		RenderSystem.disableTexture();
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		bufferBuilder.vertex(panelWidth,      height, 0D).color(0, 0, 0, 200).next();
 		bufferBuilder.vertex(panelWidth + 8D, height, 0D).color(0, 0, 0,   0).next();
 		bufferBuilder.vertex(panelWidth + 8D, 20D,    0D).color(0, 0, 0,   0).next();
 		bufferBuilder.vertex(panelWidth,      20D,    0D).color(0, 0, 0, 200).next();
 		tessellator.draw();
 
+		RenderSystem.enableTexture();
 		RenderSystem.disableDepthTest();
 		RenderSystem.disableBlend();
-		RenderSystem.enableTexture();
-		client.getTextureManager().bindTexture(listWidget.getBackground());
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
+		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		RenderSystem.setShaderTexture(0, listWidget.getBackground());
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
 		bufferBuilder.vertex(0D,    20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
 		bufferBuilder.vertex(width, 20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
 		bufferBuilder.vertex(width,  0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 0F).next();
@@ -240,7 +238,5 @@ public class ConfigScreen extends Screen {
 		tessellator.draw();
 
 		drawCenteredText(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
-
-		super.render(matrices, mouseX, mouseY, delta);
 	}
 }

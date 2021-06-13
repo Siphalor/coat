@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.util.CoatUtil;
+import de.siphalor.coat.util.TickableElement;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
@@ -13,11 +14,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.TickableElement;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.screen.narration.NarrationPart;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +37,7 @@ import java.util.stream.Collectors;
  * This is mostly a copy of {@link net.minecraft.client.gui.widget.EntryListWidget} to enable variable item heights.
  */
 @Environment(EnvType.CLIENT)
-public class DynamicEntryListWidget extends ConfigListCompoundEntry implements Drawable, TickableElement {
+public class DynamicEntryListWidget extends ConfigListCompoundEntry implements Drawable, Selectable, TickableElement {
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
 	protected final MinecraftClient client;
@@ -199,8 +202,9 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		this.client.getTextureManager().bindTexture(background);
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
+		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		RenderSystem.setShaderTexture(0,background);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
 		bufferBuilder.vertex(left,  bottom, -100D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (bottom + (int) getScrollAmount()) / 32F).next();
 		bufferBuilder.vertex(right, bottom, -100D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
 		bufferBuilder.vertex(right, top,    -100D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
@@ -221,6 +225,8 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
 			RenderSystem.disableTexture();
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
+			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 			int p = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getMaxPosition());
 			p = MathHelper.clamp(p, 32, this.bottom - this.top - 8);
 			int q = (int) this.getScrollAmount() * (this.bottom - this.top - p) / maxScroll + this.top;
@@ -228,7 +234,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 				q = this.top;
 			}
 
-			bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, top, scrollbarXEnd, bottom, 0, 0, 0, 255);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, 128, 128, 128, 255);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, 192, 192, 192, 255);
@@ -446,6 +452,16 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		for (ConfigListEntry child : entries) {
 			child.tick();
 		}
+	}
+
+	@Override
+	public void appendNarrations(NarrationMessageBuilder builder) {
+		// TODO: narrations
+	}
+
+	@Override
+	public SelectionType getType() {
+		return SelectionType.NONE;
 	}
 
 	@Environment(EnvType.CLIENT)
