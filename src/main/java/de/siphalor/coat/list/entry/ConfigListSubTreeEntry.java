@@ -41,7 +41,7 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 		super.widthChanged(newWidth);
 		nameText = CoatUtil.intelliTrim(
 				MinecraftClient.getInstance().textRenderer, configWidget.getName(),
-				newWidth - button.getWidth() - CoatUtil.DOUBLE_MARGIN - CoatUtil.MARGIN
+				newWidth - button.getWidth() - CoatUtil.DOUBLE_MARGIN - CoatUtil.DOUBLE_MARGIN - CoatUtil.MARGIN
 		);
 	}
 
@@ -68,7 +68,7 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 
 		button.x = x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN;
 		button.y = y + CoatUtil.MARGIN;
-		MinecraftClient.getInstance().textRenderer.draw(matrices, nameText, x + CoatUtil.MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
+		MinecraftClient.getInstance().textRenderer.draw(matrices, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
 		button.render(matrices, mouseX, mouseY, tickDelta);
 
 		if (hovered && nameText != configWidget.getName() && !button.isMouseOver(mouseX, mouseY)) {
