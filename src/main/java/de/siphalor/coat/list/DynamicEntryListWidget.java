@@ -47,7 +47,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	protected int left;
 	private int rowWidth;
 	private double scrollAmount;
-	private boolean renderBackground;
+	private float backgroundBrightness = 0.27F;
 	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
 	private boolean scrolling;
 
@@ -67,7 +67,6 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		top = 20;
 		addEntries(entries);
 		this.background = background;
-		renderBackground = true;
 	}
 
 	public int getHorizontalPadding() {
@@ -82,8 +81,8 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		this.background = background;
 	}
 
-	public void setRenderBackground(boolean renderBackground) {
-		this.renderBackground = renderBackground;
+	public void setBackgroundBrightness(float backgroundBrightness) {
+		this.backgroundBrightness = backgroundBrightness;
 	}
 
 	public int getEntryWidth() {
@@ -199,13 +198,15 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
+		RenderSystem.color3f(backgroundBrightness, backgroundBrightness, backgroundBrightness);
 		this.client.getTextureManager().bindTexture(background);
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(left,  bottom, -100D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, bottom, -100D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, top,    -100D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(left,  top,    -100D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (top + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE);
+		bufferBuilder.vertex(left,  bottom, -100D).texture(left / 32F,  (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, bottom, -100D).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, top,    -100D).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  top,    -100D).texture(left / 32F,  (top + (int) getScrollAmount()) / 32F).next();
 		tessellator.draw();
+		RenderSystem.clearCurrentColor();
 	}
 
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -214,9 +215,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-		if (renderBackground) {
-			renderBackground(tessellator, bufferBuilder);
-		}
+		renderBackground(tessellator, bufferBuilder);
 
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
