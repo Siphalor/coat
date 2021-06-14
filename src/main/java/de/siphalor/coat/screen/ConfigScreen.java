@@ -1,6 +1,5 @@
 package de.siphalor.coat.screen;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
@@ -15,11 +14,9 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL32;
 
 import java.util.Collection;

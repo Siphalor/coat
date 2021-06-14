@@ -1,10 +1,10 @@
 package de.siphalor.coat.list.category;
 
 import de.siphalor.coat.Coat;
-import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
 import de.siphalor.coat.list.ConfigListWidget;
+import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class ConfigTreeEntry extends ConfigListCompoundEntry {
