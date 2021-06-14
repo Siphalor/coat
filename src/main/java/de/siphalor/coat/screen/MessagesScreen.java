@@ -53,7 +53,7 @@ public class MessagesScreen extends Screen {
 
 		messagesList = new DynamicEntryListWidget(MinecraftClient.getInstance(), width, height - 62, 62, 260);
 		messagesList.addEntries(messages.stream().map(MessageListEntry::new).collect(Collectors.toList()));
-		addDrawable(messagesList);
+		addDrawableChild(messagesList);
 
 		resize(MinecraftClient.getInstance(), width, height);
 	}

@@ -53,7 +53,7 @@ public class ConfigScreen extends Screen {
 	protected void init() {
 		panelWidth = 200;
 		treeWidget = new DynamicEntryListWidget(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
-		treeWidget.setRenderBackground(false);
+		treeWidget.setRenderBackground(true);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		addDrawableChild(treeWidget);
 
@@ -198,20 +198,8 @@ public class ConfigScreen extends Screen {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		super.render(matrices, mouseX, mouseY, delta);
 
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL32.GL_LEQUAL);
-
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
-		RenderSystem.setShaderTexture(0, treeWidget.getBackground());
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(0D,         height, -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, height / 32F).next();
-		bufferBuilder.vertex(panelWidth, height, -100D).color(0x77, 0x77, 0x77, 0xff).texture(panelWidth / 32F, height / 32F).next();
-		bufferBuilder.vertex(panelWidth, 20D,    -100D).color(0x77, 0x77, 0x77, 0xff).texture(panelWidth / 32F, 0F).next();
-		bufferBuilder.vertex(0D,         20D,    -100D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
-		tessellator.draw();
-
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL32.GL_LEQUAL);
 		RenderSystem.disableTexture();
@@ -226,7 +214,6 @@ public class ConfigScreen extends Screen {
 		tessellator.draw();
 
 		RenderSystem.enableTexture();
-		RenderSystem.disableDepthTest();
 		RenderSystem.disableBlend();
 		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 		RenderSystem.setShaderTexture(0, listWidget.getBackground());

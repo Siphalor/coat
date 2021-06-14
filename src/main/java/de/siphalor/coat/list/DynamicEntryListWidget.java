@@ -202,13 +202,14 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0,background);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(left,  bottom, -100D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, bottom, -100D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, top,    -100D).color(0x44, 0x44, 0x44, 0xff).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(left,  top,    -100D).color(0x44, 0x44, 0x44, 0xff).texture(left / 32F,  (top + (int) getScrollAmount()) / 32F).next();
+		RenderSystem.setShaderColor(0.27F, 0.27F, 0.27F, 1F);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		bufferBuilder.vertex(left,  bottom, -100D).texture(left / 32F,  (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, bottom, -100D).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(right, top,    -100D).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
+		bufferBuilder.vertex(left,  top,    -100D).texture(left / 32F,  (top + (int) getScrollAmount()) / 32F).next();
 		tessellator.draw();
 	}
 
