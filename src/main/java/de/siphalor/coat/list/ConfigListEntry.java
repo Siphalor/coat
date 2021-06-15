@@ -1,11 +1,11 @@
 package de.siphalor.coat.list;
 
 import de.siphalor.coat.handler.Message;
+import de.siphalor.coat.util.TickableElement;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.Collection;
