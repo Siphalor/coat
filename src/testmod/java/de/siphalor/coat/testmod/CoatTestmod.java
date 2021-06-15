@@ -2,6 +2,7 @@ package de.siphalor.coat.testmod;
 
 import com.google.common.collect.ImmutableList;
 import de.siphalor.amecs.api.PriorityKeyBinding;
+import de.siphalor.coat.input.SliderConfigInput;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
@@ -69,6 +70,18 @@ public class CoatTestmod implements ClientModInitializer {
 				new LiteralText("This is a fine description"),
 				new GenericEntryHandler<>("default", s -> Collections.emptyList()),
 				new TextConfigInput("Blub")
+		));
+		list.add(new ConfigListConfigEntry<>(
+				new LiteralText("Integer Slider"),
+				new LiteralText("Some rounding slider"),
+				new GenericEntryHandler<>(23, v -> Collections.emptyList()),
+				new SliderConfigInput<>(23, -50, 50)
+		));
+		list.add(new ConfigListConfigEntry<>(
+				new LiteralText("Double Slider"),
+				new LiteralText(""),
+				new GenericEntryHandler<>(3.14D, v -> Collections.emptyList()),
+				new SliderConfigInput<>(0D, -10D, 90D)
 		));
 
 		ConfigListWidget widget = new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Hi"), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
