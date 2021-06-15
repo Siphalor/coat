@@ -8,15 +8,16 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class ConfigListCompoundEntry extends ConfigListEntry implements ParentElement, Selectable {
 	private Element focused;
+	private boolean dragging;
 
 	@Override
 	public boolean isDragging() {
-		return false;
+		return dragging;
 	}
 
 	@Override
 	public void setDragging(boolean dragging) {
-
+		this.dragging = dragging;
 	}
 
 	@Nullable

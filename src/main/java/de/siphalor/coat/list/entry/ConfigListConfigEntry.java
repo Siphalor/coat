@@ -234,10 +234,10 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		if (!Objects.equals(newValue, entryHandler.getDefault())) {
 			defaultButton.active = true;
 		} else {
-			defaultButton.active = false;
 			if (defaultButton.isFocused()) {
 				changeFocus(false);
 			}
+			defaultButton.active = false;
 		}
 		setMessages(entryHandler.getMessages(newValue));
 	}

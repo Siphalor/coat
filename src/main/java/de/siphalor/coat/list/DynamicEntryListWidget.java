@@ -366,13 +366,14 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		IntListIterator bottomIter = entries.bottoms.iterator();
 		Iterator<ConfigListEntry> entryIter = entries.iterator();
 		int relBottom = 0, relTop = 0;
+		final int entryAreaTop = getEntryAreaTop();
 		ConfigListEntry entry = null;
 
 		while (bottomIter.hasNext()) {
 			relTop = relBottom;
 			relBottom = bottomIter.nextInt();
 			entry = entryIter.next();
-			if (relBottom > scrollAmount) {
+			if (entryAreaTop + relBottom > top) {
 				break;
 			}
 		}
@@ -386,7 +387,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 				break;
 			}
 
-			int rowTop = relTop + getEntryAreaTop();
+			int rowTop = relTop + entryAreaTop;
 
 			entry.render(matrices, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
 
