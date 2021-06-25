@@ -334,7 +334,11 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		this.setScrollAmount(this.getScrollAmount() - amount * 10.0D);
+		if (!super.mouseScrolled(mouseX, mouseY, amount)) {
+			double prevScroll = getScrollAmount();
+			this.setScrollAmount(this.getScrollAmount() - amount * 10.0D);
+			return getScrollAmount() != prevScroll;
+		}
 		return true;
 	}
 
