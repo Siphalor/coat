@@ -33,12 +33,10 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	private final ButtonWidget defaultButton;
 	private Collection<Message> messages;
 	private boolean expanded;
-	protected int x;
-	protected int y;
 
 	public ConfigListConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
-		nameWidget = new TextButtonWidget(x, y, 100, 12, name, button -> setExpanded(!isExpanded()));
+		nameWidget = new TextButtonWidget(0, 0, 100, 12, name, button -> setExpanded(!isExpanded()));
 		setName(name.copy());
 		this.description = description;
 		this.entryHandler = entryHandler;
@@ -116,9 +114,6 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		this.x = x;
-		this.y = y;
-
 		int namePart = (int) getNamePart(entryWidth);
 		int configEntryPart = (int) getConfigEntryPart(entryWidth);
 		int inputHeight = input.getHeight();
