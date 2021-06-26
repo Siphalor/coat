@@ -24,6 +24,7 @@ import java.util.Objects;
 
 public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements InputChangeListener<V> {
 	private static final Text DEFAULT_TEXT = new TranslatableText(Coat.MOD_ID + ".default");
+	private static final int TEXT_INDENT = 8;
 	private final TextRenderer textRenderer;
 	private final TextButtonWidget nameWidget;
 	private final Text description;
@@ -76,7 +77,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	}
 
 	protected void updateExpanded(int width) {
-		descriptionMultiline = MultilineText.create(MinecraftClient.getInstance().textRenderer, description, width);
+		descriptionMultiline = MultilineText.create(MinecraftClient.getInstance().textRenderer, description, width - TEXT_INDENT);
 	}
 
 	@Override
@@ -131,8 +132,8 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		nameWidget.render(matrices, mouseX, mouseY, tickDelta);
 
 		float curY = y + CoatUtil.MARGIN + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
-		float msgX = x + CoatUtil.DOUBLE_MARGIN;
-		int msgWidth = entryWidth - CoatUtil.DOUBLE_MARGIN - CoatUtil.DOUBLE_MARGIN;
+		float msgX = x + TEXT_INDENT;
+		int msgWidth = entryWidth - TEXT_INDENT;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
 				List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
@@ -156,7 +157,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 				}
 			}
 
-			descriptionMultiline.draw(matrices, x + CoatUtil.DOUBLE_MARGIN, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
+			descriptionMultiline.draw(matrices, x + TEXT_INDENT, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
 		}
 	}
 
