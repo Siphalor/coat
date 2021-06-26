@@ -162,7 +162,7 @@ public class ConfigScreen extends Screen {
 		listWidget = category.getConfigWidget();
 		children.add(listWidget);
 		listWidget.setPosition(panelWidth, 20);
-		listWidget.setRowWidth(260);
+		listWidget.setRowWidth(500);
 
 		if (listWidget.getName() != null && !listWidget.getName().getString().isEmpty()) {
 			visualTitle = title.copy().append(" - ").append(listWidget.getName());
