@@ -12,7 +12,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	private InputChangeListener<N> changeListener;
 
 	public SliderConfigInput(N value, N min, N max) {
-		super(0, 0, 100, 16, LiteralText.EMPTY, value.doubleValue());
+		super(0, 0, 100, 20, LiteralText.EMPTY, value.doubleValue());
 		//noinspection unchecked
 		valueClass = (Class<N>) value.getClass();
 		this.min = min;
