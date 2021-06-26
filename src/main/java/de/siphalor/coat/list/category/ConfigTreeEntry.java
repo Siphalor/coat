@@ -56,7 +56,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		this.y = y;
 
 		boolean hoverFound = false;
-		int indent = x + 8 + CoatUtil.DOUBLE_MARGIN;
+		int indent = x + 6 + CoatUtil.DOUBLE_MARGIN;
 		int innerWidth = getEntryWidth();
 
 		if (!subTrees.isEmpty()) {
@@ -67,7 +67,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 		nameButton.x = indent;
 		nameButton.y = y;
-		nameButton.setWidth(innerWidth - 8 - CoatUtil.MARGIN);
+		nameButton.setWidth(innerWidth);
 		nameButton.render(matrices, mouseX, mouseY, tickDelta);
 
 		if (expanded) {
