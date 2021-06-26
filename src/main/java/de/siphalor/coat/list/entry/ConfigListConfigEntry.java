@@ -237,6 +237,12 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		setMessages(entryHandler.getMessages(newValue));
 	}
 
+	@Override
+	public void save() {
+		super.save();
+		entryHandler.save(input.getValue());
+	}
+
 	public Message.Level getHighestMessageLevel() {
 		if (messages == null) {
 			return null;

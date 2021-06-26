@@ -98,6 +98,9 @@ public class ConfigScreen extends Screen {
 	}
 
 	protected void onSave() {
+		for (ConfigListWidget widget : widgets) {
+			widget.save();
+		}
 		onSave.run();
 	}
 

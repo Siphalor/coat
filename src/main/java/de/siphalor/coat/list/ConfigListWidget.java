@@ -55,4 +55,10 @@ public class ConfigListWidget extends DynamicEntryListWidget<ConfigListEntry> {
 	public Collection<Message> getMessages() {
 		return children().stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
 	}
+
+	public void save() {
+		for (ConfigListEntry entry : children()) {
+			entry.save();
+		}
+	}
 }

@@ -6,4 +6,8 @@ import java.util.Collection;
 
 public abstract class ConfigListEntry extends DynamicEntryListWidget.Entry {
 	public abstract Collection<Message> getMessages();
+
+	public void save() {
+
+	}
 }
