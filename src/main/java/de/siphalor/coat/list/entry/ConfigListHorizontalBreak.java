@@ -1,9 +1,11 @@
 package de.siphalor.coat.list.entry;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +15,10 @@ public class ConfigListHorizontalBreak extends ConfigListEntry {
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(GL11.GL_LESS);
 		fill(matrices, x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR);
+		RenderSystem.disableDepthTest();
 	}
 
 	@Override
