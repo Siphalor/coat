@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ConfigListCompoundEntry extends DynamicEntryListWidget.Entry implements ParentElement, EntryContainer {
+public abstract class ConfigListCompoundEntry extends ConfigListEntry implements ParentElement, EntryContainer {
 	private Element focused;
 	private boolean dragging;
 

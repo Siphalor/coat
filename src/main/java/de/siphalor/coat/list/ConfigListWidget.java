@@ -1,5 +1,6 @@
 package de.siphalor.coat.list;
 
+import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.list.entry.ConfigListHorizontalBreak;
 import de.siphalor.coat.list.entry.ConfigListSubTreeEntry;
@@ -10,14 +11,15 @@ import net.minecraft.util.Identifier;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class ConfigListWidget extends DynamicEntryListWidget {
+public class ConfigListWidget extends DynamicEntryListWidget<ConfigListEntry> {
 	private final Text name;
 	private final List<ConfigListWidget> subTrees;
 	private final List<ConfigListSubTreeEntry> subTreeLinks;
 	private ConfigTreeEntry treeEntry;
 
-	public ConfigListWidget(MinecraftClient client, Text name, Collection<Entry> entries, Identifier background) {
+	public ConfigListWidget(MinecraftClient client, Text name, Collection<ConfigListEntry> entries, Identifier background) {
 		super(client, entries, background);
 		this.name = name;
 		subTrees = new LinkedList<>();
@@ -48,5 +50,9 @@ public class ConfigListWidget extends DynamicEntryListWidget {
 			treeEntry = new ConfigTreeEntry(name, this);
 		}
 		return treeEntry;
+	}
+
+	public Collection<Message> getMessages() {
+		return children().stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
 	}
 }

@@ -341,10 +341,6 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		return mouseY >= (double) this.top && mouseY <= (double) this.bottom && mouseX >= (double) this.left && mouseX <= (double) this.right;
 	}
 
-	public Collection<Message> getMessages() {
-		return entries.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
-	}
-
 	protected void renderList(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		IntListIterator bottomIter = entries.bottoms.iterator();
 		Iterator<E> entryIter = entries.iterator();
@@ -544,7 +540,5 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		public void focusLost() {
 
 		}
-
-		public abstract Collection<Message> getMessages();
 	}
 }

@@ -52,7 +52,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		panelWidth = 200;
-		treeWidget = new DynamicEntryListWidget(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
+		treeWidget = new DynamicEntryListWidget<>(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.8F);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		children.add(treeWidget);
@@ -68,7 +68,7 @@ public class ConfigScreen extends Screen {
 
 		super.init();
 
-		openCategory((ConfigTreeEntry) treeWidget.getEntry(0));
+		openCategory(treeWidget.getEntry(0));
 	}
 
 	public DynamicEntryListWidget<ConfigTreeEntry> getTreeWidget() {
@@ -106,15 +106,14 @@ public class ConfigScreen extends Screen {
 		List<Message> errors = new LinkedList<>();
 		int warningSev = Message.Level.WARNING.getSeverity();
 		int errorSev = Message.Level.ERROR.getSeverity();
-		int sev;
-		for (Message message : treeWidget.getMessages()) {
-			sev = message.getLevel().getSeverity();
+		treeWidget.children().stream().flatMap(entry -> entry.getMessages().stream()).forEach(message -> {
+			int sev = message.getLevel().getSeverity();
 			if (sev >= errorSev) {
 				errors.add(message);
 			} else if (sev >= warningSev) {
 				warnings.add(message);
 			}
-		}
+		});
 
 		Runnable saveRunnable = () -> {
 			onSave();
