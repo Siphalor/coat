@@ -178,7 +178,7 @@ public class ConfigScreen extends Screen {
 		this.width = width;
 		this.height = height;
 
-		panelWidth = Math.max(64, (int) (width * 0.3));
+		panelWidth = Math.max(100, (int) (width * 0.2));
 		treeWidget.resize(panelWidth, height - 20);
 		listWidget.setPosition(panelWidth, 20);
 		listWidget.resize(width - panelWidth, height - 20);
