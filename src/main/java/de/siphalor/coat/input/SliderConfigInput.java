@@ -5,11 +5,14 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.MathHelper;
 
+import java.text.NumberFormat;
+
 public class SliderConfigInput<N extends Number> extends SliderWidget implements ConfigInput<N> {
 	private final Class<N> valueClass;
 	private final N min;
 	private final N max;
 	private InputChangeListener<N> changeListener;
+	private int precision;
 
 	public SliderConfigInput(N value, N min, N max) {
 		super(0, 0, 100, 20, LiteralText.EMPTY, value.doubleValue());
@@ -17,7 +20,13 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 		valueClass = (Class<N>) value.getClass();
 		this.min = min;
 		this.max = max;
-		setMessage(new LiteralText(getRealValue().toString()));
+		if (valueClass == Double.class || valueClass == Float.class) {
+			precision = Math.max((int) Math.log10(min.doubleValue()), (int) Math.log10(max.doubleValue()));
+			precision = Math.max(0, 4 - precision);
+		} else {
+			precision = 0;
+		}
+		updateMessage();
 	}
 
 	@Override
@@ -36,6 +45,10 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 		value = MathHelper.clamp(value, 0D, 1D);
 		applyValue();
 		updateMessage();
+	}
+
+	public void setPrecision(int precision) {
+		this.precision = precision;
 	}
 
 	@Override
@@ -59,7 +72,10 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 
 	@Override
 	protected void updateMessage() {
-		setMessage(new LiteralText(getRealValue().toString()));
+		NumberFormat format = NumberFormat.getInstance();
+		format.setMaximumFractionDigits(precision);
+		format.setMinimumFractionDigits(precision);
+		setMessage(new LiteralText(format.format(getRealValue())));
 	}
 
 	@Override
