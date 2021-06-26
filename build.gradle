@@ -12,6 +12,7 @@ group = project.maven_group
 
 repositories {
 	maven { url "https://maven.siphalor.de" }
+	maven { url "https://jitpack.io"}
 }
 
 sourceSets {
@@ -32,6 +33,7 @@ dependencies {
 
 	// for testing
 	modImplementation "de.siphalor:amecsapi-1.16:1+"
+	modRuntime("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
 }
