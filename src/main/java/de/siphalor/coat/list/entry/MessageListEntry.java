@@ -32,15 +32,16 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 		this.message = message;
 		jumpButton = new ButtonWidget(0, 0, 100, 20, JUMP_TEXT, button -> {
 			if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
-				EntryContainer last;
+				Element last = (Element) message.getOrigin();
 				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
-				do {
+				if (category == null) return;
+				while (!(category instanceof ConfigListWidget)) {
 					last = category;
 					category = category.getParent();
 					if (category == null) {
 						return;
 					}
-				} while (!(category instanceof ConfigListWidget));
+				}
 
 				Screen currentScreen = MinecraftClient.getInstance().currentScreen;
 				ConfigScreen configScreen = null;
