@@ -47,11 +47,13 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		defaultButton = new ButtonWidget(0, 0, 10, 20, DEFAULT_TEXT, button ->
 				input.setValue(entryHandler.getDefault()),
 				(button, matrices, mouseX, mouseY) -> {
-					List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
-					ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
-					list.addAll(wrappedLines);
-					list.add(0, new TranslatableText(Coat.MOD_ID + ".default.hover").asOrderedText());
-					client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
+					if (button.active) {
+						List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
+						ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
+						list.addAll(wrappedLines);
+						list.add(0, new TranslatableText(Coat.MOD_ID + ".default.hover").asOrderedText());
+						client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
+					}
 				}
 		);
 
