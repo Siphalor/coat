@@ -9,4 +9,6 @@ public interface EntryContainer extends Element {
 	default EntryContainer getParent() {
 		return null;
 	}
+
+	void setFocused(Element element);
 }

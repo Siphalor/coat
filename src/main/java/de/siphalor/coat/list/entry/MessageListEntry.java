@@ -41,6 +41,7 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 					if (category == null) {
 						return;
 					}
+					category.setFocused(last);
 				}
 
 				Screen currentScreen = MinecraftClient.getInstance().currentScreen;
@@ -54,6 +55,7 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 
 				if (configScreen != null) {
 					configScreen.openCategory(((ConfigListWidget) category).getTreeEntry());
+					configScreen.setFocused(category);
 					configScreen.getListWidget().focusOn(last);
 					configScreen.getListWidget().changeFocus(true);
 				}
