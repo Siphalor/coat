@@ -25,8 +25,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	@Override
 	public void setValue(String value) {
 		setText(value);
-		setSelectionStart(0);
-		setSelectionEnd(0);
+		setCursorToStart(); // Required because otherwise the text doesn't render sometimes
 	}
 
 	@Override
