@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A list entry linking to a message and providing functionality to jump to it.
+ */
 public class MessageListEntry extends ConfigListCompoundEntry {
 	private static final Text JUMP_TEXT = new TranslatableText(Coat.MOD_ID + ".message.jump");
 
@@ -28,6 +31,11 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 	private Text text;
 	private ButtonWidget jumpButton;
 
+	/**
+	 * Constructs a new message list entry.
+	 *
+	 * @param message The message to link
+	 */
 	public MessageListEntry(Message message) {
 		this.message = message;
 		jumpButton = new ButtonWidget(0, 0, 100, 20, JUMP_TEXT, button -> {
@@ -63,6 +71,9 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 		});
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
@@ -72,6 +83,9 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 		);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR);
@@ -84,26 +98,41 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getHeight() {
 		return 20 + CoatUtil.MARGIN;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Collection<Message> getMessages() {
 		return Collections.singleton(message);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void tick() {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getEntryWidth() {
 		return parent.getEntryWidth();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<? extends Element> children() {
 		return Collections.singletonList(jumpButton);

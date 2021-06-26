@@ -7,6 +7,12 @@ import net.minecraft.util.math.MathHelper;
 
 import java.text.NumberFormat;
 
+/**
+ * A numeric config input displayed as a slider.
+ * Automatically adapts to the number type used.
+ *
+ * @param <N> The number type
+ */
 public class SliderConfigInput<N extends Number> extends SliderWidget implements ConfigInput<N> {
 	private final Class<N> valueClass;
 	private final N min;
@@ -14,6 +20,13 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	private InputChangeListener<N> changeListener;
 	private int precision;
 
+	/**
+	 * Creates a new slider input.
+	 *
+	 * @param value The initial value of this input
+	 * @param min   The minimum of the slider
+	 * @param max   The maximum of the slider
+	 */
 	public SliderConfigInput(N value, N min, N max) {
 		super(0, 0, 100, 20, LiteralText.EMPTY, value.doubleValue());
 		//noinspection unchecked
@@ -29,16 +42,25 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 		updateMessage();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public N getValue() {
 		return getRealValue();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setFocused(boolean focused) {
 		super.setFocused(focused);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setValue(N realValue) {
 		value = (realValue.doubleValue() - min.doubleValue()) / (max.doubleValue() - min.doubleValue());
@@ -47,20 +69,35 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 		updateMessage();
 	}
 
+	/**
+	 * Sets the amount of fractional digits to be displayed.
+	 * If not explicitly specified an appropriate precision will be guessed.
+	 *
+	 * @param precision The precision of this slider
+	 */
 	public void setPrecision(int precision) {
 		this.precision = precision;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setChangeListener(InputChangeListener<N> changeListener) {
 		this.changeListener = changeListener;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void tick() {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x;
@@ -70,6 +107,9 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 		render(matrices, mouseX, mouseY, tickDelta);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void updateMessage() {
 		NumberFormat format = NumberFormat.getInstance();
@@ -78,11 +118,19 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 		setMessage(new LiteralText(format.format(getRealValue())));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void applyValue() {
 		changeListener.inputChanged(getRealValue());
 	}
 
+	/**
+	 * Gets the actual value of the config input normalized and and adjusted to the numeric type.
+	 *
+	 * @return The real value
+	 */
 	@SuppressWarnings({"unchecked", "CastCanBeRemovedNarrowingVariableType"})
 	protected N getRealValue() {
 		Number realValue = min.doubleValue() + this.value * (max.doubleValue() - min.doubleValue());
@@ -92,17 +140,17 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 
 
 		if (valueClass == Byte.class) {
-			return (N)(Object) realValue.byteValue();
+			return (N) (Object) realValue.byteValue();
 		} else if (valueClass == Short.class) {
-			return (N)(Object) realValue.shortValue();
+			return (N) (Object) realValue.shortValue();
 		} else if (valueClass == Integer.class) {
-			return (N)(Object) realValue.intValue();
+			return (N) (Object) realValue.intValue();
 		} else if (valueClass == Long.class) {
-			return (N)(Object) realValue.longValue();
+			return (N) (Object) realValue.longValue();
 		} else if (valueClass == Float.class) {
-			return (N)(Object) realValue.floatValue();
+			return (N) (Object) realValue.floatValue();
 		} else if (valueClass == Double.class) {
-			return (N)(Object) realValue.doubleValue();
+			return (N) (Object) realValue.doubleValue();
 		}
 		throw new RuntimeException("Number class " + valueClass.getSimpleName() + " is not supported!");
 	}

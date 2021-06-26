@@ -13,6 +13,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A textual entry for config list widgets.
+ */
 public class ConfigListTextEntry extends ConfigListEntry {
 	private final TextRenderer textRenderer;
 	private final Text text;
@@ -25,6 +28,9 @@ public class ConfigListTextEntry extends ConfigListEntry {
 		textRenderer = MinecraftClient.getInstance().textRenderer;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
@@ -33,11 +39,17 @@ public class ConfigListTextEntry extends ConfigListEntry {
 		parent.entryHeightChanged(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getHeight() {
 		return height;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		for (int i = 0; i < multilineText.size(); i++) {
@@ -45,11 +57,17 @@ public class ConfigListTextEntry extends ConfigListEntry {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void tick() {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Collection<Message> getMessages() {
 		return Collections.emptyList();

@@ -22,6 +22,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * An entry linking to a sub tree.
+ */
 public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 	private static final TranslatableText OPEN_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.open");
 
@@ -29,6 +32,11 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 	private final ButtonWidget button;
 	private Text nameText;
 
+	/**
+	 * Constructs a new sub tree entry.
+	 *
+	 * @param configWidget The list widget that this entry refers to
+	 */
 	public ConfigListSubTreeEntry(ConfigListWidget configWidget) {
 		this.configWidget = configWidget;
 		button = new ButtonWidget(0, 0, 50, 20, OPEN_TEXT,
@@ -36,6 +44,9 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 		);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
@@ -45,6 +56,9 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 		);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		int r = entryHeight / 2;
@@ -76,26 +90,41 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getHeight() {
 		return 24;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Collection<Message> getMessages() {
 		return Collections.emptyList();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void tick() {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getEntryWidth() {
 		return parent.getEntryWidth();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<? extends Element> children() {
 		return Collections.singletonList(button);

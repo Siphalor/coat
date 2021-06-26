@@ -16,6 +16,10 @@ import net.minecraft.text.TranslatableText;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A screen that shows the user a list of messages with the option to acknowledging them
+ * or to return to the previous screen.
+ */
 public class MessagesScreen extends Screen {
 	private final ConfigScreen parent;
 	private final Runnable acceptRunnable;
@@ -23,8 +27,16 @@ public class MessagesScreen extends Screen {
 	private MultilineText titleLines;
 	private ButtonWidget acceptButton;
 	private ButtonWidget abortButton;
-	private DynamicEntryListWidget messagesList;
+	private DynamicEntryListWidget<MessageListEntry> messagesList;
 
+	/**
+	 * Creates a new instance.
+	 *
+	 * @param title          The main message of this screen
+	 * @param parent         The screen that the user might return to
+	 * @param acceptRunnable A runnable that gets executed when the user acknowledges the messages
+	 * @param messages       A list of messages to show
+	 */
 	public MessagesScreen(Text title, ConfigScreen parent, Runnable acceptRunnable, List<Message> messages) {
 		super(title);
 		this.parent = parent;
@@ -32,10 +44,18 @@ public class MessagesScreen extends Screen {
 		this.messages = messages;
 	}
 
+	/**
+	 * Get the screen to return to.
+	 *
+	 * @return The parent screen
+	 */
 	public ConfigScreen getParent() {
 		return parent;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void init() {
 		super.init();
@@ -58,6 +78,9 @@ public class MessagesScreen extends Screen {
 		resize(MinecraftClient.getInstance(), width, height);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void resize(MinecraftClient client, int width, int height) {
 		this.width = width;
@@ -67,11 +90,14 @@ public class MessagesScreen extends Screen {
 		titleLines = MultilineText.create(client.textRenderer, title, 260);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		int left = width / 2 - 130;
 		renderBackground(matrices);
-		abortButton.x  = width / 2 - CoatUtil.MARGIN - abortButton.getWidth();
+		abortButton.x = width / 2 - CoatUtil.MARGIN - abortButton.getWidth();
 		acceptButton.x = width / 2 + CoatUtil.MARGIN;
 		titleLines.draw(matrices, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR);
 		messagesList.render(matrices, mouseX, mouseY, delta);
