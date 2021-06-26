@@ -4,9 +4,9 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.DynamicEntryListWidget;
+import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
@@ -17,7 +17,6 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -38,7 +37,7 @@ public class ConfigScreen extends Screen {
 	private Text visualTitle;
 
 	private int panelWidth;
-	private DynamicEntryListWidget treeWidget;
+	private DynamicEntryListWidget<ConfigTreeEntry> treeWidget;
 	private ButtonWidget abortButton;
 	private ButtonWidget saveButton;
 	private ConfigListWidget listWidget;
@@ -72,7 +71,7 @@ public class ConfigScreen extends Screen {
 		openCategory((ConfigTreeEntry) treeWidget.getEntry(0));
 	}
 
-	public DynamicEntryListWidget getTreeWidget() {
+	public DynamicEntryListWidget<ConfigTreeEntry> getTreeWidget() {
 		return treeWidget;
 	}
 
@@ -153,7 +152,7 @@ public class ConfigScreen extends Screen {
 		openCategory = category;
 		category.setOpen(true);
 
-		ConfigListEntry parent = category;
+		EntryContainer parent = category;
 		while ((parent = parent.getParent()) instanceof ConfigTreeEntry) {
 			((ConfigTreeEntry) parent).setExpanded(true);
 		}

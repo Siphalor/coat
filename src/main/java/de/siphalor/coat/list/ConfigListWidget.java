@@ -17,7 +17,7 @@ public class ConfigListWidget extends DynamicEntryListWidget {
 	private final List<ConfigListSubTreeEntry> subTreeLinks;
 	private ConfigTreeEntry treeEntry;
 
-	public ConfigListWidget(MinecraftClient client, Text name, Collection<ConfigListEntry> entries, Identifier background) {
+	public ConfigListWidget(MinecraftClient client, Text name, Collection<Entry> entries, Identifier background) {
 		super(client, entries, background);
 		this.name = name;
 		subTrees = new LinkedList<>();

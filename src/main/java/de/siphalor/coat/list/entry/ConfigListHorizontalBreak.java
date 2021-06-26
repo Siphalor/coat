@@ -1,14 +1,14 @@
 package de.siphalor.coat.list.entry;
 
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListEntry;
+import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public class ConfigListHorizontalBreak extends ConfigListEntry {
+public class ConfigListHorizontalBreak extends DynamicEntryListWidget.Entry {
 	private static final int PADDING = 10;
 
 	@Override

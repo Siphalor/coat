@@ -3,8 +3,9 @@ package de.siphalor.coat.list.entry;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
-import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigListWidget;
+import de.siphalor.coat.list.DynamicEntryListWidget;
+import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.screen.MessagesScreen;
 import de.siphalor.coat.util.CoatUtil;
@@ -30,9 +31,9 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 	public MessageListEntry(Message message) {
 		this.message = message;
 		jumpButton = new ButtonWidget(0, 0, 100, 20, JUMP_TEXT, button -> {
-			if (message.getOrigin() instanceof ConfigListEntry) {
-				ConfigListEntry last;
-				ConfigListEntry category = (ConfigListEntry) message.getOrigin();
+			if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
+				EntryContainer last;
+				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
 				do {
 					last = category;
 					category = category.getParent();

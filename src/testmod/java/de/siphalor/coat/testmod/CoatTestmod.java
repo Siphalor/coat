@@ -3,11 +3,11 @@ package de.siphalor.coat.testmod;
 import com.google.common.collect.ImmutableList;
 import de.siphalor.amecs.api.PriorityKeyBinding;
 import de.siphalor.coat.input.SliderConfigInput;
+import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
-import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.entry.ConfigListConfigEntry;
 import de.siphalor.coat.list.entry.ConfigListTextEntry;
@@ -33,7 +33,7 @@ public class CoatTestmod implements ClientModInitializer {
 	}
 
 	public static ConfigScreen createScreen() {
-		LinkedList<ConfigListEntry> list = new LinkedList<>();
+		LinkedList<DynamicEntryListWidget.Entry> list = new LinkedList<>();
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text!")));
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text! this is even fucking hell longer.")));
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text!")));
@@ -86,12 +86,12 @@ public class CoatTestmod implements ClientModInitializer {
 
 		ConfigListWidget widget = new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Hi"), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 
-		LinkedList<ConfigListEntry> list1 = new LinkedList<>();
+		LinkedList<DynamicEntryListWidget.Entry> list1 = new LinkedList<>();
 		list1.add(new ConfigListTextEntry(new LiteralText("You know the rules and so do I")));
 		list1.add(new ConfigListTextEntry(new LiteralText("A full commitment's what I'm thinking of")));
 		widget.addSubTree(new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("a"), list1, new Identifier("textures/block/acacia_planks.png")));
 
-		LinkedList<ConfigListEntry> list2 = new LinkedList<>();
+		LinkedList<DynamicEntryListWidget.Entry> list2 = new LinkedList<>();
 		list2.add(new ConfigListTextEntry(new LiteralText("Heyho")));
 		widget.addSubTree(new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("This is a kinda long category name"), list2, new Identifier("textures/block/end_stone.png")));
 

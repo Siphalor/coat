@@ -1,7 +1,7 @@
 package de.siphalor.coat.list.entry;
 
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListEntry;
+import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ConfigListTextEntry extends ConfigListEntry {
+public class ConfigListTextEntry extends DynamicEntryListWidget.Entry {
 	private final TextRenderer textRenderer;
 	private final Text text;
 	private List<OrderedText> multilineText;

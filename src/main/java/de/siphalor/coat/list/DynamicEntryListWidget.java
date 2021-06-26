@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.ints.IntListIterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  * This is mostly a copy of {@link net.minecraft.client.gui.widget.EntryListWidget} to enable variable item heights.
  */
 @Environment(EnvType.CLIENT)
-public class DynamicEntryListWidget extends ConfigListCompoundEntry implements Drawable, TickableElement {
+public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> extends AbstractParentElement implements Drawable, EntryContainer, TickableElement {
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
 	protected final MinecraftClient client;
@@ -62,7 +63,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		this.rowWidth = rowWidth;
 	}
 
-	public DynamicEntryListWidget(MinecraftClient client, Collection<ConfigListEntry> entries, Identifier background) {
+	public DynamicEntryListWidget(MinecraftClient client, Collection<E> entries, Identifier background) {
 		this.client = client;
 		top = 20;
 		addEntries(entries);
@@ -89,31 +90,26 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		return Math.min(rowWidth, width) - getHorizontalPadding() * 2;
 	}
 
-	@Nullable
-	public ConfigListEntry getFocused() {
-		return (ConfigListEntry) super.getFocused();
-	}
-
-	public List<ConfigListEntry> children() {
+	public List<E> children() {
 		return entries;
 	}
 
-	public ConfigListEntry getEntry(int index) {
+	public E getEntry(int index) {
 		return entries.get(index);
 	}
 
-	public void addEntry(ConfigListEntry entry) {
+	public void addEntry(E entry) {
 		entry.setParent(this);
 		entries.add(entry);
 	}
 
-	public void addEntry(int position, ConfigListEntry entry) {
+	public void addEntry(int position, E entry) {
 		entry.setParent(this);
 		entries.add(position, entry);
 	}
 
-	public void addEntries(Collection<ConfigListEntry> newEntries) {
-		for (ConfigListEntry newEntry : newEntries) {
+	public void addEntries(Collection<E> newEntries) {
+		for (E newEntry : newEntries) {
 			newEntry.setParent(this);
 		}
 		entries.addAll(newEntries);
@@ -124,7 +120,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	@Nullable
-	protected final ConfigListEntry getEntryAtPosition(double x, double y) {
+	protected final E getEntryAtPosition(double x, double y) {
 		int halfRowWidth = this.getEntryWidth() / 2;
 		int screenCenter = this.left + this.width / 2;
 		int rowLeft = screenCenter - halfRowWidth;
@@ -161,13 +157,11 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		widthChanged(newWidth);
 	}
 
-	@Override
 	public void widthChanged(int newWidth) {
-		super.widthChanged(newWidth);
 		width = newWidth;
 		right = left + newWidth;
 
-		for (ConfigListEntry entry : entries) {
+		for (Entry entry : entries) {
 			entry.widthChanged(getEntryWidth());
 		}
 	}
@@ -242,12 +236,12 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 
 	}
 
-	public void centerScrollOn(ConfigListEntry entry) {
+	public void centerScrollOn(E entry) {
 		int index = entries.indexOf(entry);
 		setScrollAmount(entries.bottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
 	}
 
-	public void ensureVisible(ConfigListEntry entry) {
+	public void ensureVisible(E entry) {
 		int index = entries.indexOf(entry);
 		int entryBottom = entries.bottoms.getInt(index);
 		if (getEntryAreaTop() + entryBottom > bottom) {
@@ -290,7 +284,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		if (!isMouseOver(mouseX, mouseY)) {
 			return false;
 		} else {
-			ConfigListEntry entry = getEntryAtPosition(mouseX, mouseY);
+			Entry entry = getEntryAtPosition(mouseX, mouseY);
 			if (entry != null) {
 				if (entry.mouseClicked(mouseX, mouseY, button)) {
 					setFocused(entry);
@@ -334,7 +328,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 	}
 
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		ConfigListEntry entry = getEntryAtPosition(mouseX, mouseY);
+		Entry entry = getEntryAtPosition(mouseX, mouseY);
 		if (entry != null && entry.mouseScrolled(mouseX, mouseY, amount)) {
 			return true;
 		}
@@ -343,33 +337,20 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		return getScrollAmount() != prevScroll;
 	}
 
-	@Override
-	public final void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		this.left = x;
-		this.top = y;
-		render(matrices, mouseX, mouseY, tickDelta);
-	}
-
 	public boolean isMouseOver(double mouseX, double mouseY) {
 		return mouseY >= (double) this.top && mouseY <= (double) this.bottom && mouseX >= (double) this.left && mouseX <= (double) this.right;
 	}
 
-	@Override
-	public int getHeight() {
-		return height;
-	}
-
-	@Override
 	public Collection<Message> getMessages() {
 		return entries.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
 	}
 
 	protected void renderList(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		IntListIterator bottomIter = entries.bottoms.iterator();
-		Iterator<ConfigListEntry> entryIter = entries.iterator();
+		Iterator<E> entryIter = entries.iterator();
 		int relBottom = 0, relTop = 0;
 		final int entryAreaTop = getEntryAreaTop();
-		ConfigListEntry entry = null;
+		E entry = null;
 
 		while (bottomIter.hasNext()) {
 			relTop = relBottom;
@@ -380,7 +361,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 			}
 		}
 
-		ConfigListEntry hoveredEntry = getEntryAtPosition(mouseX, mouseY);
+		E hoveredEntry = getEntryAtPosition(mouseX, mouseY);
 
 		int rowWidth = getEntryWidth();
 		int rowLeft = getEntryLeft();
@@ -426,43 +407,51 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		return getEntryAreaTop() + entries.bottoms.getInt(index);
 	}
 
+	@Nullable
+	@Override
+	public E getFocused() {
+		//noinspection unchecked
+		return (E) super.getFocused();
+	}
+
 	@Override
 	public void setFocused(@Nullable Element focused) {
-		ConfigListEntry old = getFocused();
+		E old = getFocused();
 		if (old != null && old != focused) {
 			old.focusLost();
 		}
 		if (focused != null) {
-			ensureVisible((ConfigListEntry) focused);
+			//noinspection unchecked
+			ensureVisible((E) focused);
 		}
 		super.setFocused(focused);
 	}
 
-	protected ConfigListEntry removeEntry(ConfigListEntry entry) {
+	protected E removeEntry(E entry) {
 		return removeEntry(entries.indexOf(entry));
 	}
 
-	protected ConfigListEntry removeEntry(int index) {
+	protected E removeEntry(int index) {
 		return entries.remove(index);
 	}
 
 	@Override
 	public void tick() {
-		for (ConfigListEntry child : entries) {
+		for (E child : entries) {
 			child.tick();
 		}
 	}
 
 	@Environment(EnvType.CLIENT)
-	class Entries extends AbstractList<ConfigListEntry> {
-		private final List<ConfigListEntry> entries;
+	class Entries extends AbstractList<E> {
+		private final List<E> entries;
 		protected final IntList bottoms = new IntArrayList();
 
 		private Entries() {
 			this.entries = Lists.newArrayList();
 		}
 
-		public ConfigListEntry get(int i) {
+		public E get(int i) {
 			return this.entries.get(i);
 		}
 
@@ -475,12 +464,12 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 			return entries.isEmpty();
 		}
 
-		public ConfigListEntry set(int i, ConfigListEntry entry) {
+		public E set(int i, E entry) {
 			entry.setParent(DynamicEntryListWidget.this);
 			return this.entries.set(i, entry);
 		}
 
-		public void add(int i, ConfigListEntry entry) {
+		public void add(int i, E entry) {
 			bottoms.add(0);
 			entry.setParent(DynamicEntryListWidget.this);
 			entries.add(i, entry);
@@ -489,7 +478,7 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 		}
 
 		@Override
-		public boolean addAll(@NotNull Collection<? extends ConfigListEntry> newEntries) {
+		public boolean addAll(@NotNull Collection<? extends E> newEntries) {
 			int oldSize = entries.size();
 			int bottom = bottoms.size() == 0 ? 0 : bottoms.getInt(0);
 			entries.addAll(newEntries);
@@ -497,15 +486,15 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 				bottom += entries.get(i).getHeight();
 				bottoms.add(bottom);
 			}
-			for (ConfigListEntry newEntry : newEntries) {
+			for (E newEntry : newEntries) {
 				newEntry.setParent(DynamicEntryListWidget.this);
 				newEntry.widthChanged(getEntryWidth());
 			}
 			return true;
 		}
 
-		public ConfigListEntry remove(int i) {
-			ConfigListEntry entry = entries.remove(i);
+		public E remove(int i) {
+			E entry = entries.remove(i);
 			bottoms.removeInt(i);
 			if (entry == getFocused()) {
 				setFocused(null);
@@ -518,5 +507,44 @@ public class DynamicEntryListWidget extends ConfigListCompoundEntry implements D
 			entries.clear();
 			bottoms.clear();
 		}
+	}
+
+	@Environment(EnvType.CLIENT)
+	public abstract static class Entry extends DrawableHelper implements Element, TickableElement {
+		protected EntryContainer parent;
+
+		public EntryContainer getParent() {
+			return parent;
+		}
+
+		protected void setParent(EntryContainer parent) {
+			this.parent = parent;
+		}
+
+		/**
+		 * Renders an entry in a list.
+		 * @param matrices    the matrix stack used for rendering
+		 * @param x           the X coordinate of the entry
+		 * @param y           the Y coordinate of the entry
+		 * @param entryWidth  the width of the entry.
+		 *                       Expensive calculations based on this should be done in {@link Entry#widthChanged(int)}.
+		 * @param entryHeight The height of the entry
+		 * @param mouseX      the X coordinate of the mouse
+		 * @param mouseY      the Y coordinate of the mouse
+		 * @param hovered     whether the mouse is hovering over the entry
+		 */
+		public abstract void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+
+		public abstract int getHeight();
+
+		public void widthChanged(int newWidth) {
+
+		}
+
+		public void focusLost() {
+
+		}
+
+		public abstract Collection<Message> getMessages();
 	}
 }
