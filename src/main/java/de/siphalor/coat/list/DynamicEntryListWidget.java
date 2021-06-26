@@ -276,7 +276,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	}
 
 	protected int getScrollbarPositionX() {
-		return getEntryRight() + getHorizontalPadding();
+		return getEntryRight() + CoatUtil.MARGIN;
 	}
 
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
