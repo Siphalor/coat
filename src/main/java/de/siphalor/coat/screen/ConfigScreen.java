@@ -196,7 +196,7 @@ public class ConfigScreen extends Screen {
 	public void openCategory(ConfigTreeEntry category) {
 		if (openCategory != null) {
 			openCategory.setOpen(false);
-			children.remove(openCategory);
+			children.remove(openCategory.getConfigWidget());
 		}
 		openCategory = category;
 		category.setOpen(true);
