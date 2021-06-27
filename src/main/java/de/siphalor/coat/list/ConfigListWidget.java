@@ -100,6 +100,9 @@ public class ConfigListWidget extends DynamicEntryListWidget<ConfigListEntry> {
 	 * @see ConfigListConfigEntry#save()
 	 */
 	public void save() {
+		for (ConfigListWidget subTree : subTrees) {
+			subTree.save();
+		}
 		for (ConfigListEntry entry : children()) {
 			entry.save();
 		}
