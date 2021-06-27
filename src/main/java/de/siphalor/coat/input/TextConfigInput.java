@@ -5,39 +5,64 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 
+/**
+ * A string input represented as a text field.
+ */
 public class TextConfigInput extends TextFieldWidget implements ConfigInput<String> {
+	/**
+	 * Constructs a new text input.
+	 *
+	 * @param value The initial value of this text field
+	 */
 	public TextConfigInput(String value) {
 		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, LiteralText.EMPTY);
 		setValue(value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getHeight() {
 		return super.getHeight() + 4;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getValue() {
 		return getText();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setValue(String value) {
 		setText(value);
-		setSelectionStart(0);
-		setSelectionEnd(0);
+		setCursorToStart(); // Required because otherwise the text doesn't render sometimes
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setChangeListener(InputChangeListener<String> changeListener) {
 		setChangedListener(changeListener);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setFocused(boolean focused) {
 		super.setFocused(focused);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x + 2;

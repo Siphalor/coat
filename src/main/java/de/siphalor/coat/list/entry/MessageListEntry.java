@@ -3,8 +3,9 @@ package de.siphalor.coat.list.entry;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
-import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigListWidget;
+import de.siphalor.coat.list.DynamicEntryListWidget;
+import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.screen.MessagesScreen;
 import de.siphalor.coat.util.CoatUtil;
@@ -20,6 +21,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A list entry linking to a message and providing functionality to jump to it.
+ */
 public class MessageListEntry extends ConfigListCompoundEntry {
 	private static final Text JUMP_TEXT = new TranslatableText(Coat.MOD_ID + ".message.jump");
 
@@ -27,19 +31,26 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 	private Text text;
 	private ButtonWidget jumpButton;
 
+	/**
+	 * Constructs a new message list entry.
+	 *
+	 * @param message The message to link
+	 */
 	public MessageListEntry(Message message) {
 		this.message = message;
 		jumpButton = new ButtonWidget(0, 0, 100, 20, JUMP_TEXT, button -> {
-			if (message.getOrigin() instanceof ConfigListEntry) {
-				ConfigListEntry last;
-				ConfigListEntry category = (ConfigListEntry) message.getOrigin();
-				do {
+			if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
+				Element last = (Element) message.getOrigin();
+				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
+				if (category == null) return;
+				while (!(category instanceof ConfigListWidget)) {
 					last = category;
 					category = category.getParent();
 					if (category == null) {
 						return;
 					}
-				} while (!(category instanceof ConfigListWidget));
+					category.setFocused(last);
+				}
 
 				Screen currentScreen = MinecraftClient.getInstance().currentScreen;
 				ConfigScreen configScreen = null;
@@ -52,6 +63,7 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 
 				if (configScreen != null) {
 					configScreen.openCategory(((ConfigListWidget) category).getTreeEntry());
+					configScreen.setFocused(category);
 					configScreen.getListWidget().focusOn(last);
 					configScreen.getListWidget().changeFocus(true);
 				}
@@ -59,6 +71,9 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 		});
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
@@ -68,6 +83,9 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 		);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR);
@@ -80,26 +98,41 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getHeight() {
 		return 20 + CoatUtil.MARGIN;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Collection<Message> getMessages() {
 		return Collections.singleton(message);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void tick() {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getEntryWidth() {
 		return parent.getEntryWidth();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<? extends Element> children() {
 		return Collections.singletonList(jumpButton);

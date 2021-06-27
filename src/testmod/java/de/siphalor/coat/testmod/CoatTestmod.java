@@ -2,15 +2,15 @@ package de.siphalor.coat.testmod;
 
 import com.google.common.collect.ImmutableList;
 import de.siphalor.amecs.api.PriorityKeyBinding;
-import de.siphalor.coat.input.SliderConfigInput;
-import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
+import de.siphalor.coat.input.SliderConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
 import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.entry.ConfigListConfigEntry;
 import de.siphalor.coat.list.entry.ConfigListTextEntry;
+import de.siphalor.coat.screen.ConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;

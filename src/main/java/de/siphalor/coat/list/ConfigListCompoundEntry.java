@@ -6,42 +6,62 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ConfigListCompoundEntry extends ConfigListEntry implements ParentElement, Selectable {
+/**
+ * An abstract entry that consists of several sub elements.
+ */
+public abstract class ConfigListCompoundEntry extends ConfigListEntry implements ParentElement, Selectable, EntryContainer {
 	private Element focused;
 	private boolean dragging;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isDragging() {
 		return dragging;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setDragging(boolean dragging) {
 		this.dragging = dragging;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Nullable
 	@Override
 	public Element getFocused() {
 		return focused;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setFocused(Element focused) {
 		this.focused = focused;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void focusLost() {
 		setFocused(null);
 		super.focusLost();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void entryHeightChanged(Element element) {
 		parent.entryHeightChanged(this);
 	}
-
-	public abstract int getEntryWidth();
 
 	@Override
 	public void appendNarrations(NarrationMessageBuilder builder) {

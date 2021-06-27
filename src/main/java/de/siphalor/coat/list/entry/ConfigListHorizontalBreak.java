@@ -10,26 +10,42 @@ import org.lwjgl.opengl.GL32;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * A horizontal break to be used in config lists.
+ */
 public class ConfigListHorizontalBreak extends ConfigListEntry {
 	private static final int PADDING = 10;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL32.GL_LEQUAL);
+		RenderSystem.depthFunc(GL32.GL_LESS);
 		fill(matrices, x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR);
+		RenderSystem.disableDepthTest();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getHeight() {
 		return PADDING + 1 + PADDING;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Collection<Message> getMessages() {
 		return Collections.emptyList();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void tick() {
 

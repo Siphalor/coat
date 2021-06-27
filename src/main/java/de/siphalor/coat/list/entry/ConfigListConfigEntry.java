@@ -22,8 +22,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A config entry with an input, a description and a reset button.
+ *
+ * @param <V> The value type
+ */
 public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements InputChangeListener<V> {
 	private static final Text DEFAULT_TEXT = new TranslatableText(Coat.MOD_ID + ".default");
+	private static final int TEXT_INDENT = 8;
 	private final TextRenderer textRenderer;
 	private final TextButtonWidget nameWidget;
 	private final Text description;
@@ -33,12 +39,18 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	private final ButtonWidget defaultButton;
 	private Collection<Message> messages;
 	private boolean expanded;
-	protected int x;
-	protected int y;
 
+	/**
+	 * Constructs a new config entry.
+	 *
+	 * @param name         The name of this entry
+	 * @param description  The description text of this entry
+	 * @param entryHandler An entry handler for this entry
+	 * @param input        The config input to use
+	 */
 	public ConfigListConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
-		nameWidget = new TextButtonWidget(x, y, 100, 12, name, button -> setExpanded(!isExpanded()));
+		nameWidget = new TextButtonWidget(0, 0, 100, 12, name, button -> setExpanded(!isExpanded()));
 		setName(name.copy());
 		this.description = description;
 		this.entryHandler = entryHandler;
@@ -49,21 +61,33 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		defaultButton = new ButtonWidget(0, 0, 10, 20, DEFAULT_TEXT, button ->
 				input.setValue(entryHandler.getDefault()),
 				(button, matrices, mouseX, mouseY) -> {
-					List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
-					ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
-					list.addAll(wrappedLines);
-					list.add(0, new TranslatableText(Coat.MOD_ID + ".default.hover").asOrderedText());
-					client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
+					if (button.active) {
+						List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
+						ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
+						list.addAll(wrappedLines);
+						list.add(0, new TranslatableText(Coat.MOD_ID + ".default.hover").asOrderedText());
+						client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
+					}
 				}
 		);
 
 		inputChanged(input.getValue());
 	}
 
+	/**
+	 * Gets whether the description and messages of this entry are currently displayed.
+	 *
+	 * @return Whether it is expanded
+	 */
 	public boolean isExpanded() {
 		return expanded;
 	}
 
+	/**
+	 * Sets whether the additional is visible.
+	 *
+	 * @param expanded Whether the entry should be expanded
+	 */
 	public void setExpanded(boolean expanded) {
 		if (expanded) {
 			updateExpanded(parent.getEntryWidth());
@@ -75,10 +99,18 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 	}
 
+	/**
+	 * Called when this entry is collapsed or gets expanded.
+	 *
+	 * @param width The new width of this entry
+	 */
 	protected void updateExpanded(int width) {
-		descriptionMultiline = MultilineText.create(MinecraftClient.getInstance().textRenderer, description, width);
+		descriptionMultiline = MultilineText.create(MinecraftClient.getInstance().textRenderer, description, width - TEXT_INDENT);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
@@ -94,6 +126,11 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 	}
 
+	/**
+	 * Updates the name of the entry and uses the appropriate text style.
+	 *
+	 * @param name The new name
+	 */
 	protected void setName(BaseText name) {
 		Message.Level level = getHighestMessageLevel();
 		if (level == null) {
@@ -104,26 +141,32 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		nameWidget.setMessage(name);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<? extends Element> children() {
 		return ImmutableList.of(nameWidget, input, defaultButton);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void tick() {
 		input.tick();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		this.x = x;
-		this.y = y;
-
 		int namePart = (int) getNamePart(entryWidth);
 		int configEntryPart = (int) getConfigEntryPart(entryWidth);
 		int inputHeight = input.getHeight();
 
-		int textY = y + (int)((inputHeight - 8) / 2F) + CoatUtil.MARGIN;
+		int textY = y + (int) ((inputHeight - 8) / 2F) + CoatUtil.MARGIN;
 
 		input.render(matrices, x + namePart + CoatUtil.HALF_MARGIN, y + CoatUtil.MARGIN, configEntryPart - CoatUtil.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		defaultButton.y = y + CoatUtil.MARGIN;
@@ -134,8 +177,8 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		nameWidget.render(matrices, mouseX, mouseY, tickDelta);
 
 		float curY = y + CoatUtil.MARGIN + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
-		float msgX = x + CoatUtil.DOUBLE_MARGIN;
-		int msgWidth = entryWidth - CoatUtil.DOUBLE_MARGIN - CoatUtil.DOUBLE_MARGIN;
+		float msgX = x + TEXT_INDENT;
+		int msgWidth = entryWidth - TEXT_INDENT;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
 				List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
@@ -159,22 +202,45 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 				}
 			}
 
-			descriptionMultiline.draw(matrices, x + CoatUtil.DOUBLE_MARGIN, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
+			descriptionMultiline.draw(matrices, x + TEXT_INDENT, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
 		}
 	}
 
+	/**
+	 * Gets the width used for the name of the config entry.
+	 *
+	 * @param width The width of the whole entry
+	 * @return The partial width to be used for the name
+	 */
 	public double getNamePart(int width) {
 		return width * 0.3;
 	}
 
+	/**
+	 * Gets the width used for the input of the config entry.
+	 *
+	 * @param width The width of the whole entry
+	 * @return The partial width to be used for the config input
+	 */
 	public double getConfigEntryPart(int width) {
 		return width * 0.5;
 	}
 
+	/**
+	 * Gets the width used for the controls section of the config entry.
+	 *
+	 * @param width The width of the whole entry
+	 * @return The partial width to be used for the controls section
+	 */
 	public double getControlsPart(int width) {
 		return width * 0.2;
 	}
 
+	/**
+	 * Gets the base height for this entry.
+	 *
+	 * @return The height of the collapsed entry
+	 */
 	public int getBaseHeight() {
 		int msgHeight = 0;
 		for (Message message : messages) {
@@ -188,6 +254,11 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		return CoatUtil.MARGIN + Math.max(20, input.getHeight()) + msgHeight;
 	}
 
+	/**
+	 * Gets the height of the expansion.
+	 *
+	 * @return The height of the expansion
+	 */
 	public int getExpansionHeight() {
 		int height = 0;
 		if (descriptionMultiline != MultilineText.EMPTY) {
@@ -201,6 +272,9 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		return height;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getHeight() {
 		if (isExpanded()) {
@@ -210,6 +284,9 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setFocused(Element focused) {
 		Element old = getFocused();
@@ -224,11 +301,17 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getEntryWidth() {
 		return (int) getConfigEntryPart(parent.getEntryWidth());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void inputChanged(V newValue) {
 		if (!Objects.equals(newValue, entryHandler.getDefault())) {
@@ -242,6 +325,20 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		setMessages(entryHandler.getMessages(newValue));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void save() {
+		super.save();
+		entryHandler.save(input.getValue());
+	}
+
+	/**
+	 * Gets the highest severity level of the currently defined messages on this entry.
+	 *
+	 * @return The message level
+	 */
 	public Message.Level getHighestMessageLevel() {
 		if (messages == null) {
 			return null;
@@ -259,11 +356,19 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 		return highestLevel;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Collection<Message> getMessages() {
 		return messages;
 	}
 
+	/**
+	 * Sets the current messages to be displayed for this entry.
+	 *
+	 * @param messages The messages to be displayed
+	 */
 	protected void setMessages(Collection<Message> messages) {
 		this.messages = messages;
 		for (Message message : messages) {

@@ -3,10 +3,11 @@ package de.siphalor.coat.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.DynamicEntryListWidget;
+import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
+import de.siphalor.coat.list.entry.ConfigListConfigEntry;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -23,6 +24,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * A Coat config screen.
+ */
 public class ConfigScreen extends Screen {
 	private static final Text ABORT_TEXT = new TranslatableText(Coat.MOD_ID + ".action.abort");
 	private static final Text SAVE_TEXT =  new TranslatableText(Coat.MOD_ID + ".action.save");
@@ -34,11 +38,17 @@ public class ConfigScreen extends Screen {
 	private Text visualTitle;
 
 	private int panelWidth;
-	private DynamicEntryListWidget treeWidget;
+	private DynamicEntryListWidget<ConfigTreeEntry> treeWidget;
 	private ButtonWidget abortButton;
 	private ButtonWidget saveButton;
 	private ConfigListWidget listWidget;
 
+	/**
+	 * Creates a new config screen.
+	 * @param parent  The previously opened screen that this screen should return the user to
+	 * @param title   The title of this config screen. Typically contains the name of the mod
+	 * @param widgets The categories/lists that this screen will be displaying
+	 */
 	public ConfigScreen(Screen parent, Text title, Collection<ConfigListWidget> widgets) {
 		super(title);
 		this.visualTitle = title.copy().append(" - ").append("missingno");
@@ -46,10 +56,13 @@ public class ConfigScreen extends Screen {
 		this.widgets = widgets;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void init() {
 		panelWidth = 200;
-		treeWidget = new DynamicEntryListWidget(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
+		treeWidget = new DynamicEntryListWidget<>(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.6F);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		addDrawableChild(treeWidget);
@@ -65,17 +78,30 @@ public class ConfigScreen extends Screen {
 
 		super.init();
 
-		openCategory((ConfigTreeEntry) treeWidget.getEntry(0));
+		openCategory(treeWidget.getEntry(0));
 	}
 
-	public DynamicEntryListWidget getTreeWidget() {
+	/**
+	 * Gets the tree pane widget.
+	 *
+	 * @return The tree widget
+	 */
+	public DynamicEntryListWidget<ConfigTreeEntry> getTreeWidget() {
 		return treeWidget;
 	}
 
+	/**
+	 * Gets the currently opened list widget.
+	 *
+	 * @return The list widget
+	 */
 	public ConfigListWidget getListWidget() {
 		return listWidget;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onClose() {
 		MinecraftClient.getInstance().openScreen(
@@ -90,28 +116,46 @@ public class ConfigScreen extends Screen {
 				new TranslatableText(Coat.MOD_ID + ".action.abort.screen.desc")));
 	}
 
+	/**
+	 * Sets a {@link Runnable} that runs after all {@link de.siphalor.coat.handler.ConfigEntryHandler#save(Object)}
+	 * calls when the user tries to save the configuration changes.
+	 *
+	 * @param onSave The runnable
+	 */
 	public void setOnSave(Runnable onSave) {
 		this.onSave = onSave;
 	}
 
+	/**
+	 * Triggers the save listeners
+	 */
 	protected void onSave() {
+		for (ConfigListWidget widget : widgets) {
+			widget.save();
+		}
 		onSave.run();
 	}
 
+	/**
+	 * Called when the user clicks on the save button.
+	 * This method checks for issues in the configuration and displays them to the user.
+	 * If the user confirms the save procedures will be triggered.
+	 *
+	 * @param button The button that has been clicked on - unused
+	 */
 	protected void clickSave(ButtonWidget button) {
 		List<Message> warnings = new LinkedList<>();
 		List<Message> errors = new LinkedList<>();
 		int warningSev = Message.Level.WARNING.getSeverity();
 		int errorSev = Message.Level.ERROR.getSeverity();
-		int sev;
-		for (Message message : treeWidget.getMessages()) {
-			sev = message.getLevel().getSeverity();
+		treeWidget.children().stream().flatMap(entry -> entry.getMessages().stream()).forEach(message -> {
+			int sev = message.getLevel().getSeverity();
 			if (sev >= errorSev) {
 				errors.add(message);
 			} else if (sev >= warningSev) {
 				warnings.add(message);
 			}
-		}
+		});
 
 		Runnable saveRunnable = () -> {
 			onSave();
@@ -141,6 +185,11 @@ public class ConfigScreen extends Screen {
 		}
 	}
 
+	/**
+	 * Open a certain category/list by a tree entry.
+	 *
+	 * @param category The tree entry that's list widget shall be opened
+	 */
 	public void openCategory(ConfigTreeEntry category) {
 		if (openCategory != null) {
 			openCategory.setOpen(false);
@@ -149,7 +198,7 @@ public class ConfigScreen extends Screen {
 		openCategory = category;
 		category.setOpen(true);
 
-		ConfigListEntry parent = category;
+		EntryContainer parent = category;
 		while ((parent = parent.getParent()) instanceof ConfigTreeEntry) {
 			((ConfigTreeEntry) parent).setExpanded(true);
 		}
@@ -157,7 +206,7 @@ public class ConfigScreen extends Screen {
 		listWidget = category.getConfigWidget();
 		addDrawableChild(listWidget);
 		listWidget.setPosition(panelWidth, 20);
-		listWidget.setRowWidth(260);
+		listWidget.setRowWidth(500);
 
 		if (listWidget.getName() != null && !listWidget.getName().getString().isEmpty()) {
 			visualTitle = title.copy().append(" - ").append(listWidget.getName());
@@ -168,12 +217,15 @@ public class ConfigScreen extends Screen {
 		resize(client, width, height);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void resize(MinecraftClient client, int width, int height) {
 		this.width = width;
 		this.height = height;
 
-		panelWidth = Math.max(64, (int) (width * 0.3));
+		panelWidth = Math.max(100, (int) (width * 0.2));
 		treeWidget.resize(panelWidth, height - 20);
 		listWidget.setPosition(panelWidth, 20);
 		listWidget.resize(width - panelWidth, height - 20);
@@ -184,6 +236,9 @@ public class ConfigScreen extends Screen {
 		abortButton.setWidth(saveButton.getWidth());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void tick() {
 		super.tick();
@@ -191,6 +246,9 @@ public class ConfigScreen extends Screen {
 		listWidget.tick();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		super.render(matrices, mouseX, mouseY, delta);

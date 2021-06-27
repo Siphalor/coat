@@ -1,50 +1,24 @@
 package de.siphalor.coat.list;
 
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.util.TickableElement;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.Collection;
 
-@Environment(EnvType.CLIENT)
-public abstract class ConfigListEntry extends DrawableHelper implements Element, TickableElement {
-	protected ConfigListCompoundEntry parent;
-
-	public ConfigListCompoundEntry getParent() {
-		return parent;
-	}
-
-	protected void setParent(ConfigListCompoundEntry parent) {
-		this.parent = parent;
-	}
+/**
+ * An entry in a {@link ConfigListWidget}.
+ */
+public abstract class ConfigListEntry extends DynamicEntryListWidget.Entry {
+	/**
+	 * Gets the messages brought up by this entry.
+	 *
+	 * @return A collection of messages
+	 */
+	public abstract Collection<Message> getMessages();
 
 	/**
-	 * Renders an entry in a list.
-	 * @param matrices    the matrix stack used for rendering
-	 * @param x           the X coordinate of the entry
-	 * @param y           the Y coordinate of the entry
-	 * @param entryWidth  the width of the entry.
-	 *                       Expensive calculations based on this should be done in {@link ConfigListEntry#widthChanged(int)}.
-	 * @param entryHeight The height of the entry
-	 * @param mouseX      the X coordinate of the mouse
-	 * @param mouseY      the Y coordinate of the mouse
-	 * @param hovered     whether the mouse is hovering over the entry
+	 * Called to save this entry and its possible children.
 	 */
-	public abstract void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
-
-	public abstract int getHeight();
-
-	public void widthChanged(int newWidth) {
+	public void save() {
 
 	}
-
-	public void focusLost() {
-
-	}
-
-	public abstract Collection<Message> getMessages();
 }
