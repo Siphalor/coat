@@ -14,11 +14,6 @@
 	"license": "MIT",
 	"icon": "assets/coat/icon.png",
 	"environment": "client",
-	"entrypoints": {
-		"client": [
-			"de.siphalor.coat.Coat"
-		]
-	},
 	"mixins": [
 		"coat.mixins.json"
 	],
