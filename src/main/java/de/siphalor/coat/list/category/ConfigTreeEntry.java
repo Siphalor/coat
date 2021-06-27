@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An entry in the tree pane which represents a config category/{@link ConfigListWidget}.
@@ -193,7 +194,9 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	 */
 	@Override
 	public Collection<Message> getMessages() {
-		return configWidget.getMessages();
+		List<Message> messages = subTrees.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
+		messages.addAll(configWidget.getMessages());
+		return messages;
 	}
 
 	/**
