@@ -13,9 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.resource.language.I18n;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,10 +23,10 @@ import java.util.List;
  * A list entry linking to a message and providing functionality to jump to it.
  */
 public class MessageListEntry extends ConfigListCompoundEntry {
-	private static final Text JUMP_TEXT = new TranslatableText(Coat.MOD_ID + ".message.jump");
+	private static final String JUMP_TEXT_KEY = Coat.MOD_ID + ".message.jump";
 
 	private final Message message;
-	private Text text;
+	private String text;
 	private ButtonWidget jumpButton;
 
 	/**
@@ -38,7 +36,7 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 	 */
 	public MessageListEntry(Message message) {
 		this.message = message;
-		jumpButton = new ButtonWidget(0, 0, 100, 20, JUMP_TEXT, button -> {
+		jumpButton = new ButtonWidget(0, 0, 100, 20, I18n.translate(JUMP_TEXT_KEY), button -> {
 			if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
 				Element last = (Element) message.getOrigin();
 				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
@@ -78,7 +76,7 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
 		text = CoatUtil.intelliTrim(
-				MinecraftClient.getInstance().textRenderer, message.getText(),
+				MinecraftClient.getInstance().textRenderer, message.getText().asFormattedString(),
 				newWidth - CoatUtil.MARGIN - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN
 		);
 	}
@@ -87,14 +85,14 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR);
+	public void render(int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+		MinecraftClient.getInstance().textRenderer.draw(text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR);
 		jumpButton.y = y;
 		jumpButton.x = x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN;
-		jumpButton.render(matrices, mouseX, mouseY, tickDelta);
+		jumpButton.render(mouseX, mouseY, tickDelta);
 
 		if (hovered && mouseX < jumpButton.x) {
-			CoatUtil.renderTooltip(matrices, mouseX, mouseY, message.getText());
+			CoatUtil.renderTooltip(mouseX, mouseY, message.getText().asFormattedString());
 		}
 	}
 

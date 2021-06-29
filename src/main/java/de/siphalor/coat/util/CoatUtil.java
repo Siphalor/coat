@@ -9,7 +9,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import org.lwjgl.opengl.GL11;
 
@@ -55,12 +54,12 @@ public class CoatUtil {
 	 * @param width        The width to trim the text to
 	 * @return The trimmed text
 	 */
-	public static Text intelliTrim(TextRenderer textRenderer, Text baseText, int width) {
-		int textWidth = textRenderer.getWidth(baseText);
+	public static String intelliTrim(TextRenderer textRenderer, String baseText, int width) {
+		int textWidth = textRenderer.getStringWidth(baseText);
 		if (textWidth > width) {
-			textWidth = textRenderer.getWidth(ELLIPSIS);
-			String trimmed = textRenderer.trimToWidth(baseText.getString(), width - textWidth);
-			return new LiteralText(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
+			textWidth = textRenderer.getStringWidth(ELLIPSIS);
+			String trimmed = textRenderer.trimToWidth(baseText, width - textWidth);
+			return trimmed.trim() + ELLIPSIS;
 		} else {
 			return baseText;
 		}
@@ -71,24 +70,22 @@ public class CoatUtil {
 	 * @param textRenderer    The text renderer to use for calculations
 	 * @param minecraftClient The {@link MinecraftClient} instance
 	 * @param text            The text to wrap
-	 * @return A list of {@link OrderedText}s representing the wrapped tooltip text
+	 * @return A list of Strings representing the wrapped tooltip text
 	 */
-	public static List<OrderedText> wrapTooltip(TextRenderer textRenderer, MinecraftClient minecraftClient, Text text) {
-		return textRenderer.wrapLines(text, minecraftClient.currentScreen.width / 2);
+	public static List<String> wrapTooltip(TextRenderer textRenderer, MinecraftClient minecraftClient, String text) {
+		return textRenderer.wrapStringToWidthAsList(text, minecraftClient.currentScreen.width / 2);
 	}
 
 	/**
 	 * Wraps and renders the given text as a tooltip.
-	 * @param matrices The matrix stack to use for rendering
 	 * @param x        The x position to render to
 	 * @param y        The y position to render to
 	 * @param text     The tooltip text to wrap and render
 	 */
-	public static void renderTooltip(MatrixStack matrices, int x, int y, Text text) {
+	public static void renderTooltip(int x, int y, String text) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		RenderSystem.depthFunc(GL11.GL_ALWAYS);
-		client.currentScreen.renderOrderedTooltip(
-				matrices,
+		client.currentScreen.renderTooltip(
 				wrapTooltip(client.textRenderer, client, text),
 				x, y
 		);

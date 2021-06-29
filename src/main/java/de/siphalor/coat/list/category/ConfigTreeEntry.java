@@ -9,11 +9,8 @@ import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.BaseText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,8 +25,8 @@ import java.util.stream.Collectors;
  * @see ConfigListWidget
  */
 public class ConfigTreeEntry extends ConfigListCompoundEntry {
-	private static final BaseText EXPAND_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.expand");
-	private static final BaseText COLLAPSE_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.collapse");
+	private static final String EXPAND_TEXT_KEY = Coat.MOD_ID + ".tree.expand";
+	private static final String COLLAPSE_TEXT_KEY = Coat.MOD_ID + ".tree.collapse";
 
 	private final TextButtonWidget collapseButton;
 	private final TextButtonWidget nameButton;
@@ -47,8 +44,8 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 
 	public ConfigTreeEntry(Text name, ConfigListWidget configWidget) {
 		this.configWidget = configWidget;
-		collapseButton = new TextButtonWidget(x, y, 7, 9, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
-		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(this));
+		collapseButton = new TextButtonWidget(x, y, 7, 9, I18n.translate(EXPAND_TEXT_KEY), button -> setExpanded(!isExpanded()));
+		nameButton = new TextButtonWidget(x, y, 100, 9, name.asFormattedString(), button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(this));
 
 		List<ConfigTreeEntry> list = new ArrayList<>();
 		for (ConfigListWidget configListWidget : configWidget.getSubTrees()) {
@@ -63,7 +60,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x;
 		this.y = y;
 
@@ -74,22 +71,22 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		if (!subTrees.isEmpty()) {
 			collapseButton.x = x;
 			collapseButton.y = y;
-			collapseButton.render(matrices, mouseX, mouseY, tickDelta);
+			collapseButton.render(mouseX, mouseY, tickDelta);
 		}
 
 		nameButton.x = indent;
 		nameButton.y = y;
 		nameButton.setWidth(innerWidth);
-		nameButton.render(matrices, mouseX, mouseY, tickDelta);
+		nameButton.render(mouseX, mouseY, tickDelta);
 
 		if (expanded) {
-			int curY = y + nameButton.getHeight() + CoatUtil.MARGIN;
+			int curY = y + 9 + CoatUtil.MARGIN;
 			for (ConfigTreeEntry entry : subTrees) {
 				if (!hoverFound && mouseY > curY) {
 					hoverFound = true;
-					entry.render(matrices, indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
+					entry.render(indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
 				} else {
-					entry.render(matrices, indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
+					entry.render(indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
 				}
 				curY += entry.getHeight() + CoatUtil.MARGIN;
 			}
@@ -114,12 +111,12 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		if (this.open != open) {
 			if (open) {
 				nameButton.setMessage(
-						nameButton.getOriginalMessage().copy().setStyle(Style.EMPTY.withFormatting(Formatting.ITALIC))
+						new LiteralText(nameButton.getOriginalMessage()).setStyle(new Style().setItalic(true)).asFormattedString()
 				);
 				setExpanded(true);
 			} else {
 				nameButton.setMessage(
-						nameButton.getOriginalMessage().copy().setStyle(Style.EMPTY)
+						configWidget.getName().asString()
 				);
 			}
 		}
@@ -137,9 +134,9 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 			parent.entryHeightChanged(this);
 		}
 		if (expanded) {
-			collapseButton.setMessage(COLLAPSE_TEXT);
+			collapseButton.setMessage(I18n.translate(COLLAPSE_TEXT_KEY));
 		} else {
-			collapseButton.setMessage(EXPAND_TEXT);
+			collapseButton.setMessage(I18n.translate(EXPAND_TEXT_KEY));
 		}
 	}
 
@@ -170,7 +167,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	 * @return The base height
 	 */
 	public int getBaseHeight() {
-		return CoatUtil.MARGIN + nameButton.getHeight();
+		return CoatUtil.MARGIN + 9;
 	}
 
 	/**

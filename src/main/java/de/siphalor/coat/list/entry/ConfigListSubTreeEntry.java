@@ -13,9 +13,8 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
@@ -26,11 +25,11 @@ import java.util.List;
  * An entry linking to a sub tree.
  */
 public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
-	private static final TranslatableText OPEN_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.open");
+	private static final String OPEN_TEXT_KEY = Coat.MOD_ID + ".tree.open";
 
 	private final ConfigListWidget configWidget;
 	private final ButtonWidget button;
-	private Text nameText;
+	private String nameText;
 
 	/**
 	 * Constructs a new sub tree entry.
@@ -39,7 +38,7 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 	 */
 	public ConfigListSubTreeEntry(ConfigListWidget configWidget) {
 		this.configWidget = configWidget;
-		button = new ButtonWidget(0, 0, 50, 20, OPEN_TEXT,
+		button = new ButtonWidget(0, 0, 50, 20, I18n.translate(OPEN_TEXT_KEY),
 				button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(configWidget.getTreeEntry())
 		);
 	}
@@ -51,7 +50,7 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
 		nameText = CoatUtil.intelliTrim(
-				MinecraftClient.getInstance().textRenderer, configWidget.getName(),
+				MinecraftClient.getInstance().textRenderer, configWidget.getName().asFormattedString(),
 				newWidth - button.getWidth() - CoatUtil.DOUBLE_MARGIN - CoatUtil.DOUBLE_MARGIN - CoatUtil.MARGIN
 		);
 	}
@@ -60,7 +59,7 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		int r = entryHeight / 2;
 
 		MinecraftClient.getInstance().getTextureManager().bindTexture(configWidget.getBackground());
@@ -82,11 +81,11 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 
 		button.x = x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN;
 		button.y = y + CoatUtil.MARGIN;
-		MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
-		button.render(matrices, mouseX, mouseY, tickDelta);
+		MinecraftClient.getInstance().textRenderer.drawWithShadow(nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
+		button.render(mouseX, mouseY, tickDelta);
 
-		if (hovered && nameText != configWidget.getName() && !button.isMouseOver(mouseX, mouseY)) {
-			CoatUtil.renderTooltip(matrices, mouseX, mouseY, configWidget.getName());
+		if (hovered && !nameText.equals(configWidget.getName().asFormattedString()) && !button.isMouseOver(mouseX, mouseY)) {
+			CoatUtil.renderTooltip(mouseX, mouseY, configWidget.getName().asFormattedString());
 		}
 	}
 

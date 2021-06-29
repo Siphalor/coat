@@ -8,7 +8,6 @@ import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
-import de.siphalor.coat.list.entry.ConfigListConfigEntry;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -17,7 +16,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -31,8 +30,8 @@ import java.util.List;
  * A Coat config screen.
  */
 public class ConfigScreen extends Screen {
-	private static final Text ABORT_TEXT = new TranslatableText(Coat.MOD_ID + ".action.abort");
-	private static final Text SAVE_TEXT =  new TranslatableText(Coat.MOD_ID + ".action.save");
+	private static final String ABORT_TEXT_KEY = Coat.MOD_ID + ".action.abort";
+	private static final String SAVE_TEXT_KEY =  Coat.MOD_ID + ".action.save";
 
 	private final Screen parent;
 	private final Collection<ConfigListWidget> widgets;
@@ -65,7 +64,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		panelWidth = 200;
-		treeWidget = new DynamicEntryListWidget<>(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
+		treeWidget = new DynamicEntryListWidget<>(MinecraftClient.getInstance(), panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.5F);
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		children.add(treeWidget);
@@ -74,8 +73,8 @@ public class ConfigScreen extends Screen {
 			treeWidget.addEntry(widget.getTreeEntry());
 		}
 
-		abortButton = new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, ABORT_TEXT, button -> onClose());
-		saveButton =  new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, SAVE_TEXT, this::clickSave);
+		abortButton = new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, I18n.translate(ABORT_TEXT_KEY), button -> onClose());
+		saveButton =  new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, I18n.translate(SAVE_TEXT_KEY), this::clickSave);
 		addButton(abortButton);
 		addButton(saveButton);
 
@@ -217,7 +216,7 @@ public class ConfigScreen extends Screen {
 			visualTitle = title;
 		}
 
-		resize(client, width, height);
+		resize(MinecraftClient.getInstance(), width, height);
 	}
 
 	/**
@@ -253,12 +252,12 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(int mouseX, int mouseY, float delta) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-		treeWidget.render(matrices, mouseX, mouseY, delta);
-		listWidget.render(matrices, mouseX, mouseY, delta);
+		treeWidget.render(mouseX, mouseY, delta);
+		listWidget.render(mouseX, mouseY, delta);
 
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
@@ -277,7 +276,7 @@ public class ConfigScreen extends Screen {
 		RenderSystem.disableDepthTest();
 		RenderSystem.disableBlend();
 		RenderSystem.enableTexture();
-		client.getTextureManager().bindTexture(listWidget.getBackground());
+		MinecraftClient.getInstance().getTextureManager().bindTexture(listWidget.getBackground());
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
 		bufferBuilder.vertex(0D,    20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
 		bufferBuilder.vertex(width, 20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
@@ -285,8 +284,8 @@ public class ConfigScreen extends Screen {
 		bufferBuilder.vertex(0D,     0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
 		tessellator.draw();
 
-		drawCenteredText(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
+		drawCenteredString(MinecraftClient.getInstance().textRenderer, visualTitle.asFormattedString(), width / 2, 8, 0xffffff);
 
-		super.render(matrices, mouseX, mouseY, delta);
+		super.render(mouseX, mouseY, delta);
 	}
 }

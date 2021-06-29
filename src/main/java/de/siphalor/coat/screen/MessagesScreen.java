@@ -6,9 +6,10 @@ import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.entry.MessageListEntry;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.MultilineText;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -24,7 +25,7 @@ public class MessagesScreen extends Screen {
 	private final ConfigScreen parent;
 	private final Runnable acceptRunnable;
 	private final List<Message> messages;
-	private MultilineText titleLines;
+	private List<String> titleLines;
 	private ButtonWidget acceptButton;
 	private ButtonWidget abortButton;
 	private DynamicEntryListWidget<MessageListEntry> messagesList;
@@ -61,11 +62,11 @@ public class MessagesScreen extends Screen {
 		super.init();
 
 		abortButton = new ButtonWidget(0, 38, 100, 20,
-				new TranslatableText(Coat.MOD_ID + ".action.abort"),
+				I18n.translate(Coat.MOD_ID + ".action.abort"),
 				button -> MinecraftClient.getInstance().openScreen(parent)
 		);
 		acceptButton = new ButtonWidget(0, 38, 100, 20,
-				new TranslatableText(Coat.MOD_ID + ".action.accept_risk"),
+				I18n.translate(Coat.MOD_ID + ".action.accept_risk"),
 				button -> acceptRunnable.run()
 		);
 		addButton(abortButton);
@@ -87,21 +88,26 @@ public class MessagesScreen extends Screen {
 		this.height = height;
 
 		messagesList.resize(width, height);
-		titleLines = MultilineText.create(client.textRenderer, title, 260);
+		titleLines = client.textRenderer.wrapStringToWidthAsList(title.asFormattedString(), 260);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(int mouseX, int mouseY, float delta) {
 		int left = width / 2 - 130;
-		renderBackground(matrices);
+		renderBackground();
 		abortButton.x = width / 2 - CoatUtil.MARGIN - abortButton.getWidth();
 		acceptButton.x = width / 2 + CoatUtil.MARGIN;
-		titleLines.draw(matrices, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR);
-		messagesList.render(matrices, mouseX, mouseY, delta);
+		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+		float y = CoatUtil.DOUBLE_MARGIN;
+		for (String titleLine : titleLines) {
+			textRenderer.draw(titleLine, left, y, CoatUtil.TEXT_COLOR);
+			y += 10F;
+		}
+		messagesList.render(mouseX, mouseY, delta);
 
-		super.render(matrices, mouseX, mouseY, delta);
+		super.render(mouseX, mouseY, delta);
 	}
 }

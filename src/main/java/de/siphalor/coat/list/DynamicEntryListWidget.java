@@ -17,7 +17,6 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +46,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	private int rowWidth;
 	private double scrollAmount;
 	private float backgroundBrightness = 0.27F;
-	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
+	private Identifier background = DrawableHelper.BACKGROUND_LOCATION;
 	private boolean scrolling;
 
 	/**
@@ -311,7 +310,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
 		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LEQUAL);
+		RenderSystem.depthFunc(GL11.GL_LESS);
 		RenderSystem.color3f(backgroundBrightness, backgroundBrightness, backgroundBrightness);
 		this.client.getTextureManager().bindTexture(background);
 		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE);
@@ -327,7 +326,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(int mouseX, int mouseY, float delta) {
 		int scrollbarXBegin = this.getScrollbarPositionX();
 		int scrollbarXEnd = scrollbarXBegin + 6;
 		Tessellator tessellator = Tessellator.getInstance();
@@ -353,10 +352,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			RenderSystem.enableTexture();
 		}
 
-		this.renderList(matrices, mouseX, mouseY, delta);
+		this.renderList(mouseX, mouseY, delta);
 
 		// render top shadow
-		fillGradient(matrices, left, top, right, top + TOP_PADDING, 0xcc000000, 0x00000000);
+		fillGradient(left, top, right, top + TOP_PADDING, 0xcc000000, 0x00000000);
 
 	}
 
@@ -514,12 +513,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * Renders all visible entries.
 	 *
-	 * @param matrices The matrix stack to use for rendering
 	 * @param mouseX   The current mouse x position
 	 * @param mouseY   The current mouse y position
 	 * @param delta    The tick delta
 	 */
-	protected void renderList(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	protected void renderList(int mouseX, int mouseY, float delta) {
 		IntListIterator bottomIter = entries.bottoms.iterator();
 		Iterator<E> entryIter = entries.iterator();
 		int relBottom = 0, relTop = 0;
@@ -546,7 +544,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 			int rowTop = relTop + entryAreaTop;
 
-			entry.render(matrices, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
+			entry.render(rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
 
 			if (bottomIter.hasNext()) {
 				relTop = relBottom;
@@ -771,18 +769,16 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 		/**
 		 * Renders an entry in a list.
-		 *
-		 * @param matrices    the matrix stack used for rendering
 		 * @param x           the X coordinate of the entry
 		 * @param y           the Y coordinate of the entry
 		 * @param entryWidth  the width of the entry.
-		 *                    Expensive calculations based on this should be done in {@link Entry#widthChanged(int)}.
+ *                    Expensive calculations based on this should be done in {@link Entry#widthChanged(int)}.
 		 * @param entryHeight The height of the entry
 		 * @param mouseX      the X coordinate of the mouse
 		 * @param mouseY      the Y coordinate of the mouse
 		 * @param hovered     whether the mouse is hovering over the entry
 		 */
-		public abstract void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+		public abstract void render(int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 
 		/**
 		 * The current height of this entry. Height updates should be announced via the parent's {@link EntryContainer#entryHeightChanged(Element)}:<br />

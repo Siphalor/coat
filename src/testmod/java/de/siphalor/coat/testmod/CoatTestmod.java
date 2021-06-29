@@ -42,7 +42,7 @@ public class CoatTestmod implements ClientModInitializer {
 				new LiteralText("a boolean"),
 				new LiteralText("noop"),
 				new GenericEntryHandler<>(true, s -> Collections.emptyList()),
-				new CheckBoxConfigInput(null, true, false)
+				new CheckBoxConfigInput(new LiteralText(""), true, false)
 		));
 		list.add(new ConfigListConfigEntry<>(
 				new LiteralText("Blub"),
@@ -84,7 +84,7 @@ public class CoatTestmod implements ClientModInitializer {
 				new SliderConfigInput<>(0D, -10D, 90D)
 		));
 
-		ConfigListWidget widget = new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Hi"), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		ConfigListWidget widget = new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Hi"), list, DrawableHelper.BACKGROUND_LOCATION);
 
 		LinkedList<ConfigListEntry> list1 = new LinkedList<>();
 		list1.add(new ConfigListTextEntry(new LiteralText("You know the rules and so do I")));

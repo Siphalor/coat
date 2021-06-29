@@ -11,7 +11,7 @@ import net.minecraft.util.math.MathHelper;
  * A button widget that only renders as text.
  */
 public class TextButtonWidget extends ButtonWidget {
-	private Text originalMessage;
+	private String originalMessage;
 
 	/**
 	 * Constructs a new instance.
@@ -23,7 +23,7 @@ public class TextButtonWidget extends ButtonWidget {
 	 * @param message The text to render
 	 * @param onPress An action to run when the widget gets triggered
 	 */
-	public TextButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress) {
+	public TextButtonWidget(int x, int y, int width, int height, String message, PressAction onPress) {
 		super(x, y, width, height, message, onPress);
 		setMessage(message);
 	}
@@ -33,7 +33,7 @@ public class TextButtonWidget extends ButtonWidget {
 	 *
 	 * @return The original message
 	 */
-	public Text getOriginalMessage() {
+	public String getOriginalMessage() {
 		return originalMessage;
 	}
 
@@ -41,18 +41,18 @@ public class TextButtonWidget extends ButtonWidget {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void renderButton(int mouseX, int mouseY, float delta) {
 		final int color = CoatUtil.TEXT_COLOR | MathHelper.ceil(alpha * 255F) << 24;
 		float textY = y + (height - 7) / 2F;
 		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-		textRenderer.drawWithShadow(matrices, getMessage(), x, textY, color);
+		textRenderer.drawWithShadow(getMessage(), x, textY, color);
 		if (isFocused()) {
 			CoatUtil.drawStrokeRect(x - 2, y - 2, x + width + 2, y + height + 2, 1, color);
 		}
-		if (hovered) {
-			fill(matrices, x - 1, y - 1, x + width + 1, y + height + 1, 0x33ffffff);
-			if (originalMessage != getMessage()) {
-				CoatUtil.renderTooltip(matrices, mouseX, mouseY, originalMessage);
+		if (isMouseOver(mouseX, mouseY)) {
+			fill(x - 1, y - 1, x + width + 1, y + height + 1, 0x33ffffff);
+			if (!originalMessage.equals(getMessage())) {
+				CoatUtil.renderTooltip(mouseX, mouseY, originalMessage);
 			}
 		}
 	}
@@ -63,7 +63,7 @@ public class TextButtonWidget extends ButtonWidget {
 	 * @param text The new button text
 	 */
 	@Override
-	public void setMessage(Text text) {
+	public void setMessage(String text) {
 		originalMessage = text;
 		super.setMessage(CoatUtil.intelliTrim(MinecraftClient.getInstance().textRenderer, originalMessage, width));
 	}

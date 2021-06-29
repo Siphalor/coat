@@ -1,7 +1,6 @@
 package de.siphalor.coat.input;
 
 import net.minecraft.client.gui.widget.CheckboxWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 /**
@@ -17,7 +16,12 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 * @param showMessage Whether the message should be displayed
 	 */
 	public CheckBoxConfigInput(Text message, boolean checked, boolean showMessage) {
-		super(0, 0, 20, 20, message, checked, showMessage);
+		super(0, 0, 20, 20, message.asFormattedString(), checked);
+	}
+
+	@Override
+	public int getHeight() {
+		return height;
 	}
 
 	/**
@@ -47,10 +51,10 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x + width - getWidth();
 		this.y = y;
-		render(matrices, mouseX, mouseY, tickDelta);
+		render(mouseX, mouseY, tickDelta);
 	}
 
 	/**

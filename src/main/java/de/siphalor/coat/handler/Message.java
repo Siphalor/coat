@@ -3,7 +3,6 @@ package de.siphalor.coat.handler;
 import de.siphalor.coat.Coat;
 import net.minecraft.text.BaseText;
 import net.minecraft.text.Style;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 
 /**
@@ -73,19 +72,19 @@ public class Message {
 		/**
 		 * Defines a low priority informational message level.
 		 */
-		public static final Level NOTE = new Level(0, Coat.MOD_ID + ".message.level.note", Style.EMPTY);
+		public static final Level NOTE = new Level(0, Coat.MOD_ID + ".message.level.note", new Style());
 		/**
 		 * Defines an informational message level.
 		 */
-		public static final Level INFO = new Level(100, Coat.MOD_ID + ".message.level.info", Style.EMPTY.withColor(TextColor.fromRgb(0xaaaaff)));
+		public static final Level INFO = new Level(100, Coat.MOD_ID + ".message.level.info", new Style().setColor(Formatting.byColorIndex(0xaaaaff)));
 		/**
 		 * Defines a warning message level.
 		 */
-		public static final Level WARNING = new Level(200, Coat.MOD_ID + ".message.level.warning", Style.EMPTY.withColor(Formatting.YELLOW));
+		public static final Level WARNING = new Level(200, Coat.MOD_ID + ".message.level.warning", new Style().setColor(Formatting.YELLOW));
 		/**
 		 * Defines an error message level.
 		 */
-		public static final Level ERROR = new Level(300, Coat.MOD_ID + ".message.level.error", Style.EMPTY.withColor(Formatting.RED));
+		public static final Level ERROR = new Level(300, Coat.MOD_ID + ".message.level.error", new Style().setColor(Formatting.RED));
 
 		/**
 		 * A threshold of levels that should always be shown to the user. To be compared with {@link Level#severity}

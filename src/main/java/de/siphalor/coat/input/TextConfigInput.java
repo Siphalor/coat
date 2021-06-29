@@ -2,9 +2,6 @@ package de.siphalor.coat.input;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 
 /**
  * A string input represented as a text field.
@@ -16,7 +13,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 * @param value The initial value of this text field
 	 */
 	public TextConfigInput(String value) {
-		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, LiteralText.EMPTY);
+		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, "");
 		setValue(value);
 	}
 
@@ -25,7 +22,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 */
 	@Override
 	public int getHeight() {
-		return super.getHeight() + 4;
+		return super.height + 4;
 	}
 
 	/**
@@ -65,10 +62,10 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x + 2;
 		this.y = y + 2;
 		this.width = width - 4;
-		render(matrices, mouseX, mouseY, tickDelta);
+		render(mouseX, mouseY, tickDelta);
 	}
 }
