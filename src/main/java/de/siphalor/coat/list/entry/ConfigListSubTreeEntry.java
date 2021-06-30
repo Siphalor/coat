@@ -1,6 +1,6 @@
 package de.siphalor.coat.list.entry;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
@@ -14,7 +14,6 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
@@ -63,26 +62,28 @@ public class ConfigListSubTreeEntry extends ConfigListCompoundEntry {
 		int r = entryHeight / 2;
 
 		MinecraftClient.getInstance().getTextureManager().bindTexture(configWidget.getBackground());
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.shadeModel(7425);
+		GlStateManager.enableDepthTest();
+		GlStateManager.depthFunc(GL11.GL_LEQUAL);
+		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
-		buffer.begin(GL11.GL_TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE);
-		buffer.vertex(x,                  y,               -100D).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      0F               ).next();
-		buffer.vertex(x + r,              y + r,           -100D).color(0x77, 0x77, 0x77, 0xff).texture(r / 32F,                 r / 32F          ).next();
-		buffer.vertex(x + entryWidth,     y,               -100D).color(0x33, 0x33, 0x33, 0xff).texture(entryWidth / 32F,        0F               ).next();
-		buffer.vertex(x + entryWidth - r, y + r,           -100D).color(0x77, 0x77, 0x77, 0xff).texture((entryWidth - r) / 32F,  r / 32F          ).next();
-		buffer.vertex(x + entryWidth,     y + entryHeight, -100D).color(0x33, 0x33, 0x33, 0xff).texture(entryWidth / 32F,        entryHeight / 32F).next();
-		buffer.vertex(x + r,              y + r,           -100D).color(0x77, 0x77, 0x77, 0xff).texture(r / 32F,                 r / 32F          ).next();
-		buffer.vertex(x,                  y + entryHeight, -100D).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      entryHeight / 32F).next();
-		buffer.vertex(x,                  y,               -100D).color(0x33, 0x33, 0x33, 0xff).texture(0F,                      0F               ).next();
+		buffer.begin(GL11.GL_TRIANGLE_STRIP, VertexFormats.POSITION_TEXTURE_COLOR);
+		buffer.vertex(x,                  y,               -100D).texture(0F,                      0F               ).color(0x33, 0x33, 0x33, 0xff).next();
+		buffer.vertex(x + r,              y + r,           -100D).texture(r / 32F,                 r / 32F          ).color(0x77, 0x77, 0x77, 0xff).next();
+		buffer.vertex(x + entryWidth,     y,               -100D).texture(entryWidth / 32F,        0F               ).color(0x33, 0x33, 0x33, 0xff).next();
+		buffer.vertex(x + entryWidth - r, y + r,           -100D).texture((entryWidth - r) / 32F,  r / 32F          ).color(0x77, 0x77, 0x77, 0xff).next();
+		buffer.vertex(x + entryWidth,     y + entryHeight, -100D).texture(entryWidth / 32F,        entryHeight / 32F).color(0x33, 0x33, 0x33, 0xff).next();
+		buffer.vertex(x + r,              y + r,           -100D).texture(r / 32F,                 r / 32F          ).color(0x77, 0x77, 0x77, 0xff).next();
+		buffer.vertex(x,                  y + entryHeight, -100D).texture(0F,                      entryHeight / 32F).color(0x33, 0x33, 0x33, 0xff).next();
+		buffer.vertex(x,                  y,               -100D).texture(0F,                      0F               ).color(0x33, 0x33, 0x33, 0xff).next();
 		tessellator.draw();
 
 		button.x = x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN;
 		button.y = y + CoatUtil.MARGIN;
 		MinecraftClient.getInstance().textRenderer.drawWithShadow(nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
 		button.render(mouseX, mouseY, tickDelta);
+
+		GlStateManager.shadeModel(GL11.GL_FLAT);
 
 		if (hovered && !nameText.equals(configWidget.getName().asFormattedString()) && !button.isMouseOver(mouseX, mouseY)) {
 			CoatUtil.renderTooltip(mouseX, mouseY, configWidget.getName().asFormattedString());

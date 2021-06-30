@@ -1,7 +1,6 @@
 package de.siphalor.coat.screen;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListWidget;
@@ -259,13 +258,13 @@ public class ConfigScreen extends Screen {
 		treeWidget.render(mouseX, mouseY, delta);
 		listWidget.render(mouseX, mouseY, delta);
 
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-		RenderSystem.disableAlphaTest();
-		RenderSystem.shadeModel(7425);
-		RenderSystem.disableTexture();
+		GlStateManager.enableDepthTest();
+		GlStateManager.depthFunc(GL11.GL_LEQUAL);
+		GlStateManager.enableBlend();
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
+		GlStateManager.disableAlphaTest();
+		GlStateManager.shadeModel(GL11.GL_SMOOTH);
+		GlStateManager.disableTexture();
 		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
 		bufferBuilder.vertex(panelWidth,      height, 0D).color(0, 0, 0, 200).next();
 		bufferBuilder.vertex(panelWidth + 8D, height, 0D).color(0, 0, 0,   0).next();
@@ -273,15 +272,15 @@ public class ConfigScreen extends Screen {
 		bufferBuilder.vertex(panelWidth,      20D,    0D).color(0, 0, 0, 200).next();
 		tessellator.draw();
 
-		RenderSystem.disableDepthTest();
-		RenderSystem.disableBlend();
-		RenderSystem.enableTexture();
+		GlStateManager.disableDepthTest();
+		GlStateManager.disableBlend();
+		GlStateManager.enableTexture();
 		MinecraftClient.getInstance().getTextureManager().bindTexture(listWidget.getBackground());
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(0D,    20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
-		bufferBuilder.vertex(width, 20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
-		bufferBuilder.vertex(width,  0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 0F).next();
-		bufferBuilder.vertex(0D,     0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
+		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+		bufferBuilder.vertex(0D,    20D, 0D).texture(0F,          20F / 32F).color(0x77, 0x77, 0x77, 0xff).next();
+		bufferBuilder.vertex(width, 20D, 0D).texture(width / 32F, 20F / 32F).color(0x77, 0x77, 0x77, 0xff).next();
+		bufferBuilder.vertex(width,  0D, 0D).texture(width / 32F, 0F       ).color(0x77, 0x77, 0x77, 0xff).next();
+		bufferBuilder.vertex(0D,     0D, 0D).texture(0F,          0F       ).color(0x77, 0x77, 0x77, 0xff).next();
 		tessellator.draw();
 
 		drawCenteredString(MinecraftClient.getInstance().textRenderer, visualTitle.asFormattedString(), width / 2, 8, 0xffffff);

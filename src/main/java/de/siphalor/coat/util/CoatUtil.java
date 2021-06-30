@@ -1,16 +1,11 @@
 package de.siphalor.coat.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
@@ -84,11 +79,13 @@ public class CoatUtil {
 	 */
 	public static void renderTooltip(int x, int y, String text) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		RenderSystem.depthFunc(GL11.GL_ALWAYS);
+		GlStateManager.disableDepthTest();
 		client.currentScreen.renderTooltip(
 				wrapTooltip(client.textRenderer, client, text),
 				x, y
 		);
+		GlStateManager.enableDepthTest();
+		GlStateManager.disableLighting();
 	}
 
 	/**
@@ -107,18 +104,16 @@ public class CoatUtil {
 		int blue = color & 255;
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
-		RenderSystem.enableBlend();
-		RenderSystem.disableTexture();
-		RenderSystem.defaultBlendFunc();
+		GlStateManager.enableBlend();
+		GlStateManager.disableTexture();
 		buffer.begin(7, VertexFormats.POSITION_COLOR);
 		addRect(buffer, x1, y1, x2, y1 + stroke, red, green, blue, alpha);
 		addRect(buffer, x1, y2 - stroke, x2, y2, red, green, blue, alpha);
 		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, red, green, blue, alpha);
 		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, red, green, blue, alpha);
-		buffer.end();
-		BufferRenderer.draw(buffer);
-		RenderSystem.enableTexture();
-		RenderSystem.disableBlend();
+		tessellator.draw();
+		GlStateManager.enableTexture();
+		GlStateManager.disableBlend();
 	}
 
 	/**

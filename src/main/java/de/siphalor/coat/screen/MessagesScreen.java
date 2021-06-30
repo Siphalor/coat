@@ -1,5 +1,6 @@
 package de.siphalor.coat.screen;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.DynamicEntryListWidget;
@@ -10,9 +11,8 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,8 +106,10 @@ public class MessagesScreen extends Screen {
 			textRenderer.draw(titleLine, left, y, CoatUtil.TEXT_COLOR);
 			y += 10F;
 		}
+
 		messagesList.render(mouseX, mouseY, delta);
 
+		GlStateManager.depthFunc(GL11.GL_LEQUAL);
 		super.render(mouseX, mouseY, delta);
 	}
 }

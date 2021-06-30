@@ -1,11 +1,11 @@
 package de.siphalor.coat.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.opengl.GL11;
 
 /**
  * A button widget that only renders as text.
@@ -44,6 +44,8 @@ public class TextButtonWidget extends ButtonWidget {
 	public void renderButton(int mouseX, int mouseY, float delta) {
 		final int color = CoatUtil.TEXT_COLOR | MathHelper.ceil(alpha * 255F) << 24;
 		float textY = y + (height - 7) / 2F;
+		GlStateManager.depthFunc(GL11.GL_LEQUAL);
+		GlStateManager.disableBlend();
 		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 		textRenderer.drawWithShadow(getMessage(), x, textY, color);
 		if (isFocused()) {

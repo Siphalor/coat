@@ -1,5 +1,6 @@
 package de.siphalor.coat.list.entry;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListCompoundEntry;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -89,6 +91,7 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 		MinecraftClient.getInstance().textRenderer.draw(text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR);
 		jumpButton.y = y;
 		jumpButton.x = x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN;
+		GlStateManager.depthFunc(GL11.GL_LEQUAL);
 		jumpButton.render(mouseX, mouseY, tickDelta);
 
 		if (hovered && mouseX < jumpButton.x) {

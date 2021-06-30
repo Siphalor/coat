@@ -39,7 +39,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	@Override
 	public void setValue(String value) {
 		setText(value);
-		setCursorToStart(); // Required because otherwise the text doesn't render sometimes
+		method_1870(); // Required because otherwise the text doesn't render sometimes
 	}
 
 	/**

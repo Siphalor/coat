@@ -1,6 +1,6 @@
 package de.siphalor.coat.list.entry;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.util.CoatUtil;
@@ -20,10 +20,10 @@ public class ConfigListHorizontalBreak extends ConfigListEntry {
 	 */
 	@Override
 	public void render(int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LESS);
+		GlStateManager.enableDepthTest();
+		GlStateManager.depthFunc(GL11.GL_LEQUAL);
 		fill(x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR);
-		RenderSystem.disableDepthTest();
+		GlStateManager.disableDepthTest();
 	}
 
 	/**

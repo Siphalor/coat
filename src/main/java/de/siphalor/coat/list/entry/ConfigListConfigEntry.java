@@ -1,6 +1,7 @@
 package de.siphalor.coat.list.entry;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.handler.Message;
@@ -14,7 +15,10 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.*;
+import net.minecraft.text.BaseText;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -190,6 +194,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 				list.addAll(wrappedLines);
 				list.add(0, I18n.translate(Coat.MOD_ID + ".default.hover"));
 				client.currentScreen.renderTooltip(list, mouseX, mouseY);
+				GlStateManager.disableLighting();
 			}
 		}
 

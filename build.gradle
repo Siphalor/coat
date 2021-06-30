@@ -32,7 +32,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// for testing
-	modImplementation "de.siphalor:amecsapi-1.15:1+"
+	modImplementation "de.siphalor:amecsapi-1.14:1+"
 	modRuntime("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output

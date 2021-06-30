@@ -1,7 +1,7 @@
 package de.siphalor.coat.list;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TickableElement;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -309,9 +309,9 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @param bufferBuilder The buffer builder to use
 	 */
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LESS);
-		RenderSystem.color3f(backgroundBrightness, backgroundBrightness, backgroundBrightness);
+		GlStateManager.enableDepthTest();
+		GlStateManager.depthFunc(GL11.GL_LESS);
+		GlStateManager.color3f(backgroundBrightness, backgroundBrightness, backgroundBrightness);
 		this.client.getTextureManager().bindTexture(background);
 		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE);
 		bufferBuilder.vertex(left, bottom, -100D).texture(left / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
@@ -319,7 +319,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		bufferBuilder.vertex(right, top, -100D).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
 		bufferBuilder.vertex(left, top, -100D).texture(left / 32F, (top + (int) getScrollAmount()) / 32F).next();
 		tessellator.draw();
-		RenderSystem.clearCurrentColor();
+		GlStateManager.clearCurrentColor();
 	}
 
 	/**
@@ -336,7 +336,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
-			RenderSystem.disableTexture();
+			GlStateManager.disableTexture();
 			int p = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getMaxPosition());
 			p = MathHelper.clamp(p, 32, this.bottom - this.top - 8);
 			int q = (int) this.getScrollAmount() * (this.bottom - this.top - p) / maxScroll + this.top;
@@ -349,7 +349,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, 128, 128, 128, 255);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, 192, 192, 192, 255);
 			tessellator.draw();
-			RenderSystem.enableTexture();
+			GlStateManager.enableTexture();
 		}
 
 		this.renderList(mouseX, mouseY, delta);
