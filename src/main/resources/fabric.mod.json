@@ -22,7 +22,8 @@
 			"badges": [
 				"library"
 			]
-		}
+		},
+		"modmenu:api": true
 	},
 	"depends": {
 		"fabricloader": ">=0.11.3",
