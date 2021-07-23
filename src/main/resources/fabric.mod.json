@@ -17,6 +17,14 @@
 	"mixins": [
 		"coat.mixins.json"
 	],
+	"custom": {
+		"modmenu": {
+			"badges": [
+				"library"
+			]
+		},
+		"modmenu:api": true
+	},
 	"depends": {
 		"fabricloader": ">=0.11.3",
 		"fabric": "*",

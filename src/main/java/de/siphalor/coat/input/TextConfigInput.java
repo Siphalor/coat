@@ -62,6 +62,14 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void tick() {
+		super.tick();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void render(int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x + 2;
 		this.y = y + 2;
