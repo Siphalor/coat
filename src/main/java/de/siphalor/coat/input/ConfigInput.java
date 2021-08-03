@@ -48,8 +48,19 @@ public interface ConfigInput<V> extends Drawable, Element {
 
 	/**
 	 * Called on every render tick.
+	 * @deprecated Use {@link ConfigInput#tickConfigInput()} instead.
 	 */
-	void tick();
+	@Deprecated
+	default void tick() {
+
+	}
+
+	/**
+	 * Called on every render tick.
+	 */
+	default void tickConfigInput() {
+		tick();
+	}
 
 	/**
 	 * Renders this config input
