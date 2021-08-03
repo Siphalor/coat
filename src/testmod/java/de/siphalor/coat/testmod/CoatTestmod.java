@@ -84,18 +84,20 @@ public class CoatTestmod implements ClientModInitializer {
 				new SliderConfigInput<>(0D, -10D, 90D)
 		));
 
-		ConfigListWidget widget = new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Hi"), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		ConfigListWidget widget = new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Hi, my name is Fry"), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 
 		LinkedList<ConfigListEntry> list1 = new LinkedList<>();
 		list1.add(new ConfigListTextEntry(new LiteralText("You know the rules and so do I")));
 		list1.add(new ConfigListTextEntry(new LiteralText("A full commitment's what I'm thinking of")));
-		widget.addSubTree(new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("a"), list1, new Identifier("textures/block/acacia_planks.png")));
+		widget.addSubTree(new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Abc Def"), list1, new Identifier("textures/block/acacia_planks.png")));
 
 		LinkedList<ConfigListEntry> list2 = new LinkedList<>();
 		list2.add(new ConfigListTextEntry(new LiteralText("Heyho")));
 		widget.addSubTree(new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("This is a kinda long category name"), list2, new Identifier("textures/block/end_stone.png")));
 
-		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, new LiteralText("Coat Test Mod"), ImmutableList.of(widget));
+		ConfigListWidget widget2 = new ConfigListWidget(MinecraftClient.getInstance(), new LiteralText("Ho, this is a no go"), Collections.emptyList(), DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+
+		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, new LiteralText("Coat Test Mod"), ImmutableList.of(widget, widget2));
 
 		return screen;
 	}
