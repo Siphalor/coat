@@ -150,7 +150,7 @@ public class ConfigListConfigEntry<V> extends ConfigListCompoundEntry implements
 	 */
 	@Override
 	public void tick() {
-		input.tick();
+		input.tickConfigInput();
 	}
 
 	/**

@@ -80,7 +80,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		nameButton.render(mouseX, mouseY, tickDelta);
 
 		if (expanded) {
-			int curY = y + 9 + CoatUtil.MARGIN;
+			int curY = y + getBaseHeight();
 			for (ConfigTreeEntry entry : subTrees) {
 				if (!hoverFound && mouseY > curY) {
 					hoverFound = true;
@@ -88,7 +88,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 				} else {
 					entry.render(indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
 				}
-				curY += entry.getHeight() + CoatUtil.MARGIN;
+				curY += entry.getHeight();
 			}
 		}
 	}
@@ -167,7 +167,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	 * @return The base height
 	 */
 	public int getBaseHeight() {
-		return CoatUtil.MARGIN + 9;
+		return CoatUtil.DOUBLE_MARGIN + 9;
 	}
 
 	/**
@@ -179,9 +179,6 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		int height = 0;
 		for (ConfigTreeEntry child : subTrees) {
 			height += child.getHeight();
-		}
-		if (height > 0) {
-			height += CoatUtil.MARGIN;
 		}
 		return height;
 	}

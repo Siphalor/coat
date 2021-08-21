@@ -58,11 +58,8 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 		super.setFocused(focused);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void tick() {
+	public void tickConfigInput() {
 		super.tick();
 	}
 
