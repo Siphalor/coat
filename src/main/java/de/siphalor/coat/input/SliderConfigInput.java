@@ -94,14 +94,6 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void tick() {
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public void render(int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x;
 		this.y = y;
