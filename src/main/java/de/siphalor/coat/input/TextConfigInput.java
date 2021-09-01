@@ -14,6 +14,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 */
 	public TextConfigInput(String value) {
 		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, "");
+		setMaxLength(Integer.MAX_VALUE);
 		setValue(value);
 	}
 
