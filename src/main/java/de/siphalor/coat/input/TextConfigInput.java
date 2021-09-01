@@ -4,7 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 
 /**
  * A string input represented as a text field.
@@ -17,6 +16,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 */
 	public TextConfigInput(String value) {
 		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, LiteralText.EMPTY);
+		setMaxLength(Integer.MAX_VALUE);
 		setValue(value);
 	}
 
