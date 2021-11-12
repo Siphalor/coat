@@ -62,7 +62,7 @@ public class MessagesScreen extends Screen {
 
 		abortButton = new ButtonWidget(0, 38, 100, 20,
 				new TranslatableText(Coat.MOD_ID + ".action.abort"),
-				button -> MinecraftClient.getInstance().openScreen(parent)
+				button -> MinecraftClient.getInstance().setScreen(parent)
 		);
 		acceptButton = new ButtonWidget(0, 38, 100, 20,
 				new TranslatableText(Coat.MOD_ID + ".action.accept_risk"),

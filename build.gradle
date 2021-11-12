@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.8-SNAPSHOT'
+	id 'fabric-loom' version '0.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -32,8 +32,8 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// for testing
-	modImplementation "de.siphalor:amecsapi-1.17:1+"
-	modRuntime("com.github.astei:lazydfu:master-SNAPSHOT")
+	modImplementation "de.siphalor:amecsapi-${project.minecraft_major_version}:1+"
+	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
 }
@@ -74,13 +74,8 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			artifactId = "${project.archives_base_name}-${project.minecraft_major_version}"
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
+			
+			from components.java
 		}
 	}
 

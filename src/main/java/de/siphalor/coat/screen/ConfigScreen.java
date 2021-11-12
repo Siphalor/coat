@@ -7,7 +7,6 @@ import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
-import de.siphalor.coat.list.entry.ConfigListConfigEntry;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -104,12 +103,12 @@ public class ConfigScreen extends Screen {
 	 */
 	@Override
 	public void onClose() {
-		MinecraftClient.getInstance().openScreen(
+		MinecraftClient.getInstance().setScreen(
 				new ConfirmScreen(action -> {
 					if (action) {
-						MinecraftClient.getInstance().openScreen(parent);
+						MinecraftClient.getInstance().setScreen(parent);
 					} else {
-						MinecraftClient.getInstance().openScreen(this);
+						MinecraftClient.getInstance().setScreen(this);
 					}
 				},
 				new TranslatableText(Coat.MOD_ID + ".action.abort.screen.title"),
@@ -159,11 +158,11 @@ public class ConfigScreen extends Screen {
 
 		Runnable saveRunnable = () -> {
 			onSave();
-			MinecraftClient.getInstance().openScreen(parent);
+			MinecraftClient.getInstance().setScreen(parent);
 		};
 
 		Runnable warningOpener = () -> {
-			MinecraftClient.getInstance().openScreen(new MessagesScreen(
+			MinecraftClient.getInstance().setScreen(new MessagesScreen(
 					new TranslatableText(Coat.MOD_ID + ".action.save.warnings"),
 					this,
 					saveRunnable,
@@ -172,7 +171,7 @@ public class ConfigScreen extends Screen {
 		};
 
 		if (!errors.isEmpty()) {
-			MinecraftClient.getInstance().openScreen(new MessagesScreen(
+			MinecraftClient.getInstance().setScreen(new MessagesScreen(
 					new TranslatableText(Coat.MOD_ID + ".action.save.errors"),
 					this,
 					warnings.isEmpty() ? saveRunnable : warningOpener,

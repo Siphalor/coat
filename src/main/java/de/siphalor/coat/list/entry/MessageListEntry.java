@@ -56,7 +56,7 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 				ConfigScreen configScreen = null;
 				if (currentScreen instanceof MessagesScreen) {
 					configScreen = ((MessagesScreen) currentScreen).getParent();
-					MinecraftClient.getInstance().openScreen(configScreen);
+					MinecraftClient.getInstance().setScreen(configScreen);
 				} else if (currentScreen instanceof ConfigScreen) {
 					configScreen = (ConfigScreen) currentScreen;
 				}
