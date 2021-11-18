@@ -271,6 +271,7 @@ public class ConfigScreen extends Screen {
 		RenderSystem.disableBlend();
 		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 		RenderSystem.setShaderTexture(0, listWidget.getBackground());
+		RenderSystem.depthFunc(GL32.GL_LESS);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
 		bufferBuilder.vertex(0D,    20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
 		bufferBuilder.vertex(width, 20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
