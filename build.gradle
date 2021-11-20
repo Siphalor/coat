@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.7-SNAPSHOT'
+	id 'fabric-loom' version '0.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -28,12 +28,11 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	// for testing
-	modImplementation "de.siphalor:amecsapi-1.16:1+"
-	modRuntime("com.github.astei:lazydfu:master-SNAPSHOT")
+	// for testmod
+	modImplementation("de.siphalor:amecsapi-1.16:1+")
+	modImplementation("net.fabricmc.fabric-api:fabric-api-base:0.4.0+3cc0f0907d")
+	modImplementation("net.fabricmc.fabric-api:fabric-key-binding-api-v1:1.0.5+3cc0f0907d")
+	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
 }
@@ -72,15 +71,10 @@ jar {
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
-			artifactId = "${project.archives_base_name}-${project.minecraft_major_version}"
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
+		create("main", MavenPublication) {
+			artifactId = "${project.archives_base_name}-${project.minecraft_major_version}".toString()
+
+			from components.java
 		}
 	}
 
