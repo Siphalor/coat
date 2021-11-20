@@ -25,14 +25,13 @@ sourceSets {
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	// for testing
-	modImplementation "de.siphalor:amecsapi-${project.minecraft_major_version}:1+"
+	// for testmod
+	modImplementation("de.siphalor:amecsapi-1.17:1+")
+	modImplementation("net.fabricmc.fabric-api:fabric-api-base:0.4.0+65d505fc9c")
+	modImplementation("net.fabricmc.fabric-api:fabric-key-binding-api-v1:1.0.5+65d505fc9c")
 	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
@@ -72,9 +71,9 @@ jar {
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
-			artifactId = "${project.archives_base_name}-${project.minecraft_major_version}"
-			
+		create("main", MavenPublication) {
+			artifactId = "${project.archives_base_name}-${project.minecraft_major_version}".toString()
+
 			from components.java
 		}
 	}
