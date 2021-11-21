@@ -8,7 +8,6 @@ import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
-import de.siphalor.coat.list.entry.ConfigListConfigEntry;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -211,10 +210,10 @@ public class ConfigScreen extends Screen {
 		listWidget.setPosition(panelWidth, 20);
 		listWidget.setRowWidth(500);
 
-		if (listWidget.getName() != null && !listWidget.getName().getString().isEmpty()) {
-			visualTitle = title.copy().append(" - ").append(listWidget.getName());
-		} else {
+		if (listWidget.getName() == null || listWidget.getName().getString().isEmpty() || listWidget.getName().getString().equals(title.getString())) {
 			visualTitle = title;
+		} else {
+			visualTitle = title.copy().append(" - ").append(listWidget.getName());
 		}
 
 		resize(client, width, height);
