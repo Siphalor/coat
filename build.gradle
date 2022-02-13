@@ -72,7 +72,7 @@ jar {
 publishing {
 	publications {
 		create("main", MavenPublication) {
-			artifactId = "${project.archives_base_name}-${project.minecraft_major_version}".toString()
+			artifactId = "${project.archives_base_name}-unstable".toString()
 
 			from components.java
 		}
