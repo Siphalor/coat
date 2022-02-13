@@ -70,7 +70,7 @@ public class ConfigScreen extends Screen {
 			treeWidget.addEntry(widget.getTreeEntry());
 		}
 
-		abortButton = new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, ABORT_TEXT, button -> onClose());
+		abortButton = new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, ABORT_TEXT, button -> close());
 		saveButton =  new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, SAVE_TEXT, this::clickSave);
 		addDrawableChild(abortButton);
 		addDrawableChild(saveButton);
@@ -98,11 +98,8 @@ public class ConfigScreen extends Screen {
 		return listWidget;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void onClose() {
+	public void close() {
 		MinecraftClient.getInstance().setScreen(
 				new ConfirmScreen(action -> {
 					if (action) {
