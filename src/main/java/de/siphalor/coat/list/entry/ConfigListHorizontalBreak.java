@@ -2,7 +2,6 @@ package de.siphalor.coat.list.entry;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.util.CoatUtil;
 import org.lwjgl.opengl.GL11;
 
@@ -12,7 +11,7 @@ import java.util.Collections;
 /**
  * A horizontal break to be used in config lists.
  */
-public class ConfigListHorizontalBreak extends ConfigListEntry {
+public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 	private static final int PADDING = 10;
 
 	/**

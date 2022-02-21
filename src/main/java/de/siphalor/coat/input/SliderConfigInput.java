@@ -26,7 +26,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	 * @param max   The maximum of the slider
 	 */
 	public SliderConfigInput(N value, N min, N max) {
-		super(0, 0, 100, 20, value.doubleValue());
+		super(0, 0, 100, 20, toInternalValue(value, min, max));
 		//noinspection unchecked
 		valueClass = (Class<N>) value.getClass();
 		this.min = min;
@@ -43,6 +43,13 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	@Override
 	public int getHeight() {
 		return height;
+	}
+
+	protected static double toInternalValue(Number value, Number min, Number max) {
+		return MathHelper.clamp(
+				(value.doubleValue() - min.doubleValue()) / (max.doubleValue() - min.doubleValue()),
+				0D, 1D
+		);
 	}
 
 	/**
@@ -66,8 +73,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	 */
 	@Override
 	public void setValue(N realValue) {
-		value = (realValue.doubleValue() - min.doubleValue()) / (max.doubleValue() - min.doubleValue());
-		value = MathHelper.clamp(value, 0D, 1D);
+		value = toInternalValue(realValue, min, max);
 		applyValue();
 		updateMessage();
 	}
