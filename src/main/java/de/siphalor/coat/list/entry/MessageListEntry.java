@@ -3,10 +3,9 @@ package de.siphalor.coat.list.entry;
 import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListCompoundEntry;
-import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.EntryContainer;
+import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.screen.MessagesScreen;
 import de.siphalor.coat.util.CoatUtil;
@@ -24,7 +23,7 @@ import java.util.List;
 /**
  * A list entry linking to a message and providing functionality to jump to it.
  */
-public class MessageListEntry extends ConfigListCompoundEntry {
+public class MessageListEntry extends ConfigContainerCompoundEntry {
 	private static final String JUMP_TEXT_KEY = Coat.MOD_ID + ".message.jump";
 
 	private final Message message;
@@ -43,7 +42,7 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 				Element last = (Element) message.getOrigin();
 				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
 				if (category == null) return;
-				while (!(category instanceof ConfigListWidget)) {
+				while (!(category instanceof ConfigCategoryWidget)) {
 					last = category;
 					category = category.getParent();
 					if (category == null) {
@@ -62,10 +61,11 @@ public class MessageListEntry extends ConfigListCompoundEntry {
 				}
 
 				if (configScreen != null) {
-					configScreen.openCategory(((ConfigListWidget) category).getTreeEntry());
+					configScreen.openCategory(((ConfigCategoryWidget) category).getTreeEntry());
 					configScreen.setFocused(category);
-					configScreen.getListWidget().focusOn(last);
-					configScreen.getListWidget().changeFocus(true);
+					ConfigCategoryWidget listWidget = (ConfigCategoryWidget) configScreen.getContentWidget();
+					listWidget.focusOn(last);
+					listWidget.changeFocus(true);
 				}
 			}
 		});

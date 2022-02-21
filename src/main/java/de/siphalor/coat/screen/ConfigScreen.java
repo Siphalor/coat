@@ -3,10 +3,10 @@ package de.siphalor.coat.screen;
 import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListWidget;
 import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
+import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -21,9 +21,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * A Coat config screen.
@@ -33,7 +31,7 @@ public class ConfigScreen extends Screen {
 	private static final String SAVE_TEXT_KEY =  Coat.MOD_ID + ".action.save";
 
 	private final Screen parent;
-	private final Collection<ConfigListWidget> widgets;
+	private final Collection<ConfigCategoryWidget> widgets;
 	private ConfigTreeEntry openCategory;
 	private Runnable onSave = () -> {};
 	private Text visualTitle;
@@ -42,7 +40,9 @@ public class ConfigScreen extends Screen {
 	private DynamicEntryListWidget<ConfigTreeEntry> treeWidget;
 	private ButtonWidget abortButton;
 	private ButtonWidget saveButton;
-	private ConfigListWidget listWidget;
+	private ConfigContentWidget contentWidget;
+
+	protected List<DeferredTooltip> deferredTooltips = new ArrayList<>();
 
 	/**
 	 * Creates a new config screen.
@@ -50,7 +50,7 @@ public class ConfigScreen extends Screen {
 	 * @param title   The title of this config screen. Typically contains the name of the mod
 	 * @param widgets The categories/lists that this screen will be displaying
 	 */
-	public ConfigScreen(Screen parent, Text title, Collection<ConfigListWidget> widgets) {
+	public ConfigScreen(Screen parent, Text title, Collection<ConfigCategoryWidget> widgets) {
 		super(title);
 		this.visualTitle = title.copy().append(" - ").append("missingno");
 		this.parent = parent;
@@ -68,7 +68,7 @@ public class ConfigScreen extends Screen {
 		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
 		children.add(treeWidget);
 
-		for (ConfigListWidget widget : widgets) {
+		for (ConfigCategoryWidget widget : widgets) {
 			treeWidget.addEntry(widget.getTreeEntry());
 		}
 
@@ -96,8 +96,8 @@ public class ConfigScreen extends Screen {
 	 *
 	 * @return The list widget
 	 */
-	public ConfigListWidget getListWidget() {
-		return listWidget;
+	public ConfigContentWidget getContentWidget() {
+		return contentWidget;
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class ConfigScreen extends Screen {
 	 * Triggers the save listeners
 	 */
 	protected void onSave() {
-		for (ConfigListWidget widget : widgets) {
+		for (ConfigCategoryWidget widget : widgets) {
 			widget.save();
 		}
 		onSave.run();
@@ -194,7 +194,39 @@ public class ConfigScreen extends Screen {
 	public void openCategory(ConfigTreeEntry category) {
 		if (openCategory != null) {
 			openCategory.setOpen(false);
-			children.remove(openCategory.getConfigWidget());
+
+			Deque<EntryContainer> newHierarchy = new LinkedList<>();
+			newHierarchy.add(category);
+			while (newHierarchy.getFirst().getParent() != treeWidget) {
+				newHierarchy.push(newHierarchy.getFirst().getParent());
+			}
+
+			EntryContainer cur = openCategory;
+			EntryContainer last = null;
+			while (cur != treeWidget) {
+				if (cur == category) {
+					break;
+				}
+				if (newHierarchy.contains(cur)) {
+					if (last != null) {
+						if (last instanceof ConfigTreeEntry) {
+							((ConfigTreeEntry) last).removeTemporaryTrees();
+						}
+					}
+					break;
+				}
+				last = cur;
+				cur = cur.getParent();
+			}
+			if (cur == treeWidget) {
+				if (((ConfigTreeEntry) last).removeTemporaryTrees()) {
+					treeWidget.entryHeightChanged(last);
+				}
+			}
+		}
+
+		if (contentWidget != null) {
+			children.remove(contentWidget);
 		}
 		openCategory = category;
 		category.setOpen(true);
@@ -204,18 +236,25 @@ public class ConfigScreen extends Screen {
 			((ConfigTreeEntry) parent).setExpanded(true);
 		}
 
-		listWidget = category.getConfigWidget();
-		children.add(listWidget);
-		listWidget.setPosition(panelWidth, 20);
-		listWidget.setRowWidth(500);
+		contentWidget = category.getContentWidget();
+		children.add(contentWidget);
+		contentWidget.setPosition(panelWidth, 20);
+		contentWidget.setRowWidth(500);
 
-		if (listWidget.getName() != null && !listWidget.getName().getString().isEmpty()) {
-			visualTitle = title.copy().append(" - ").append(listWidget.getName());
-		} else {
+		if (contentWidget.getName() == null || contentWidget.getName().getString().isEmpty() || contentWidget.getName().getString().equals(title.getString())) {
 			visualTitle = title;
+		} else {
+			visualTitle = title.copy().append(" - ").append(contentWidget.getName());
 		}
 
 		resize(MinecraftClient.getInstance(), width, height);
+	}
+
+	public void openTemporary(ConfigTreeEntry temporaryTreeEntry) {
+		// I just assume that temporaryWidget is a child of openCategory
+
+		openCategory.addTemporaryTree(temporaryTreeEntry);
+		openCategory(temporaryTreeEntry);
 	}
 
 	/**
@@ -228,8 +267,8 @@ public class ConfigScreen extends Screen {
 
 		panelWidth = Math.max(100, (int) (width * 0.2));
 		treeWidget.resize(panelWidth, height - 20);
-		listWidget.setPosition(panelWidth, 20);
-		listWidget.resize(width - panelWidth, height - 20);
+		contentWidget.setPosition(panelWidth, 20);
+		contentWidget.resize(width - panelWidth, height - 20);
 
 		saveButton.y  = height - 20 - CoatUtil.MARGIN;
 		abortButton.y = saveButton.y - 20 - CoatUtil.MARGIN;
@@ -244,7 +283,12 @@ public class ConfigScreen extends Screen {
 	public void tick() {
 		super.tick();
 		treeWidget.tick();
-		listWidget.tick();
+		contentWidget.tick();
+	}
+
+	@Override
+	public void renderTooltip(List<String> text, int x, int y) {
+		deferredTooltips.add(new DeferredTooltip(text, x, y));
 	}
 
 	/**
@@ -256,7 +300,7 @@ public class ConfigScreen extends Screen {
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
 		treeWidget.render(mouseX, mouseY, delta);
-		listWidget.render(mouseX, mouseY, delta);
+		contentWidget.render(mouseX, mouseY, delta);
 
 		GlStateManager.enableDepthTest();
 		GlStateManager.depthFunc(GL11.GL_LEQUAL);
@@ -275,7 +319,7 @@ public class ConfigScreen extends Screen {
 		GlStateManager.disableDepthTest();
 		GlStateManager.disableBlend();
 		GlStateManager.enableTexture();
-		MinecraftClient.getInstance().getTextureManager().bindTexture(listWidget.getBackground());
+		MinecraftClient.getInstance().getTextureManager().bindTexture(contentWidget.getBackground());
 		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
 		bufferBuilder.vertex(0D,    20D, 0D).texture(0F,          20F / 32F).color(0x77, 0x77, 0x77, 0xff).next();
 		bufferBuilder.vertex(width, 20D, 0D).texture(width / 32F, 20F / 32F).color(0x77, 0x77, 0x77, 0xff).next();
@@ -286,5 +330,22 @@ public class ConfigScreen extends Screen {
 		drawCenteredString(MinecraftClient.getInstance().textRenderer, visualTitle.asFormattedString(), width / 2, 8, 0xffffff);
 
 		super.render(mouseX, mouseY, delta);
+
+		for (DeferredTooltip tooltip : deferredTooltips) {
+			super.renderTooltip(tooltip.text, tooltip.x, tooltip.y);
+		}
+		deferredTooltips.clear();
+	}
+
+	protected static class DeferredTooltip {
+		public final List<String> text;
+		public final int x;
+		public final int y;
+
+		public DeferredTooltip(List<String> text, int x, int y) {
+			this.text = text;
+			this.x = x;
+			this.y = y;
+		}
 	}
 }

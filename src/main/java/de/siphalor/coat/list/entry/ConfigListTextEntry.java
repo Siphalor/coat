@@ -1,7 +1,6 @@
 package de.siphalor.coat.list.entry;
 
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListEntry;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -14,7 +13,7 @@ import java.util.List;
 /**
  * A textual entry for config list widgets.
  */
-public class ConfigListTextEntry extends ConfigListEntry {
+public class ConfigListTextEntry extends ConfigContainerEntry {
 	private final TextRenderer textRenderer;
 	private final Text text;
 	private List<String> multilineText;
