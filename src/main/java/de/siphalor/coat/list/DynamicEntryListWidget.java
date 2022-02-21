@@ -220,6 +220,30 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	}
 
 	/**
+	 * Finds the matching entry index for the given y coordinate
+	 *
+	 * @param y The y coordinate to look for
+	 * @return The nearest entry index
+	 */
+	protected int getEntryAtY(int y) {
+		y -= getEntryAreaTop();
+		if (y < 0) {
+			return 0;
+		}
+		if (y > getMaxEntryPosition()) {
+			return getEntryCount();
+		}
+		IntListIterator iterator = entries.bottoms.iterator();
+		while (iterator.hasNext()) {
+			int cur = iterator.nextInt();
+			if (y < cur) {
+				return iterator.previousIndex();
+			}
+		}
+		return getEntryCount() - 1;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -447,11 +471,13 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		} else {
 			Entry entry = getEntryAtPosition(mouseX, mouseY);
 			if (entry != null) {
-				if (entry.mouseClicked(mouseX, mouseY, button)) {
+				if (entry.mouseClicked(mouseX, mouseY, button) && entry.getParent() == this) {
 					setFocused(entry);
 					setDragging(true);
 					return true;
 				}
+			} else {
+				setFocused(null);
 			}
 
 			return scrolling;
@@ -616,6 +642,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 	/**
 	 * Remove an entry
+	 *
 	 * @param entry The entry to remove
 	 * @return The removed entry
 	 */
@@ -625,6 +652,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 	/**
 	 * Remove an entry by index
+	 *
 	 * @param index The index to remove an entry from
 	 * @return The removed entry
 	 */
@@ -737,9 +765,14 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		@Override
 		public E remove(int i) {
 			E entry = entries.remove(i);
+			entry.setParent(null);
+			int height = entry.getHeight();
 			bottoms.removeInt(i);
 			if (entry == getFocused()) {
 				setFocused(null);
+			}
+			for (int j = i; j < entries.size(); j++) {
+				bottoms.set(j, bottoms.getInt(j) - height);
 			}
 			return entry;
 		}
