@@ -2,8 +2,9 @@ package de.siphalor.coat.list.category;
 
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.ConfigListCompoundEntry;
-import de.siphalor.coat.list.ConfigListWidget;
+import de.siphalor.coat.list.complex.ConfigCategoryWidget;
+import de.siphalor.coat.list.entry.ConfigContainerCompoundEntry;
+import de.siphalor.coat.screen.ConfigContentWidget;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TextButtonWidget;
@@ -11,30 +12,30 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.BaseText;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * An entry in the tree pane which represents a config category/{@link ConfigListWidget}.
+ * An entry in the tree pane which represents a config category/{@link ConfigCategoryWidget}.
  *
- * @see ConfigListWidget
+ * @see ConfigCategoryWidget
  */
-public class ConfigTreeEntry extends ConfigListCompoundEntry {
+public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	private static final BaseText EXPAND_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.expand");
 	private static final BaseText COLLAPSE_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.collapse");
 
 	private final TextButtonWidget collapseButton;
 	private final TextButtonWidget nameButton;
 	private final List<ConfigTreeEntry> subTrees;
-	private final ConfigListWidget configWidget;
+	private final ConfigContentWidget contentWidget;
+	private final boolean temporary;
 	private int x;
 	private int y;
 	private boolean open = false;
@@ -45,16 +46,23 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	 */
 	protected Element focused;
 
-	public ConfigTreeEntry(Text name, ConfigListWidget configWidget) {
-		this.configWidget = configWidget;
+	public ConfigTreeEntry(Text name, ConfigContentWidget contentWidget) {
+		this(name, contentWidget, false);
+	}
+
+	public ConfigTreeEntry(Text name, ConfigContentWidget contentWidget, boolean temporary) {
+		this.contentWidget = contentWidget;
+		this.temporary = temporary;
 		collapseButton = new TextButtonWidget(x, y, 7, 9, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
 		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(this));
 
 		List<ConfigTreeEntry> list = new ArrayList<>();
-		for (ConfigListWidget configListWidget : configWidget.getSubTrees()) {
-			ConfigTreeEntry treeEntry = configListWidget.getTreeEntry();
-			treeEntry.setParent(this);
-			list.add(treeEntry);
+		if (contentWidget instanceof ConfigCategoryWidget) {
+			for (ConfigCategoryWidget configCategoryWidget : ((ConfigCategoryWidget) contentWidget).getSubTrees()) {
+				ConfigTreeEntry treeEntry = configCategoryWidget.getTreeEntry();
+				treeEntry.setParent(this);
+				list.add(treeEntry);
+			}
 		}
 		subTrees = list;
 	}
@@ -96,6 +104,10 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		}
 	}
 
+	public boolean isTemporary() {
+		return temporary;
+	}
+
 	/**
 	 * Gets whether this config category is currently opened in the config screen.
 	 *
@@ -114,12 +126,12 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		if (this.open != open) {
 			if (open) {
 				nameButton.setMessage(
-						nameButton.getOriginalMessage().copy().setStyle(Style.EMPTY.withFormatting(Formatting.ITALIC))
+						nameButton.getOriginalMessage().copy().styled(style -> nameButton.getOriginalMessage().getStyle().withItalic(true))
 				);
 				setExpanded(true);
 			} else {
 				nameButton.setMessage(
-						nameButton.getOriginalMessage().copy().setStyle(Style.EMPTY)
+						nameButton.getOriginalMessage().copy().styled(style -> nameButton.getOriginalMessage().getStyle().withItalic(false))
 				);
 			}
 		}
@@ -192,7 +204,7 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 	@Override
 	public Collection<Message> getMessages() {
 		List<Message> messages = subTrees.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
-		messages.addAll(configWidget.getMessages());
+		messages.addAll(contentWidget.getMessages());
 		return messages;
 	}
 
@@ -210,6 +222,29 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		return children;
 	}
 
+	public List<ConfigTreeEntry> getSubTrees() {
+		return subTrees;
+	}
+
+	public void addTemporaryTree(ConfigTreeEntry temporaryTreeEntry) {
+		temporaryTreeEntry.setParent(this);
+		subTrees.add(temporaryTreeEntry);
+		parent.entryHeightChanged(this);
+	}
+
+	public boolean removeTemporaryTrees() {
+		boolean changed = false;
+		for (Iterator<ConfigTreeEntry> iterator = subTrees.iterator(); iterator.hasNext(); ) {
+			ConfigTreeEntry subTree = iterator.next();
+			if (subTree.isTemporary()) {
+				iterator.remove();
+			} else {
+				changed |= subTree.removeTemporaryTrees();
+			}
+		}
+		return changed;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -220,13 +255,14 @@ public class ConfigTreeEntry extends ConfigListCompoundEntry {
 		}
 	}
 
+	// TODO: Fix javadoc
 	/**
 	 * Gets the list widget that this tree entry is linked to.
 	 *
 	 * @return The linked list widget.
 	 */
-	public ConfigListWidget getConfigWidget() {
-		return configWidget;
+	public ConfigContentWidget getContentWidget() {
+		return contentWidget;
 	}
 
 	/**
