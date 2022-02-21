@@ -22,10 +22,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * A Coat config screen.
@@ -45,6 +42,8 @@ public class ConfigScreen extends Screen {
 	private ButtonWidget abortButton;
 	private ButtonWidget saveButton;
 	private ConfigContentWidget contentWidget;
+
+	protected List<DeferredTooltip> deferredTooltips = new ArrayList<>();
 
 	/**
 	 * Creates a new config screen.
@@ -288,6 +287,11 @@ public class ConfigScreen extends Screen {
 		contentWidget.tick();
 	}
 
+	@Override
+	public void renderTooltip(List<String> text, int x, int y) {
+		deferredTooltips.add(new DeferredTooltip(text, x, y));
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -327,5 +331,22 @@ public class ConfigScreen extends Screen {
 		drawCenteredString(MinecraftClient.getInstance().textRenderer, visualTitle.asFormattedString(), width / 2, 8, 0xffffff);
 
 		super.render(mouseX, mouseY, delta);
+
+		for (DeferredTooltip tooltip : deferredTooltips) {
+			super.renderTooltip(tooltip.text, tooltip.x, tooltip.y);
+		}
+		deferredTooltips.clear();
+	}
+
+	protected static class DeferredTooltip {
+		public final List<String> text;
+		public final int x;
+		public final int y;
+
+		public DeferredTooltip(List<String> text, int x, int y) {
+			this.text = text;
+			this.x = x;
+			this.y = y;
+		}
 	}
 }
