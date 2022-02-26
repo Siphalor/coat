@@ -75,6 +75,7 @@ publishing {
 			artifactId = "${project.archives_base_name}-unstable".toString()
 
 			from components.java
+			java.withSourcesJar()
 		}
 	}
 
