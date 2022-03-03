@@ -14,9 +14,6 @@
 	"license": "MIT",
 	"icon": "assets/coat/icon.png",
 	"environment": "client",
-	"mixins": [
-		"coat.mixins.json"
-	],
 	"custom": {
 		"modmenu": {
 			"badges": [
