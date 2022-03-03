@@ -30,8 +30,8 @@ dependencies {
 
 	// for testmod
 	modImplementation("de.siphalor:amecsapi-1.16:1+")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-base:0.4.0+3cc0f0907d")
-	modImplementation("net.fabricmc.fabric-api:fabric-key-binding-api-v1:1.0.5+3cc0f0907d")
+	modImplementation(fabricApi.module("fabric-api-base", fabric_version))
+	modImplementation(fabricApi.module("fabric-key-binding-api-v1", fabric_version))
 	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
