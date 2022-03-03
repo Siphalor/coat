@@ -29,7 +29,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// for testmod
-	modImplementation("de.siphalor:amecsapi-1.16:1+")
+	modImplementation("de.siphalor:amecsapi-$project.minecraft_major_version:1+")
 	modImplementation(fabricApi.module("fabric-api-base", fabric_version))
 	modImplementation(fabricApi.module("fabric-key-binding-api-v1", fabric_version))
 	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
