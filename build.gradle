@@ -7,7 +7,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
+version = "$project.mod_version+mc$project.minecraft_version"
 group = project.maven_group
 
 repositories {
@@ -29,9 +29,9 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// for testmod
-	modImplementation("de.siphalor:amecsapi-1.14:1+")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-base:0.4.0+65d505fc9c")
-	modImplementation("net.fabricmc.fabric-api:fabric-key-binding-api-v1:1.0.5+65d505fc9c")
+	modImplementation("de.siphalor:amecsapi-$project.minecraft_major_version:1+")
+	modImplementation(fabricApi.module("fabric-api-base", fabric_version))
+	modImplementation(fabricApi.module("fabric-key-binding-api-v1", fabric_version))
 	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
