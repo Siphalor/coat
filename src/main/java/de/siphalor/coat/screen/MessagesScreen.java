@@ -11,7 +11,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,11 +60,11 @@ public class MessagesScreen extends Screen {
 		super.init();
 
 		abortButton = new ButtonWidget(0, 38, 100, 20,
-				new TranslatableText(Coat.MOD_ID + ".action.abort"),
+				Text.translatable(Coat.MOD_ID + ".action.abort"),
 				button -> MinecraftClient.getInstance().setScreen(parent)
 		);
 		acceptButton = new ButtonWidget(0, 38, 100, 20,
-				new TranslatableText(Coat.MOD_ID + ".action.accept_risk"),
+				Text.translatable(Coat.MOD_ID + ".action.accept_risk"),
 				button -> acceptRunnable.run()
 		);
 		addDrawableChild(abortButton);

@@ -2,7 +2,7 @@ package de.siphalor.coat.input;
 
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import java.text.NumberFormat;
@@ -28,7 +28,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	 * @param max   The maximum of the slider
 	 */
 	public SliderConfigInput(N value, N min, N max) {
-		super(0, 0, 100, 20, LiteralText.EMPTY, toInternalValue(value, min, max));
+		super(0, 0, 100, 20, Text.empty(), toInternalValue(value, min, max));
 		//noinspection unchecked
 		valueClass = (Class<N>) value.getClass();
 		this.min = min;
@@ -113,7 +113,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 		NumberFormat format = NumberFormat.getInstance();
 		format.setMaximumFractionDigits(precision);
 		format.setMinimumFractionDigits(precision);
-		setMessage(new LiteralText(format.format(getRealValue())));
+		setMessage(Text.literal(format.format(getRealValue())));
 	}
 
 	/**

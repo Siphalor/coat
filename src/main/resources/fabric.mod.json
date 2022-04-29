@@ -24,6 +24,6 @@
 	},
 	"depends": {
 		"fabricloader": ">=0.11.3",
-		"minecraft": "~1.18-beta.1"
+		"minecraft": "~1.19-alpha.22.17.a"
 	}
 }

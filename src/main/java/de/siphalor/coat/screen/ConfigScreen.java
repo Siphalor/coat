@@ -15,7 +15,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL32;
 
@@ -28,8 +27,8 @@ import java.util.List;
  * A Coat config screen.
  */
 public class ConfigScreen extends Screen {
-	private static final Text ABORT_TEXT = new TranslatableText(Coat.MOD_ID + ".action.abort");
-	private static final Text SAVE_TEXT =  new TranslatableText(Coat.MOD_ID + ".action.save");
+	private static final Text ABORT_TEXT = Text.translatable(Coat.MOD_ID + ".action.abort");
+	private static final Text SAVE_TEXT =  Text.translatable(Coat.MOD_ID + ".action.save");
 
 	private final Screen parent;
 	private final Collection<ConfigCategoryWidget> widgets;
@@ -109,8 +108,8 @@ public class ConfigScreen extends Screen {
 						MinecraftClient.getInstance().setScreen(this);
 					}
 				},
-				new TranslatableText(Coat.MOD_ID + ".action.abort.screen.title"),
-				new TranslatableText(Coat.MOD_ID + ".action.abort.screen.desc")));
+				Text.translatable(Coat.MOD_ID + ".action.abort.screen.title"),
+				Text.translatable(Coat.MOD_ID + ".action.abort.screen.desc")));
 	}
 
 	/**
@@ -161,7 +160,7 @@ public class ConfigScreen extends Screen {
 
 		Runnable warningOpener = () -> {
 			MinecraftClient.getInstance().setScreen(new MessagesScreen(
-					new TranslatableText(Coat.MOD_ID + ".action.save.warnings"),
+					Text.translatable(Coat.MOD_ID + ".action.save.warnings"),
 					this,
 					saveRunnable,
 					warnings
@@ -170,7 +169,7 @@ public class ConfigScreen extends Screen {
 
 		if (!errors.isEmpty()) {
 			MinecraftClient.getInstance().setScreen(new MessagesScreen(
-					new TranslatableText(Coat.MOD_ID + ".action.save.errors"),
+					Text.translatable(Coat.MOD_ID + ".action.save.errors"),
 					this,
 					warnings.isEmpty() ? saveRunnable : warningOpener,
 					errors

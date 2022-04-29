@@ -2,7 +2,6 @@ package de.siphalor.coat.testmod;
 
 import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.handler.Message;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +34,6 @@ public class GenericEntryHandler<V> implements ConfigEntryHandler<V> {
 
 	@Override
 	public Text asText(V value) {
-		return new LiteralText(value.toString());
+		return Text.literal(value.toString());
 	}
 }

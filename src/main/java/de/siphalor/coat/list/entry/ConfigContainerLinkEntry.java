@@ -13,7 +13,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
@@ -24,7 +23,7 @@ import java.util.List;
  * An entry linking to an entry.
  */
 public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
-	private static final TranslatableText OPEN_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.open");
+	private static final Text OPEN_TEXT = Text.translatable(Coat.MOD_ID + ".tree.open");
 
 	private final ConfigContentWidget configWidget;
 	private final ButtonWidget button;

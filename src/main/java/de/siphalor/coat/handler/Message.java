@@ -1,7 +1,7 @@
 package de.siphalor.coat.handler;
 
 import de.siphalor.coat.Coat;
-import net.minecraft.text.BaseText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -17,13 +17,13 @@ public class Message {
 	/**
 	 * The text of this message.
 	 */
-	private final BaseText text;
+	private final MutableText text;
 	/**
 	 * An object that identifies where this messages originates from.
 	 */
 	private Object origin;
 
-	public Message(Level level, BaseText text) {
+	public Message(Level level, MutableText text) {
 		this.level = level;
 		text.setStyle(level.getTextStyle());
 		this.text = text;
@@ -43,7 +43,7 @@ public class Message {
 	 *
 	 * @return The text
 	 */
-	public BaseText getText() {
+	public MutableText getText() {
 		return text;
 	}
 

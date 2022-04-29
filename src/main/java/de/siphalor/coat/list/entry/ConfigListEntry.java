@@ -6,11 +6,10 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.list.complex.ConfigListWidget;
 import de.siphalor.coat.util.CoatUtil;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.Collection;
@@ -26,7 +25,7 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 
 	public ConfigListEntry(ConfigInput<V> input) {
 		this.input = input;
-		deleteWidget = new ButtonWidget(0, 0, 20, 20, new LiteralText("x"), button -> {
+		deleteWidget = new ButtonWidget(0, 0, 20, 20, Text.literal("x"), button -> {
 			if (parent instanceof ConfigListWidget) {
 				((ConfigListWidget<?>) parent).children().remove(this);
 			}

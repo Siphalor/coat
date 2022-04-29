@@ -7,7 +7,7 @@ import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.list.entry.ConfigListEntry;
 import de.siphalor.coat.screen.ConfigContentWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.BaseText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -16,19 +16,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<V>> implements ConfigContentWidget {
-	private final BaseText name;
+	private final MutableText name;
 	private final ConfigEntryHandler<List<V>> entryHandler;
 	private final ConfigListEntryFactory<V> entryFactory;
 	private ConfigListEntry<V> dragEntry;
 
-	public ConfigListWidget(MinecraftClient client, int width, int height, int top, int rowWidth, ConfigContentWidget parent, BaseText name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
+	public ConfigListWidget(MinecraftClient client, int width, int height, int top, int rowWidth, ConfigContentWidget parent, MutableText name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
 		super(client, width, height, top, rowWidth);
 		this.name = name;
 		this.entryHandler = entryHandler;
 		this.entryFactory = entryFactory;
 	}
 
-	public ConfigListWidget(MinecraftClient client, Collection<ConfigListEntry<V>> entries, Identifier background, ConfigContentWidget parent, BaseText name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
+	public ConfigListWidget(MinecraftClient client, Collection<ConfigListEntry<V>> entries, Identifier background, ConfigContentWidget parent, MutableText name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
 		super(client, entries, background);
 		this.name = name;
 		this.entryHandler = entryHandler;

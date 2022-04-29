@@ -11,9 +11,7 @@ import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.BaseText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -28,8 +26,8 @@ import java.util.stream.Collectors;
  * @see ConfigCategoryWidget
  */
 public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
-	private static final BaseText EXPAND_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.expand");
-	private static final BaseText COLLAPSE_TEXT = new TranslatableText(Coat.MOD_ID + ".tree.collapse");
+	private static final Text EXPAND_TEXT = Text.translatable(Coat.MOD_ID + ".tree.expand");
+	private static final Text COLLAPSE_TEXT = Text.translatable(Coat.MOD_ID + ".tree.collapse");
 
 	private final TextButtonWidget collapseButton;
 	private final TextButtonWidget nameButton;

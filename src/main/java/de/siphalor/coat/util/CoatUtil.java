@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import org.lwjgl.opengl.GL11;
@@ -57,7 +56,7 @@ public class CoatUtil {
 		if (textWidth > width) {
 			textWidth = textRenderer.getWidth(ELLIPSIS);
 			String trimmed = textRenderer.trimToWidth(baseText.getString(), width - textWidth);
-			return new LiteralText(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
+			return Text.literal(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
 		} else {
 			return baseText;
 		}
@@ -116,8 +115,7 @@ public class CoatUtil {
 		addRect(buffer, x1, y2 - stroke, x2, y2, red, green, blue, alpha);
 		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, red, green, blue, alpha);
 		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, red, green, blue, alpha);
-		buffer.end();
-		BufferRenderer.draw(buffer);
+		BufferRenderer.drawWithoutShader(buffer.end());
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}

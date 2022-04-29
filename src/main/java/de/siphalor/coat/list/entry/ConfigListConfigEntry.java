@@ -2,7 +2,7 @@ package de.siphalor.coat.list.entry;
 
 import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.input.ConfigInput;
-import net.minecraft.text.BaseText;
+import net.minecraft.text.MutableText;
 
 /**
  * @deprecated use {@link ConfigCategoryConfigEntry} instead
@@ -17,7 +17,7 @@ public class ConfigListConfigEntry<V> extends ConfigCategoryConfigEntry<V> {
 	 * @param entryHandler An entry handler for this entry
 	 * @param input        The config input to use
 	 */
-	public ConfigListConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
+	public ConfigListConfigEntry(MutableText name, MutableText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super(name, description, entryHandler, input);
 	}
 }

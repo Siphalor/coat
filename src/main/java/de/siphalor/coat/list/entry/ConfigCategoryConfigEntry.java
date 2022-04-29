@@ -14,7 +14,10 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.*;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +30,7 @@ import java.util.Objects;
  * @param <V> The value type
  */
 public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry implements InputChangeListener<V> {
-	private static final Text DEFAULT_TEXT = new TranslatableText(Coat.MOD_ID + ".default");
+	private static final Text DEFAULT_TEXT = Text.translatable(Coat.MOD_ID + ".default");
 	private static final int TEXT_INDENT = 8;
 	private final TextRenderer textRenderer;
 	private final TextButtonWidget nameWidget;
@@ -47,7 +50,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * @param entryHandler An entry handler for this entry
 	 * @param input        The config input to use
 	 */
-	public ConfigCategoryConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
+	public ConfigCategoryConfigEntry(MutableText name, MutableText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
 		nameWidget = new TextButtonWidget(0, 0, 100, 12, name, button -> setExpanded(!isExpanded()));
 		setName(name.copy());
@@ -64,7 +67,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 						List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
 						ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
 						list.addAll(wrappedLines);
-						list.add(0, new TranslatableText(Coat.MOD_ID + ".default.hover").asOrderedText());
+						list.add(0, Text.translatable(Coat.MOD_ID + ".default.hover").asOrderedText());
 						client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
 					}
 				}
@@ -130,7 +133,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 *
 	 * @param name The new name
 	 */
-	protected void setName(BaseText name) {
+	protected void setName(MutableText name) {
 		Message.Level level = getHighestMessageLevel();
 		if (level == null) {
 			name.setStyle(Style.EMPTY);
@@ -376,7 +379,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		if (parent != null) {
 			parent.entryHeightChanged(this);
 		}
-		// shallow copy is required because the OrderedText in BaseText is cached, so the style needs to be force updated
-		setName((BaseText) nameWidget.getOriginalMessage().shallowCopy());
+		// shallow copy is required because the OrderedText in MutableText is cached, so the style needs to be force updated
+		setName(nameWidget.getOriginalMessage().shallowCopy());
 	}
 }

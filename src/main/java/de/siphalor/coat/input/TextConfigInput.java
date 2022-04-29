@@ -3,7 +3,7 @@ package de.siphalor.coat.input;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 /**
  * A string input represented as a text field.
@@ -15,7 +15,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 * @param value The initial value of this text field
 	 */
 	public TextConfigInput(String value) {
-		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, LiteralText.EMPTY);
+		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, Text.empty());
 		setMaxLength(Integer.MAX_VALUE);
 		setValue(value);
 	}

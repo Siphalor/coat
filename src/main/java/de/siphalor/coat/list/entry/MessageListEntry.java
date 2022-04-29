@@ -14,7 +14,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +23,7 @@ import java.util.List;
  * A list entry linking to a message and providing functionality to jump to it.
  */
 public class MessageListEntry extends ConfigContainerCompoundEntry {
-	private static final Text JUMP_TEXT = new TranslatableText(Coat.MOD_ID + ".message.jump");
+	private static final Text JUMP_TEXT = Text.translatable(Coat.MOD_ID + ".message.jump");
 
 	private final Message message;
 	private Text text;
