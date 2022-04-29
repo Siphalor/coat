@@ -63,7 +63,7 @@ public class ConfigScreen extends Screen {
 		panelWidth = 200;
 		treeWidget = new DynamicEntryListWidget<>(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.5F);
-		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
+		treeWidget.setBackground(new Identifier("textures/block/mangrove_log.png"));
 		addDrawableChild(treeWidget);
 
 		for (ConfigCategoryWidget widget : widgets) {
