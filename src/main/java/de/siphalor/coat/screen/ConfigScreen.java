@@ -297,7 +297,7 @@ public class ConfigScreen extends Screen {
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
 		treeWidget.render(matrices, mouseX, mouseY, delta);
-		contentWidget.render(matrices, mouseX, mouseY, delta);
+		contentWidget.renderWidget(matrices, mouseX, mouseY, delta);
 
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);

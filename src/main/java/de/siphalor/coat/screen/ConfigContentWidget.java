@@ -19,5 +19,13 @@ public interface ConfigContentWidget extends Element {
 	void setRowWidth(int rowWidth);
 	void resize(int width, int height);
 	void tick();
-	void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
+
+	/**
+	 * @deprecated Override and use {@link #renderWidget(MatrixStack, int, int, float)} instead.
+	 */
+	@Deprecated
+	default void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		renderWidget(matrices, mouseX, mouseY, delta);
+	}
+	default void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {}
 }
