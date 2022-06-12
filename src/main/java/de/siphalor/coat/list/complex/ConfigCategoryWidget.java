@@ -9,6 +9,7 @@ import de.siphalor.coat.list.entry.ConfigContainerLinkEntry;
 import de.siphalor.coat.list.entry.ConfigListHorizontalBreak;
 import de.siphalor.coat.screen.ConfigContentWidget;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -112,5 +113,10 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 		for (ConfigContainerEntry entry : children()) {
 			entry.save();
 		}
+	}
+
+	@Override
+	public void renderWidget(int mouseX, int mouseY, float delta) {
+		render(mouseX, mouseY, delta);
 	}
 }
