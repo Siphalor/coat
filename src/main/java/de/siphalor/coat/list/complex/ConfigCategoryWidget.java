@@ -113,4 +113,9 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 			entry.save();
 		}
 	}
+
+	@Override
+	public void renderWidget(int mouseX, int mouseY, float delta) {
+		render(mouseX, mouseY, delta);
+	}
 }

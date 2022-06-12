@@ -18,5 +18,13 @@ public interface ConfigContentWidget extends Element {
 	void setRowWidth(int rowWidth);
 	void resize(int width, int height);
 	void tick();
-	void render(int mouseX, int mouseY, float delta);
+
+	/**
+	 * @deprecated Override and use {@link #renderWidget(int, int, float)} instead.
+	 */
+	@Deprecated
+	default void render(int mouseX, int mouseY, float delta) {
+		renderWidget(mouseX, mouseY, delta);
+	}
+	default void renderWidget(int mouseX, int mouseY, float delta) {}
 }

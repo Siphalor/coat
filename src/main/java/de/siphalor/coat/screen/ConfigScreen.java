@@ -300,7 +300,7 @@ public class ConfigScreen extends Screen {
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
 		treeWidget.render(mouseX, mouseY, delta);
-		contentWidget.render(mouseX, mouseY, delta);
+		contentWidget.renderWidget(mouseX, mouseY, delta);
 
 		GlStateManager.enableDepthTest();
 		GlStateManager.depthFunc(GL11.GL_LEQUAL);
