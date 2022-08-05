@@ -133,7 +133,12 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<E> children() {
+	public List<E> entries() {
+		return entries;
+	}
+
+	@Override
+	public List<? extends Element> children() {
 		return entries;
 	}
 
@@ -186,7 +191,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @return The count of entries
 	 */
 	protected int getEntryCount() {
-		return this.children().size();
+		return this.entries().size();
 	}
 
 	/**
@@ -612,25 +617,19 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * {@inheritDoc}
 	 */
-	@Nullable
-	@Override
-	public E getFocused() {
-		//noinspection unchecked
-		return (E) super.getFocused();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void setFocused(@Nullable Element focused) {
-		E old = getFocused();
+		Element old = getFocused();
 		if (old != null && old != focused) {
-			old.focusLost();
+			if (old instanceof Entry) {
+				((Entry) old).focusLost();
+			}
 		}
 		if (focused != null) {
-			//noinspection unchecked
-			ensureVisible((E) focused);
+			if (focused instanceof Entry) {
+				//noinspection unchecked
+				ensureVisible((E) focused);
+			}
 		}
 		super.setFocused(focused);
 	}
@@ -642,7 +641,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @return The removed entry
 	 */
 	protected E removeEntry(E entry) {
-		return removeEntry(entries.indexOf(entry));
+		if (entry == getFocused()) {
+			changeFocus(true);
+		}
+		entries.remove(entry);
+		return entry;
 	}
 
 	/**
@@ -652,7 +655,8 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @return The removed entry
 	 */
 	protected E removeEntry(int index) {
-		return entries.remove(index);
+		E entry = entries.get(index);
+		return removeEntry(entry);
 	}
 
 	/**
