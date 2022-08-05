@@ -64,7 +64,7 @@ public class ConfigScreen extends Screen {
 		panelWidth = 200;
 		treeWidget = new DynamicEntryListWidget<>(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.5F);
-		treeWidget.setBackground(new Identifier("textures/block/stone_bricks.png"));
+		treeWidget.setBackground(new Identifier("textures/block/smooth_basalt.png"));
 		addDrawableChild(treeWidget);
 
 		for (ConfigCategoryWidget widget : widgets) {
@@ -145,7 +145,7 @@ public class ConfigScreen extends Screen {
 		List<Message> errors = new LinkedList<>();
 		int warningSev = Message.Level.WARNING.getSeverity();
 		int errorSev = Message.Level.ERROR.getSeverity();
-		treeWidget.children().stream().flatMap(entry -> entry.getMessages().stream()).forEach(message -> {
+		treeWidget.entries().stream().flatMap(entry -> entry.getMessages().stream()).forEach(message -> {
 			int sev = message.getLevel().getSeverity();
 			if (sev >= errorSev) {
 				errors.add(message);
@@ -249,6 +249,7 @@ public class ConfigScreen extends Screen {
 	public void openTemporary(ConfigTreeEntry temporaryTreeEntry) {
 		// I just assume that temporaryWidget is a child of openCategory
 
+		openCategory.removeTemporaryTrees();
 		openCategory.addTemporaryTree(temporaryTreeEntry);
 		openCategory(temporaryTreeEntry);
 	}
