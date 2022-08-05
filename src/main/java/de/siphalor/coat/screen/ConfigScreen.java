@@ -151,7 +151,7 @@ public class ConfigScreen extends Screen {
 		List<Message> errors = new LinkedList<>();
 		int warningSev = Message.Level.WARNING.getSeverity();
 		int errorSev = Message.Level.ERROR.getSeverity();
-		treeWidget.children().stream().flatMap(entry -> entry.getMessages().stream()).forEach(message -> {
+		treeWidget.entries().stream().flatMap(entry -> entry.getMessages().stream()).forEach(message -> {
 			int sev = message.getLevel().getSeverity();
 			if (sev >= errorSev) {
 				errors.add(message);
@@ -255,6 +255,7 @@ public class ConfigScreen extends Screen {
 	public void openTemporary(ConfigTreeEntry temporaryTreeEntry) {
 		// I just assume that temporaryWidget is a child of openCategory
 
+		openCategory.removeTemporaryTrees();
 		openCategory.addTemporaryTree(temporaryTreeEntry);
 		openCategory(temporaryTreeEntry);
 	}
