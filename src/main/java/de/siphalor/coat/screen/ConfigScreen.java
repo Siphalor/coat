@@ -66,7 +66,7 @@ public class ConfigScreen extends Screen {
 		panelWidth = 200;
 		treeWidget = new DynamicEntryListWidget<>(MinecraftClient.getInstance(), panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.5F);
-		treeWidget.setBackground(new Identifier("textures/block/blackstone_top.png"));
+		treeWidget.setBackground(new Identifier("textures/block/smithing_table_top.png"));
 		children.add(treeWidget);
 
 		for (ConfigCategoryWidget widget : widgets) {
