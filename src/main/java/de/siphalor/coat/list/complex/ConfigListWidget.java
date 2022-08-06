@@ -141,7 +141,7 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 
 	@Override
 	public void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		super.render(matrices, mouseX, mouseY, delta);
+		super.renderWidget(matrices, mouseX, mouseY, delta);
 		appendButton.y = super.getEntryAreaTop() + super.getMaxPosition();
 		appendButton.x = left + (width - appendButton.getWidth()) / 2;
 		appendButton.render(matrices, mouseX, mouseY, delta);
