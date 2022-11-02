@@ -25,7 +25,8 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		this.input = input;
 		deleteWidget = new ButtonWidget(0, 0, 20, 20, "x", button -> {
 			if (parent instanceof ConfigListWidget) {
-				((ConfigListWidget<?>) parent).children().remove(this);
+				//noinspection unchecked
+				((ConfigListWidget<V>) parent).removeEntry(this);
 			}
 		});
 	}

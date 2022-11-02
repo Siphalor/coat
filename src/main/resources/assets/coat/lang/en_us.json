@@ -10,6 +10,8 @@
 	"coat.default": "Default",
 	"coat.default.hover": "Reset to:",
 
+  "coat.list.append": "Create new entry",
+
 	"coat.message.jump": "Go to issue",
 	"coat.message.level.info": "Info",
 	"coat.message.level.warning": "Warning",

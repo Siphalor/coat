@@ -58,12 +58,12 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 	 */
 	public void addSubTree(ConfigCategoryWidget subWidget) {
 		if (subTrees.isEmpty()) {
-			children().add(0, new ConfigListHorizontalBreak());
+			entries().add(0, new ConfigListHorizontalBreak());
 		}
 
 		subTrees.add(subWidget);
 		ConfigContainerLinkEntry treeEntry = new ConfigContainerLinkEntry(subWidget);
-		children().add(subTreeLinks.size(), treeEntry);
+		entries().add(subTreeLinks.size(), treeEntry);
 		subTreeLinks.add(treeEntry);
 	}
 
@@ -95,7 +95,7 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 	 * @return A collection of all these entries
 	 */
 	public Collection<Message> getMessages() {
-		return children().stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
+		return entries().stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
 	}
 
 	/**
@@ -109,13 +109,8 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 		for (ConfigCategoryWidget subTree : subTrees) {
 			subTree.save();
 		}
-		for (ConfigContainerEntry entry : children()) {
+		for (ConfigContainerEntry entry : entries()) {
 			entry.save();
 		}
-	}
-
-	@Override
-	public void renderWidget(int mouseX, int mouseY, float delta) {
-		render(mouseX, mouseY, delta);
 	}
 }
