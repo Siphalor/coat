@@ -354,8 +354,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public void render(int mouseX, int mouseY, float delta) {
+	public void renderWidget(int mouseX, int mouseY, float delta) {
 		int scrollbarXBegin = this.getScrollbarPositionX();
 		int scrollbarXEnd = scrollbarXBegin + 6;
 		Tessellator tessellator = Tessellator.getInstance();
@@ -385,7 +384,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 		// render top shadow
 		fillGradient(left, top, right, top + TOP_PADDING, 0xcc000000, 0x00000000);
+	}
 
+	@Override
+	public void render(int mouseX, int mouseY, float delta) {
+		renderWidget(mouseX, mouseY, delta);
 	}
 
 	/**
