@@ -41,8 +41,7 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		this.x = x + width - getWidth();
-		this.y = y;
+		setPos(x + width - getWidth(), y);
 		render(matrices, mouseX, mouseY, tickDelta);
 	}
 

@@ -36,7 +36,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	 */
 	public ConfigContainerLinkEntry(ConfigContentWidget configWidget) {
 		this.configWidget = configWidget;
-		button = new ButtonWidget(0, 0, 50, 20, OPEN_TEXT,
+		button = ButtonWidget.createBuilder(OPEN_TEXT,
 				button -> {
 					ConfigScreen screen = ((ConfigScreen) MinecraftClient.getInstance().currentScreen);
 					ConfigTreeEntry treeEntry = configWidget.getTreeEntry();
@@ -46,7 +46,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 						screen.openTemporary(treeEntry);
 					}
 				}
-		);
+		).setSize(50, 20).build();
 	}
 
 	/**
@@ -86,8 +86,8 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 		buffer.vertex(x, y, -100D).color(0x33, 0x33, 0x33, 0xff).texture(0F, 0F).next();
 		tessellator.draw();
 
-		button.x = x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN;
-		button.y = y + CoatUtil.MARGIN;
+		button.setX(x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN);
+		button.setY(y + CoatUtil.MARGIN);
 		MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
 		button.render(matrices, mouseX, mouseY, tickDelta);
 

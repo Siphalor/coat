@@ -60,18 +60,17 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		input.setChangeListener(this);
 		MinecraftClient client = MinecraftClient.getInstance();
 		textRenderer = client.textRenderer;
-		defaultButton = new ButtonWidget(0, 0, 10, 20, DEFAULT_TEXT, button ->
-				input.setValue(entryHandler.getDefault()),
-				(button, matrices, mouseX, mouseY) -> {
-					if (button.active) {
-						List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
-						ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
-						list.addAll(wrappedLines);
-						list.add(0, Text.translatable(Coat.MOD_ID + ".default.hover").asOrderedText());
-						client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
-					}
-				}
-		);
+		defaultButton = ButtonWidget.createBuilder(DEFAULT_TEXT, button ->
+				input.setValue(entryHandler.getDefault())
+		).setSize(10, 20).setTooltipSupplier((button, matrices, mouseX, mouseY) -> {
+			if (button.active) {
+				List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
+				ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
+				list.addAll(wrappedLines);
+				list.add(0, Text.translatable(Coat.MOD_ID + ".default.hover").asOrderedText());
+				client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
+			}
+		}).build();
 
 		inputChanged(input.getValue());
 	}
@@ -171,11 +170,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		int textY = y + (int) ((inputHeight - 8) / 2F) + CoatUtil.MARGIN;
 
 		input.render(matrices, x + namePart + CoatUtil.HALF_MARGIN, y + CoatUtil.MARGIN, configEntryPart - CoatUtil.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
-		defaultButton.y = y + CoatUtil.MARGIN;
-		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + CoatUtil.HALF_MARGIN;
+		defaultButton.setY(y + CoatUtil.MARGIN);
+		defaultButton.setX(x + entryWidth - (int) getControlsPart(entryWidth) + CoatUtil.HALF_MARGIN);
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
-		nameWidget.x = x;
-		nameWidget.y = textY - 2;
+		nameWidget.setPos(x, textY - 2);
 		nameWidget.render(matrices, mouseX, mouseY, tickDelta);
 
 		float curY = y + CoatUtil.MARGIN + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
@@ -380,6 +378,6 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 			parent.entryHeightChanged(this);
 		}
 		// shallow copy is required because the OrderedText in MutableText is cached, so the style needs to be force updated
-		setName(nameWidget.getOriginalMessage().shallowCopy());
+		setName(nameWidget.getOriginalMessage().copyContentOnly());
 	}
 }

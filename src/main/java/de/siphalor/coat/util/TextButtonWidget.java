@@ -24,7 +24,7 @@ public class TextButtonWidget extends ButtonWidget {
 	 * @param onPress An action to run when the widget gets triggered
 	 */
 	public TextButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress) {
-		super(x, y, width, height, message, onPress);
+		super(x, y, width, height, message, onPress, EMPTY_TOOLTIP, DEFAULT_NARRATION_SUPPLIER);
 		setMessage(message);
 	}
 
@@ -42,6 +42,8 @@ public class TextButtonWidget extends ButtonWidget {
 	 */
 	@Override
 	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		int x = getX();
+		int y = getY();
 		final int color = CoatUtil.TEXT_COLOR | MathHelper.ceil(alpha * 255F) << 24;
 		float textY = y + (height - 7) / 2F;
 		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;

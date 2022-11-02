@@ -59,14 +59,14 @@ public class MessagesScreen extends Screen {
 	protected void init() {
 		super.init();
 
-		abortButton = new ButtonWidget(0, 38, 100, 20,
+		abortButton = ButtonWidget.createBuilder(
 				Text.translatable(Coat.MOD_ID + ".action.abort"),
 				button -> MinecraftClient.getInstance().setScreen(parent)
-		);
-		acceptButton = new ButtonWidget(0, 38, 100, 20,
+		).setPosition(0, 38).setSize(100, 20).build();
+		acceptButton = ButtonWidget.createBuilder(
 				Text.translatable(Coat.MOD_ID + ".action.accept_risk"),
 				button -> acceptRunnable.run()
-		);
+		).setPosition(0, 38).setSize(100, 20).build();
 		addDrawableChild(abortButton);
 		addDrawableChild(acceptButton);
 
@@ -96,8 +96,8 @@ public class MessagesScreen extends Screen {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		int left = width / 2 - 130;
 		renderBackground(matrices);
-		abortButton.x = width / 2 - CoatUtil.MARGIN - abortButton.getWidth();
-		acceptButton.x = width / 2 + CoatUtil.MARGIN;
+		abortButton.setX(width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
+		acceptButton.setX(width / 2 + CoatUtil.MARGIN);
 		titleLines.draw(matrices, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR);
 		// messagesList.render(matrices, mouseX, mouseY, delta);
 

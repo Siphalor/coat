@@ -26,11 +26,10 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	private final MutableText name;
 	private final ConfigEntryHandler<List<V>> entryHandler;
 	private final ConfigListEntryFactory<V> entryFactory;
-	private final ButtonWidget appendButton = new ButtonWidget(
-			0, 0, 100, 20,
+	private final ButtonWidget appendButton = ButtonWidget.createBuilder(
 			Text.translatable(Coat.MOD_ID + ".list.append"),
 			button -> createEntry(getEntryCount())
-	);
+	).setSize(100, 20).build();
 	private ConfigListEntry<V> dragEntry;
 
 	public ConfigListWidget(MinecraftClient client, int width, int height, int top, int rowWidth, ConfigContentWidget parent, MutableText name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
@@ -141,8 +140,8 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	@Override
 	public void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		super.renderWidget(matrices, mouseX, mouseY, delta);
-		appendButton.y = super.getEntryAreaTop() + super.getMaxPosition();
-		appendButton.x = left + (width - appendButton.getWidth()) / 2;
+		appendButton.setY(super.getEntryAreaTop() + super.getMaxPosition());
+		appendButton.setX(left + (width - appendButton.getWidth()) / 2);
 		appendButton.render(matrices, mouseX, mouseY, delta);
 	}
 

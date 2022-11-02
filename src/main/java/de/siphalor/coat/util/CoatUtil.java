@@ -115,7 +115,7 @@ public class CoatUtil {
 		addRect(buffer, x1, y2 - stroke, x2, y2, red, green, blue, alpha);
 		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, red, green, blue, alpha);
 		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, red, green, blue, alpha);
-		BufferRenderer.drawWithoutShader(buffer.end());
+		BufferRenderer.draw(buffer.end());
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}

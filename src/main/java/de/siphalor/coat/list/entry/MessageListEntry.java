@@ -36,7 +36,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 */
 	public MessageListEntry(Message message) {
 		this.message = message;
-		jumpButton = new ButtonWidget(0, 0, 100, 20, JUMP_TEXT, button -> {
+		jumpButton = ButtonWidget.createBuilder(JUMP_TEXT, button -> {
 			if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
 				Element last = (Element) message.getOrigin();
 				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
@@ -67,7 +67,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 					listWidget.changeFocus(true);
 				}
 			}
-		});
+		}).setSize(100, 20).build();
 	}
 
 	/**
@@ -88,11 +88,11 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR);
-		jumpButton.y = y;
-		jumpButton.x = x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN;
+		jumpButton.setY(y);
+		jumpButton.setX(x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN);
 		jumpButton.render(matrices, mouseX, mouseY, tickDelta);
 
-		if (hovered && mouseX < jumpButton.x) {
+		if (hovered && mouseX < jumpButton.getX()) {
 			CoatUtil.renderTooltip(matrices, mouseX, mouseY, message.getText());
 		}
 	}

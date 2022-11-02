@@ -70,8 +70,10 @@ public class ConfigScreen extends Screen {
 			treeWidget.addEntry(widget.getTreeEntry());
 		}
 
-		abortButton = new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, ABORT_TEXT, button -> close());
-		saveButton =  new ButtonWidget(CoatUtil.MARGIN, 0, 0, 20, SAVE_TEXT, this::clickSave);
+		abortButton = ButtonWidget.createBuilder(ABORT_TEXT, button -> close())
+				.setPosition(CoatUtil.MARGIN, 0).setSize(0, 20).build();
+		saveButton =  ButtonWidget.createBuilder(SAVE_TEXT, this::clickSave)
+				.setPosition(CoatUtil.MARGIN, 0).setSize(0, 20).build();
 		addDrawableChild(abortButton);
 		addDrawableChild(saveButton);
 
@@ -266,8 +268,8 @@ public class ConfigScreen extends Screen {
 		contentWidget.setPosition(panelWidth, 20);
 		contentWidget.resize(width - panelWidth, height - 20);
 
-		saveButton.y  = height - 20 - CoatUtil.MARGIN;
-		abortButton.y = saveButton.y - 20 - CoatUtil.MARGIN;
+		saveButton.setY(height - 20 - CoatUtil.MARGIN);
+		abortButton.setY(saveButton.getY() - 20 - CoatUtil.MARGIN);
 		saveButton.setWidth(panelWidth - CoatUtil.DOUBLE_MARGIN);
 		abortButton.setWidth(saveButton.getWidth());
 	}

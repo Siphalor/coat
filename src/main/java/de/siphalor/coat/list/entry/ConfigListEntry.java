@@ -25,12 +25,12 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 
 	public ConfigListEntry(ConfigInput<V> input) {
 		this.input = input;
-		deleteWidget = new ButtonWidget(0, 0, 20, 20, Text.literal("x"), button -> {
+		deleteWidget = ButtonWidget.createBuilder(Text.literal("x"), button -> {
 			if (parent instanceof ConfigListWidget) {
 				//noinspection unchecked
 				((ConfigListWidget<V>) parent).removeEntry(this);
 			}
-		});
+		}).setSize(20, 20).build();
 	}
 
 	public void setDragFollow(boolean dragFollow) {
@@ -50,8 +50,7 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		RenderSystem.setShaderTexture(0, HANDLE_TEXTURE);
 		drawTexture(matrices, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
 		input.render(matrices, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
-		deleteWidget.x = x + entryWidth - 20;
-		deleteWidget.y = y;
+		deleteWidget.setPos(x + entryWidth - 20, y);
 		deleteWidget.render(matrices, mouseX, mouseY, tickDelta);
 	}
 
