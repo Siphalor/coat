@@ -1,0 +1,19 @@
+{
+  "coat.action.abort": "Abbrechen",
+  "coat.action.abort.screen.title": "Änderungen gehen verloren!",
+  "coat.action.abort.screen.desc": "Wenn du fortfährst gehen alle Änderungen verloren.\nBist du dir sicher, dass du fortfahren möchtest?",
+  "coat.action.accept_risk": "Risiko akzeptieren",
+  "coat.action.save": "Speich. & Schließ.",
+  "coat.action.save.errors": "Es wurden Fehler in der Konfiguration gefunden.\n§lWenn du fortfährst, werden Änderungen verloren gehen!",
+  "coat.action.save.warnings": "Für die Konfiguration existieren Warnmeldungen.\nPrüfe die Warnungen, bevor du fortfährst.",
+  "coat.default": "Standard",
+  "coat.default.hover": "Zurücksetzen zu:",
+  "coat.list.append": "Neuer Eintrag",
+  "coat.message.jump": "Zum Problem",
+  "coat.message.level.info": "Info",
+  "coat.message.level.warning": "Warnung",
+  "coat.message.level.error": "Fehler",
+  "coat.tree.expand": "+",
+  "coat.tree.collapse": "-",
+  "coat.tree.open": "Öffnen"
+}
