@@ -36,7 +36,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 */
 	public MessageListEntry(Message message) {
 		this.message = message;
-		jumpButton = ButtonWidget.createBuilder(JUMP_TEXT, button -> {
+		jumpButton = ButtonWidget.builder(JUMP_TEXT, button -> {
 			if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
 				Element last = (Element) message.getOrigin();
 				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
@@ -67,7 +67,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 					listWidget.changeFocus(true);
 				}
 			}
-		}).setSize(100, 20).build();
+		}).size(100, 20).build();
 	}
 
 	/**

@@ -36,7 +36,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	 */
 	public ConfigContainerLinkEntry(ConfigContentWidget configWidget) {
 		this.configWidget = configWidget;
-		button = ButtonWidget.createBuilder(OPEN_TEXT,
+		button = ButtonWidget.builder(OPEN_TEXT,
 				button -> {
 					ConfigScreen screen = ((ConfigScreen) MinecraftClient.getInstance().currentScreen);
 					ConfigTreeEntry treeEntry = configWidget.getTreeEntry();
@@ -46,7 +46,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 						screen.openTemporary(treeEntry);
 					}
 				}
-		).setSize(50, 20).build();
+		).size(50, 20).build();
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(configWidget.getBackground());
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
 		RenderSystem.setShaderTexture(0, configWidget.getBackground());
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();

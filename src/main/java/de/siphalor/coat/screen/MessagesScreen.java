@@ -59,14 +59,14 @@ public class MessagesScreen extends Screen {
 	protected void init() {
 		super.init();
 
-		abortButton = ButtonWidget.createBuilder(
+		abortButton = ButtonWidget.builder(
 				Text.translatable(Coat.MOD_ID + ".action.abort"),
 				button -> MinecraftClient.getInstance().setScreen(parent)
-		).setPosition(0, 38).setSize(100, 20).build();
-		acceptButton = ButtonWidget.createBuilder(
+		).position(0, 38).size(100, 20).build();
+		acceptButton = ButtonWidget.builder(
 				Text.translatable(Coat.MOD_ID + ".action.accept_risk"),
 				button -> acceptRunnable.run()
-		).setPosition(0, 38).setSize(100, 20).build();
+		).position(0, 38).size(100, 20).build();
 		addDrawableChild(abortButton);
 		addDrawableChild(acceptButton);
 

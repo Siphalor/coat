@@ -109,7 +109,7 @@ public class CoatUtil {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		addRect(buffer, x1, y1, x2, y1 + stroke, red, green, blue, alpha);
 		addRect(buffer, x1, y2 - stroke, x2, y2, red, green, blue, alpha);

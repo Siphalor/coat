@@ -70,10 +70,10 @@ public class ConfigScreen extends Screen {
 			treeWidget.addEntry(widget.getTreeEntry());
 		}
 
-		abortButton = ButtonWidget.createBuilder(ABORT_TEXT, button -> close())
-				.setPosition(CoatUtil.MARGIN, 0).setSize(0, 20).build();
-		saveButton =  ButtonWidget.createBuilder(SAVE_TEXT, this::clickSave)
-				.setPosition(CoatUtil.MARGIN, 0).setSize(0, 20).build();
+		abortButton = ButtonWidget.builder(ABORT_TEXT, button -> close())
+				.position(CoatUtil.MARGIN, 0).size(0, 20).build();
+		saveButton =  ButtonWidget.builder(SAVE_TEXT, this::clickSave)
+				.position(CoatUtil.MARGIN, 0).size(0, 20).build();
 		addDrawableChild(abortButton);
 		addDrawableChild(saveButton);
 
@@ -298,7 +298,7 @@ public class ConfigScreen extends Screen {
 		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		bufferBuilder.vertex(panelWidth,      height, 0D).color(0, 0, 0, 200).next();
 		bufferBuilder.vertex(panelWidth + 8D, height, 0D).color(0, 0, 0,   0).next();
@@ -308,7 +308,7 @@ public class ConfigScreen extends Screen {
 
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
-		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
 		RenderSystem.setShaderTexture(0, contentWidget.getBackground());
 		RenderSystem.depthFunc(GL32.GL_LEQUAL);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);

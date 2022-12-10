@@ -26,10 +26,10 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	private final MutableText name;
 	private final ConfigEntryHandler<List<V>> entryHandler;
 	private final ConfigListEntryFactory<V> entryFactory;
-	private final ButtonWidget appendButton = ButtonWidget.createBuilder(
+	private final ButtonWidget appendButton = ButtonWidget.builder(
 			Text.translatable(Coat.MOD_ID + ".list.append"),
 			button -> createEntry(getEntryCount())
-	).setSize(100, 20).build();
+	).size(100, 20).build();
 	private ConfigListEntry<V> dragEntry;
 
 	public ConfigListWidget(MinecraftClient client, int width, int height, int top, int rowWidth, ConfigContentWidget parent, MutableText name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {

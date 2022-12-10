@@ -25,12 +25,12 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 
 	public ConfigListEntry(ConfigInput<V> input) {
 		this.input = input;
-		deleteWidget = ButtonWidget.createBuilder(Text.literal("x"), button -> {
+		deleteWidget = ButtonWidget.builder(Text.literal("x"), button -> {
 			if (parent instanceof ConfigListWidget) {
 				//noinspection unchecked
 				((ConfigListWidget<V>) parent).removeEntry(this);
 			}
-		}).setSize(20, 20).build();
+		}).size(20, 20).build();
 	}
 
 	public void setDragFollow(boolean dragFollow) {

@@ -7,6 +7,7 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.input.InputChangeListener;
 import de.siphalor.coat.util.CoatUtil;
+import de.siphalor.coat.util.CustomTooltip;
 import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
@@ -19,10 +20,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A config entry with an input, a description and a reset button.
@@ -60,19 +58,26 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		input.setChangeListener(this);
 		MinecraftClient client = MinecraftClient.getInstance();
 		textRenderer = client.textRenderer;
-		defaultButton = ButtonWidget.createBuilder(DEFAULT_TEXT, button ->
+		defaultButton = ButtonWidget.builder(DEFAULT_TEXT, button ->
 				input.setValue(entryHandler.getDefault())
-		).setSize(10, 20).setTooltipSupplier((button, matrices, mouseX, mouseY) -> {
-			if (button.active) {
-				List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
-				ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
-				list.addAll(wrappedLines);
-				list.add(0, Text.translatable(Coat.MOD_ID + ".default.hover").asOrderedText());
-				client.currentScreen.renderOrderedTooltip(matrices, list, mouseX, mouseY);
-			}
-		}).build();
+		).size(10, 20).tooltip(
+				new CustomTooltip(() -> {
+					if (!getDefaultButton().active) {
+						return Collections.emptyList();
+					}
+					List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
+					ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
+					list.addAll(wrappedLines);
+					list.add(0, Text.translatable(Coat.MOD_ID + ".default.hover").asOrderedText());
+					return list;
+				}, null)
+		).build();
 
 		inputChanged(input.getValue());
+	}
+
+	private ButtonWidget getDefaultButton() {
+		return defaultButton;
 	}
 
 	/**

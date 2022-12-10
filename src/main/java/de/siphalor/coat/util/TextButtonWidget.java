@@ -24,7 +24,7 @@ public class TextButtonWidget extends ButtonWidget {
 	 * @param onPress An action to run when the widget gets triggered
 	 */
 	public TextButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress) {
-		super(x, y, width, height, message, onPress, EMPTY_TOOLTIP, DEFAULT_NARRATION_SUPPLIER);
+		super(x, y, width, height, message, onPress, DEFAULT_NARRATION_SUPPLIER);
 		setMessage(message);
 	}
 

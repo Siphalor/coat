@@ -337,7 +337,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		RenderSystem.setShaderTexture(0,background);
 		RenderSystem.setShaderColor(backgroundBrightness, backgroundBrightness, backgroundBrightness, 1F);
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
@@ -363,7 +363,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
 			RenderSystem.disableTexture();
-			RenderSystem.setShader(GameRenderer::getPositionColorShader);
+			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 			int p = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getMaxPosition());
 			p = MathHelper.clamp(p, 32, this.bottom - this.top - 8);
