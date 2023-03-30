@@ -64,7 +64,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 					configScreen.setFocused(category);
 					ConfigCategoryWidget listWidget = (ConfigCategoryWidget) configScreen.getContentWidget();
 					listWidget.focusOn(last);
-					listWidget.changeFocus(true);
+					listWidget.setFocused(true);
 				}
 			}
 		}).size(100, 20).build();

@@ -362,7 +362,6 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
-			RenderSystem.disableTexture();
 			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 			int p = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getMaxPosition());
@@ -377,7 +376,6 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, 128, 128, 128, 255);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, 192, 192, 192, 255);
 			tessellator.draw();
-			RenderSystem.enableTexture();
 		}
 
 		this.renderList(matrices, mouseX, mouseY, delta);
@@ -646,7 +644,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	protected E removeEntry(E entry) {
 		if (entry == getFocused()) {
-			changeFocus(true);
+			setFocused(true);
 		}
 		entries.remove(entry);
 		return entry;

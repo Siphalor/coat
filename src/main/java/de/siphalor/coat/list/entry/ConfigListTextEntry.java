@@ -71,4 +71,13 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	public Collection<Message> getMessages() {
 		return Collections.emptyList();
 	}
+
+	@Override
+	public void setFocused(boolean focused) {
+	}
+
+	@Override
+	public boolean isFocused() {
+		return false;
+	}
 }

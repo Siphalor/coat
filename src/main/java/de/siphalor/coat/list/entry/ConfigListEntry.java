@@ -50,7 +50,7 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		RenderSystem.setShaderTexture(0, HANDLE_TEXTURE);
 		drawTexture(matrices, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
 		input.render(matrices, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
-		deleteWidget.setPos(x + entryWidth - 20, y);
+		deleteWidget.setPosition(x + entryWidth - 20, y);
 		deleteWidget.render(matrices, mouseX, mouseY, tickDelta);
 	}
 

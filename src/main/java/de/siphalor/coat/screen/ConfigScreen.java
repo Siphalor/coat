@@ -295,7 +295,6 @@ public class ConfigScreen extends Screen {
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL32.GL_LEQUAL);
-		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -306,7 +305,6 @@ public class ConfigScreen extends Screen {
 		bufferBuilder.vertex(panelWidth,      20D,    0D).color(0, 0, 0, 200).next();
 		tessellator.draw();
 
-		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 		RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
 		RenderSystem.setShaderTexture(0, contentWidget.getBackground());
@@ -319,7 +317,7 @@ public class ConfigScreen extends Screen {
 		tessellator.draw();
 
 		matrices.translate(0, 0, 10);
-		drawCenteredText(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
+		drawCenteredTextWithShadow(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
 		matrices.translate(0, 0, -10);
 	}
 }

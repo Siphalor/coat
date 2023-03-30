@@ -107,7 +107,6 @@ public class CoatUtil {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		RenderSystem.enableBlend();
-		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -116,7 +115,6 @@ public class CoatUtil {
 		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, red, green, blue, alpha);
 		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, red, green, blue, alpha);
 		BufferRenderer.draw(buffer.end());
-		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 
