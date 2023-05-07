@@ -37,7 +37,6 @@ dependencies {
 	modImplementation(fabricApi.module("fabric-api-base", fabric_version))
 	modImplementation(fabricApi.module("fabric-key-binding-api-v1", fabric_version))
 	modRuntimeOnly(fabricApi.module("fabric-resource-loader-v0", fabric_version))
-	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
 }
