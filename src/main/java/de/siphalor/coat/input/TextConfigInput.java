@@ -71,7 +71,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		setPos(x + 2, y + 2);
+		setPosition(x + 2, y + 2);
 		this.width = width - 4;
 		render(matrices, mouseX, mouseY, tickDelta);
 	}

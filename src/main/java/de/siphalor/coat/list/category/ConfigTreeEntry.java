@@ -78,11 +78,11 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		int innerWidth = getEntryWidth();
 
 		if (!subTrees.isEmpty()) {
-			collapseButton.setPos(x, y);
+			collapseButton.setPosition(x, y);
 			collapseButton.render(matrices, mouseX, mouseY, tickDelta);
 		}
 
-		nameButton.setPos(indent, y);
+		nameButton.setPosition(indent, y);
 		nameButton.setWidth(innerWidth);
 		nameButton.render(matrices, mouseX, mouseY, tickDelta);
 

@@ -49,4 +49,13 @@ public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 	public void tick() {
 
 	}
+
+	@Override
+	public void setFocused(boolean focused) {
+	}
+
+	@Override
+	public boolean isFocused() {
+		return false;
+	}
 }

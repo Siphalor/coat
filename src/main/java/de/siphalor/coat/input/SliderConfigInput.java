@@ -98,7 +98,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		setPos(x, y);
+		setPosition(x, y);
 		setWidth(width);
 
 		render(matrices, mouseX, mouseY, tickDelta);

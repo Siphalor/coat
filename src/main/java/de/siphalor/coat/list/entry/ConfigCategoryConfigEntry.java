@@ -178,7 +178,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		defaultButton.setY(y + CoatUtil.MARGIN);
 		defaultButton.setX(x + entryWidth - (int) getControlsPart(entryWidth) + CoatUtil.HALF_MARGIN);
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
-		nameWidget.setPos(x, textY - 2);
+		nameWidget.setPosition(x, textY - 2);
 		nameWidget.render(matrices, mouseX, mouseY, tickDelta);
 
 		float curY = y + CoatUtil.MARGIN + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
@@ -323,7 +323,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 			defaultButton.active = true;
 		} else {
 			if (defaultButton.isFocused()) {
-				changeFocus(false);
+				setFocused(false);
 			}
 			defaultButton.active = false;
 		}
