@@ -38,6 +38,9 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	private final ButtonWidget defaultButton;
 	private Collection<Message> messages;
 	private boolean expanded;
+	private boolean hovered;
+	private int leftInputOffset;
+	private int inputWidth;
 
 	/**
 	 * Constructs a new config entry.
@@ -50,6 +53,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	public ConfigCategoryConfigEntry(BaseText name, BaseText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
 		nameWidget = new TextButtonWidget(0, 0, 100, 12, name, button -> setExpanded(!isExpanded()));
+		nameWidget.setHoverEffect(false);
 		setName(name.copy());
 		this.description = description;
 		this.entryHandler = entryHandler;
@@ -80,6 +84,23 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 */
 	public boolean isExpanded() {
 		return expanded;
+	}
+
+	/**
+	 * Gets whether there is any description or messages to display.
+	 *
+	 * @return Whether the expansion is empty
+	 */
+	public boolean isExpansionEmpty() {
+		if (description != null) {
+			return false;
+		}
+		for (Message message : messages) {
+			if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -114,10 +135,24 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
 
-		int namePart = (int) getNamePart(newWidth) - CoatUtil.MARGIN;
-		nameWidget.setWidth(namePart);
+		int inputWidth = input.getPreferredWidth(); // actual width without gaps
+		// these parts include the gaps
+		int namePart = (int) (newWidth * 0.3);
+		int controlsPart = (int) (newWidth * 0.2);
+		if (inputWidth > 0) {
+			int rest = newWidth - namePart - inputWidth - CoatUtil.MARGIN - controlsPart;
+			if (rest > 0) {
+				namePart += rest;
+			} else {
+				inputWidth += rest;
+			}
+		} else { // auto input width
+			inputWidth = newWidth - namePart - CoatUtil.MARGIN - controlsPart;
+		}
 
-		int controlsPart = (int) getControlsPart(newWidth);
+		nameWidget.setWidth(namePart - CoatUtil.HALF_MARGIN);
+		this.inputWidth = inputWidth;
+		this.leftInputOffset = namePart + CoatUtil.HALF_MARGIN;
 		defaultButton.setWidth(controlsPart - CoatUtil.HALF_MARGIN);
 
 		if (isExpanded()) {
@@ -161,21 +196,27 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 */
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		int namePart = (int) getNamePart(entryWidth);
-		int configEntryPart = (int) getConfigEntryPart(entryWidth);
 		int inputHeight = input.getHeight();
+		int top = y + CoatUtil.MARGIN;
+		int right = x + entryWidth;
+		int bottom = y + entryHeight;
 
-		int textY = y + (int) ((inputHeight - 8) / 2F) + CoatUtil.MARGIN;
+		this.hovered = hovered;
+		if (hovered) {
+			fill(matrices, x, top, right, bottom, CoatUtil.HOVER_BG_COLOR);
+		}
 
-		input.render(matrices, x + namePart + CoatUtil.HALF_MARGIN, y + CoatUtil.MARGIN, configEntryPart - CoatUtil.MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
-		defaultButton.y = y + CoatUtil.MARGIN;
-		defaultButton.x = x + entryWidth - (int) getControlsPart(entryWidth) + CoatUtil.HALF_MARGIN;
+		int textY = top + (int) ((inputHeight - 8) / 2F);
+
+		input.render(matrices, x + leftInputOffset, top, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		defaultButton.y = top;
+		defaultButton.x = x + entryWidth - defaultButton.getWidth() + CoatUtil.HALF_MARGIN;
 		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
 		nameWidget.x = x;
 		nameWidget.y = textY - 2;
 		nameWidget.render(matrices, mouseX, mouseY, tickDelta);
 
-		float curY = y + CoatUtil.MARGIN + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
+		float curY = top + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
 		float msgX = x + TEXT_INDENT;
 		int msgWidth = entryWidth - TEXT_INDENT;
 		for (Message message : messages) {
@@ -203,36 +244,6 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 
 			descriptionMultiline.draw(matrices, x + TEXT_INDENT, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
 		}
-	}
-
-	/**
-	 * Gets the width used for the name of the config entry.
-	 *
-	 * @param width The width of the whole entry
-	 * @return The partial width to be used for the name
-	 */
-	public double getNamePart(int width) {
-		return width * 0.3;
-	}
-
-	/**
-	 * Gets the width used for the input of the config entry.
-	 *
-	 * @param width The width of the whole entry
-	 * @return The partial width to be used for the config input
-	 */
-	public double getConfigEntryPart(int width) {
-		return width * 0.5;
-	}
-
-	/**
-	 * Gets the width used for the controls section of the config entry.
-	 *
-	 * @param width The width of the whole entry
-	 * @return The partial width to be used for the controls section
-	 */
-	public double getControlsPart(int width) {
-		return width * 0.2;
 	}
 
 	/**
@@ -305,7 +316,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 */
 	@Override
 	public int getEntryWidth() {
-		return (int) getConfigEntryPart(parent.getEntryWidth());
+		return parent.getEntryWidth();
 	}
 
 	/**
@@ -378,5 +389,18 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		}
 		// shallow copy is required because the OrderedText in BaseText is cached, so the style needs to be force updated
 		setName((BaseText) nameWidget.getOriginalMessage().shallowCopy());
+	}
+
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		if (!super.mouseClicked(mouseX, mouseY, button)) {
+			if (hovered && !isExpansionEmpty()) {
+				CoatUtil.playClickSound();
+				setExpanded(!isExpanded());
+				return true;
+			}
+			return false;
+		}
+		return true;
 	}
 }

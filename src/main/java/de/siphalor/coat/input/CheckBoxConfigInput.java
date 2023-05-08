@@ -20,6 +20,11 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 		super(0, 0, 20, 20, message, checked, showMessage);
 	}
 
+	@Override
+	public int getPreferredWidth() {
+		return getWidth();
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */

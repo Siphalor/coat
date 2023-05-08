@@ -7,7 +7,10 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -28,6 +31,10 @@ public class CoatUtil {
 	 * The secondary text color to use in Coat.
 	 */
 	public static final int SECONDARY_TEXT_COLOR = 0xffaaaaaa;
+	/**
+	 * A semi-transparent light color to use as background for hovered elements.
+	 */
+	public static final int HOVER_BG_COLOR = 0x2dffffff;
 	/**
 	 * A predefined margin that'll always™ be <code>2</code>.
 	 * I really don't like having constant numeric values in my code.
@@ -141,5 +148,10 @@ public class CoatUtil {
 		buffer.vertex(x2, y2, 0).color(red, green, blue, alpha).next();
 		buffer.vertex(x2, y1, 0).color(red, green, blue, alpha).next();
 		buffer.vertex(x1, y1, 0).color(red, green, blue, alpha).next();
+	}
+
+	public static void playClickSound() {
+		SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
+		soundManager.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 	}
 }

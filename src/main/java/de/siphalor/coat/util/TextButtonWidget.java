@@ -12,6 +12,7 @@ import net.minecraft.util.math.MathHelper;
  */
 public class TextButtonWidget extends ButtonWidget {
 	private Text originalMessage;
+	private boolean hoverEffect = true;
 
 	/**
 	 * Constructs a new instance.
@@ -37,6 +38,10 @@ public class TextButtonWidget extends ButtonWidget {
 		return originalMessage;
 	}
 
+	public void setHoverEffect(boolean hoverEffect) {
+		this.hoverEffect = hoverEffect;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -50,7 +55,9 @@ public class TextButtonWidget extends ButtonWidget {
 			CoatUtil.drawStrokeRect(x - 2, y - 2, x + width + 2, y + height + 2, 1, color);
 		}
 		if (hovered) {
-			fill(matrices, x - 1, y - 1, x + width + 1, y + height + 1, 0x33ffffff);
+			if (hoverEffect) {
+				fill(matrices, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR);
+			}
 			if (originalMessage != getMessage()) {
 				CoatUtil.renderTooltip(matrices, mouseX, mouseY, originalMessage);
 			}

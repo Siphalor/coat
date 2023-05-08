@@ -39,8 +39,8 @@ public class CoatTestmod implements ClientModInitializer {
 		list.add(new ConfigListTextEntry(new LiteralText("This is some stupidly long text!")));
 		list.add(new ConfigListTextEntry(new LiteralText("I'd probably just kill all humans if it came to it - profjb")));
 		list.add(new ConfigCategoryConfigEntry<>(
-				new LiteralText("a boolean"),
-				new LiteralText("noop"),
+				new LiteralText("A boolean with a pretty long name to demonstrate the spacing improvements"),
+				new LiteralText("The checkbox needs less space, so more space for the name :)"),
 				new GenericEntryHandler<>(true, s -> Collections.emptyList()),
 				new CheckBoxConfigInput(null, true, false)
 		));
