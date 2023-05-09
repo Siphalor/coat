@@ -29,9 +29,10 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// for testmod
-	modImplementation("de.siphalor:amecsapi-$project.minecraft_major_version:1.3.6+mc22w17a")
+	modImplementation("de.siphalor:amecsapi-$project.minecraft_major_version:$amecsapi_version")
 	modImplementation(fabricApi.module("fabric-api-base", fabric_version))
 	modImplementation(fabricApi.module("fabric-key-binding-api-v1", fabric_version))
+	modRuntimeOnly(fabricApi.module("fabric-resource-loader-v0", fabric_version))
 	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
