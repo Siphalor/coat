@@ -10,6 +10,18 @@ import net.minecraft.client.gui.Element;
  */
 public interface ConfigInput<V> extends Drawable, Element {
 	/**
+	 * Get a hint for how wide the input should render.
+	 * If the render method provides a greater width, the input should render with that width,
+	 * preferably aligning to the right.
+	 *
+	 * @return The preferred width or {@code -1} if there is no preferred width.
+	 * In this case, the parent should render at maximum width.
+	 */
+	default int getPreferredWidth() {
+		return -1;
+	}
+
+	/**
 	 * Gets the current height of the input.
 	 * Call to {@link de.siphalor.coat.list.EntryContainer#entryHeightChanged(Element)} to propagate height changes.
 	 *
