@@ -24,6 +24,11 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 		return height;
 	}
 
+	@Override
+	public int getPreferredWidth() {
+		return getWidth();
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
