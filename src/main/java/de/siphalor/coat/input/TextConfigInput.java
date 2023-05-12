@@ -1,8 +1,8 @@
 package de.siphalor.coat.input;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 /**
@@ -70,9 +70,9 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		setPosition(x + 2, y + 2);
 		this.width = width - 4;
-		render(matrices, mouseX, mouseY, tickDelta);
+		render(drawContext, mouseX, mouseY, tickDelta);
 	}
 }

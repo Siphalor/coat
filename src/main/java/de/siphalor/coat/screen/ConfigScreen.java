@@ -9,11 +9,11 @@ import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL32;
@@ -63,7 +63,7 @@ public class ConfigScreen extends Screen {
 		panelWidth = 200;
 		treeWidget = new DynamicEntryListWidget<>(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.5F);
-		treeWidget.setBackground(new Identifier("textures/block/mangrove_log.png"));
+		treeWidget.setBackground(new Identifier("textures/block/cherry_log.png"));
 		addDrawableChild(treeWidget);
 
 		for (ConfigCategoryWidget widget : widgets) {
@@ -288,8 +288,8 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		super.render(matrices, mouseX, mouseY, delta);
+	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+		super.render(drawContext, mouseX, mouseY, delta);
 
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -316,8 +316,8 @@ public class ConfigScreen extends Screen {
 		bufferBuilder.vertex(0D,     0D, 10D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
 		tessellator.draw();
 
-		matrices.translate(0, 0, 10);
-		drawCenteredTextWithShadow(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
-		matrices.translate(0, 0, -10);
+		drawContext.getMatrices().translate(0, 0, 10);
+		drawContext.drawCenteredTextWithShadow(this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
+		drawContext.getMatrices().translate(0, 0, -10);
 	}
 }

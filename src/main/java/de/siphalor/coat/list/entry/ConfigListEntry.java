@@ -1,14 +1,13 @@
 package de.siphalor.coat.list.entry;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.list.complex.ConfigListWidget;
 import de.siphalor.coat.util.CoatUtil;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -42,16 +41,15 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		if (isDragFollow()) {
 			y = mouseY - entryHeight / 2;
 		}
 
-		RenderSystem.setShaderTexture(0, HANDLE_TEXTURE);
-		drawTexture(matrices, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
-		input.render(matrices, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		drawContext.drawTexture(HANDLE_TEXTURE, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
+		input.render(drawContext, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		deleteWidget.setPosition(x + entryWidth - 20, y);
-		deleteWidget.render(matrices, mouseX, mouseY, tickDelta);
+		deleteWidget.render(drawContext, mouseX, mouseY, tickDelta);
 	}
 
 	@Override

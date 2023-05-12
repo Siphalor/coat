@@ -2,8 +2,8 @@ package de.siphalor.coat.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
@@ -46,22 +46,22 @@ public class TextButtonWidget extends ButtonWidget {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		int x = getX();
 		int y = getY();
 		final int color = CoatUtil.TEXT_COLOR | MathHelper.ceil(alpha * 255F) << 24;
-		float textY = y + (height - 7) / 2F;
+		int textY = y + (height - 7) / 2;
 		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-		textRenderer.drawWithShadow(matrices, getMessage(), x, textY, color);
+		drawContext.drawTextWithShadow(textRenderer, getMessage(), x, textY, color);
 		if (isFocused()) {
 			CoatUtil.drawStrokeRect(x - 2, y - 2, x + width + 2, y + height + 2, 1, color);
 		}
 		if (hovered) {
 			if (hoverEffect) {
-				fill(matrices, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR);
+				drawContext.fill(x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR);
 			}
 			if (originalMessage != getMessage()) {
-				CoatUtil.renderTooltip(matrices, mouseX, mouseY, originalMessage);
+				CoatUtil.renderTooltip(drawContext, mouseX, mouseY, originalMessage);
 			}
 		}
 	}

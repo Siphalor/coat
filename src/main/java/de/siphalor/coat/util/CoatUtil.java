@@ -3,10 +3,10 @@ package de.siphalor.coat.util;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundManager;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -82,16 +82,17 @@ public class CoatUtil {
 
 	/**
 	 * Wraps and renders the given text as a tooltip.
-	 * @param matrices The matrix stack to use for rendering
-	 * @param x        The x position to render to
-	 * @param y        The y position to render to
-	 * @param text     The tooltip text to wrap and render
+	 *
+	 * @param drawContext The matrix stack to use for rendering
+	 * @param x           The x position to render to
+	 * @param y           The y position to render to
+	 * @param text        The tooltip text to wrap and render
 	 */
-	public static void renderTooltip(MatrixStack matrices, int x, int y, Text text) {
+	public static void renderTooltip(DrawContext drawContext, int x, int y, Text text) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		RenderSystem.depthFunc(GL11.GL_ALWAYS);
-		client.currentScreen.renderOrderedTooltip(
-				matrices,
+		drawContext.drawOrderedTooltip(
+				client.textRenderer,
 				wrapTooltip(client.textRenderer, client, text),
 				x, y
 		);

@@ -9,8 +9,8 @@ import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,7 +69,7 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		this.x = x;
 		this.y = y;
 
@@ -79,21 +79,21 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 
 		if (!subTrees.isEmpty()) {
 			collapseButton.setPosition(x, y);
-			collapseButton.render(matrices, mouseX, mouseY, tickDelta);
+			collapseButton.render(drawContext, mouseX, mouseY, tickDelta);
 		}
 
 		nameButton.setPosition(indent, y);
 		nameButton.setWidth(innerWidth);
-		nameButton.render(matrices, mouseX, mouseY, tickDelta);
+		nameButton.render(drawContext, mouseX, mouseY, tickDelta);
 
 		if (expanded) {
 			int curY = y + getBaseHeight();
 			for (ConfigTreeEntry entry : subTrees) {
 				if (!hoverFound && mouseY > curY) {
 					hoverFound = true;
-					entry.render(matrices, indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
+					entry.render(drawContext, indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
 				} else {
-					entry.render(matrices, indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
+					entry.render(drawContext, indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
 				}
 				curY += entry.getHeight();
 			}

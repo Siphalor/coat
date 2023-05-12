@@ -9,9 +9,9 @@ import de.siphalor.coat.list.entry.ConfigListEntry;
 import de.siphalor.coat.screen.ConfigContentWidget;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -138,11 +138,11 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	}
 
 	@Override
-	public void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		super.renderWidget(matrices, mouseX, mouseY, delta);
+	public void renderWidget(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+		super.renderWidget(drawContext, mouseX, mouseY, delta);
 		appendButton.setY(super.getEntryAreaTop() + super.getMaxPosition());
 		appendButton.setX(left + (width - appendButton.getWidth()) / 2);
-		appendButton.render(matrices, mouseX, mouseY, delta);
+		appendButton.render(drawContext, mouseX, mouseY, delta);
 	}
 
 	@Override

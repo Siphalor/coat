@@ -8,10 +8,10 @@ import de.siphalor.coat.screen.ConfigContentWidget;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.lwjgl.opengl.GL11;
 
@@ -65,7 +65,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		int r = entryHeight / 2;
 
 		MinecraftClient.getInstance().getTextureManager().bindTexture(configWidget.getBackground());
@@ -88,11 +88,11 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 
 		button.setX(x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN);
 		button.setY(y + CoatUtil.MARGIN);
-		MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
-		button.render(matrices, mouseX, mouseY, tickDelta);
+		drawContext.drawText(MinecraftClient.getInstance().textRenderer, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2, CoatUtil.TEXT_COLOR, true);
+		button.render(drawContext, mouseX, mouseY, tickDelta);
 
 		if (hovered && nameText != configWidget.getName() && !button.isMouseOver(mouseX, mouseY)) {
-			CoatUtil.renderTooltip(matrices, mouseX, mouseY, configWidget.getName());
+			CoatUtil.renderTooltip(drawContext, mouseX, mouseY, configWidget.getName());
 		}
 	}
 

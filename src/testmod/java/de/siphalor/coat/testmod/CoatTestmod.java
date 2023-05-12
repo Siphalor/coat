@@ -13,7 +13,7 @@ import de.siphalor.coat.screen.ConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
@@ -84,7 +84,7 @@ public class CoatTestmod implements ClientModInitializer {
 				new SliderConfigInput<>(0D, -10D, 90D)
 		));
 
-		ConfigCategoryWidget widget = new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("Hi, my name is Fry"), list, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		ConfigCategoryWidget widget = new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("Hi, my name is Fry"), list, Screen.OPTIONS_BACKGROUND_TEXTURE);
 
 		LinkedList<ConfigContainerEntry> list1 = new LinkedList<>();
 		list1.add(new ConfigListTextEntry(Text.literal("You know the rules and so do I")));
@@ -95,7 +95,7 @@ public class CoatTestmod implements ClientModInitializer {
 		list2.add(new ConfigListTextEntry(Text.literal("Heyho")));
 		widget.addSubTree(new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("This is a kinda long category name"), list2, new Identifier("textures/block/end_stone.png")));
 
-		ConfigCategoryWidget widget2 = new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("Ho, this is a no go"), Collections.emptyList(), DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+		ConfigCategoryWidget widget2 = new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("Ho, this is a no go"), Collections.emptyList(), Screen.OPTIONS_BACKGROUND_TEXTURE);
 
 		ConfigListWidget<String> listWidget = new ConfigListWidget<>(MinecraftClient.getInstance(), Arrays.asList(
 				new ConfigListEntry<>(new TextConfigInput("a")),

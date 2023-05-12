@@ -12,9 +12,9 @@ import de.siphalor.coat.util.TextButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
@@ -202,7 +202,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		int inputHeight = input.getHeight();
 		int top = y + CoatUtil.MARGIN;
 		int right = x + entryWidth;
@@ -210,26 +210,26 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 
 		this.hovered = hovered;
 		if (hovered) {
-			fill(matrices, x, top, right, bottom, CoatUtil.HOVER_BG_COLOR);
+			drawContext.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR);
 		}
 
 		int textY = top + (int) ((inputHeight - 8) / 2F);
 
-		input.render(matrices, x + leftInputOffset, top, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		input.render(drawContext, x + leftInputOffset, top, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		defaultButton.setY(top);
 		defaultButton.setX(x + entryWidth - defaultButton.getWidth() + CoatUtil.HALF_MARGIN);
-		defaultButton.render(matrices, mouseX, mouseY, tickDelta);
+		defaultButton.render(drawContext, mouseX, mouseY, tickDelta);
 		nameWidget.setPosition(x, textY - 2);
-		nameWidget.render(matrices, mouseX, mouseY, tickDelta);
+		nameWidget.render(drawContext, mouseX, mouseY, tickDelta);
 
-		float curY = top + Math.max(20F, inputHeight) + CoatUtil.MARGIN;
-		float msgX = x + TEXT_INDENT;
+		int curY = top + Math.max(20, inputHeight) + CoatUtil.MARGIN;
+		int msgX = x + TEXT_INDENT;
 		int msgWidth = entryWidth - TEXT_INDENT;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
 				List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
 				for (OrderedText line : lines) {
-					textRenderer.draw(matrices, line, msgX, curY, 0xffffff);
+					drawContext.drawText(textRenderer, line, msgX, curY, 0xffffff, false);
 					curY += 9;
 				}
 				curY += CoatUtil.MARGIN;
@@ -241,14 +241,14 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 				if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
 					List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
 					for (OrderedText line : lines) {
-						textRenderer.draw(matrices, line, msgX, curY, 0xffffff);
+						drawContext.drawText(textRenderer, line, msgX, curY, 0xffffff, false);
 						curY += 9;
 					}
 					curY += CoatUtil.MARGIN;
 				}
 			}
 
-			descriptionMultiline.draw(matrices, x + TEXT_INDENT, (int) curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
+			descriptionMultiline.draw(drawContext, x + TEXT_INDENT, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
 		}
 	}
 

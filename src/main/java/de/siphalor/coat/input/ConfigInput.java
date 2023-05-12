@@ -1,8 +1,8 @@
 package de.siphalor.coat.input;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
 
 /**
  * A user input for a configuration entry.
@@ -76,7 +76,8 @@ public interface ConfigInput<V> extends Drawable, Element {
 
 	/**
 	 * Renders this config input
-	 * @param matrices    The matrix stack used for rendering
+	 *
+	 * @param drawContext The matrix stack used for rendering
 	 * @param x           The x position where the render area for this input begins
 	 * @param y           The y position to render this
 	 * @param width       The maximum width to render this width
@@ -86,5 +87,5 @@ public interface ConfigInput<V> extends Drawable, Element {
 	 * @param hovered     Whether this input is currently hovered by the mouse
 	 * @param tickDelta   The render tick delta
 	 */
-	void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+	void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 }

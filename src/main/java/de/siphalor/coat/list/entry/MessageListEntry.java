@@ -9,10 +9,11 @@ import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.screen.MessagesScreen;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import java.util.Collection;
@@ -86,14 +87,15 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR);
+	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+		drawContext.drawText(textRenderer, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR, false);
 		jumpButton.setY(y);
 		jumpButton.setX(x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN);
-		jumpButton.render(matrices, mouseX, mouseY, tickDelta);
+		jumpButton.render(drawContext, mouseX, mouseY, tickDelta);
 
 		if (hovered && mouseX < jumpButton.getX()) {
-			CoatUtil.renderTooltip(matrices, mouseX, mouseY, message.getText());
+			drawContext.drawTooltip(textRenderer, message.getText(), mouseX, mouseY);
 		}
 	}
 

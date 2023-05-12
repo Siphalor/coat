@@ -1,7 +1,7 @@
 package de.siphalor.coat.input;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
@@ -97,11 +97,11 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		setPosition(x, y);
 		setWidth(width);
 
-		render(matrices, mouseX, mouseY, tickDelta);
+		render(drawContext, mouseX, mouseY, tickDelta);
 	}
 
 	/**

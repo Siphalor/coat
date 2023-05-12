@@ -4,7 +4,7 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
@@ -50,9 +50,9 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		for (int i = 0; i < multilineText.size(); i++) {
-			textRenderer.draw(matrices, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR);
+			drawContext.drawText(textRenderer, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR, false);
 		}
 	}
 

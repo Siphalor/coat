@@ -1,7 +1,7 @@
 package de.siphalor.coat.input;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.CheckboxWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 /**
@@ -45,9 +45,9 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(MatrixStack matrices, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	public void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		setPosition(x + width - getWidth(), y);
-		render(matrices, mouseX, mouseY, tickDelta);
+		render(drawContext, mouseX, mouseY, tickDelta);
 	}
 
 	/**
