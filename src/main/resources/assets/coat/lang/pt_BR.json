@@ -1,0 +1,19 @@
+{
+    "coat.action.abort.screen.title": "Descartando mudanças!",
+    "coat.action.accept_risk": "Aceitar Risco",
+    "coat.action.save": "Salvar & Fechar",
+    "coat.action.save.errors": "Foram encontrados erros com a configuração atual.\n§lProsseguir resultará em perda de dados!",
+    "coat.default": "Padrão",
+    "coat.default.hover": "Redefinir para:",
+    "coat.list.append": "Criar novo registro",
+    "coat.message.jump": "Ir para o problema",
+    "coat.message.level.info": "Informação",
+    "coat.message.level.warning": "Aviso",
+    "coat.message.level.error": "Erro",
+    "coat.tree.expand": "+",
+    "coat.tree.collapse": "-",
+    "coat.tree.open": "Abrir",
+    "coat.action.abort": "Abortar",
+    "coat.action.abort.screen.desc": "Você está prestes a descartar todas as mudanças que fez. Você quer continuar?",
+    "coat.action.save.warnings": "Há alguns avisos na configuração atual.\nPor favor dê uma olhada e depois continue."
+}
