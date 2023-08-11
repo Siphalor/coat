@@ -1,0 +1,19 @@
+{
+    "coat.action.abort": "Keskeytä",
+    "coat.action.abort.screen.title": "Hylätään muutokset!",
+    "coat.action.abort.screen.desc": "Olet hylkäämässä kaikki tekemäsi muutokset. Haluatko jatkaa?",
+    "coat.action.accept_risk": "Hyväksy Riski",
+    "coat.action.save": "Tallenna ja Sulje",
+    "coat.action.save.errors": "Nykyisessä konfiguraatiossa on havaittu virheitä.\n§lJatkaminen johtaa tiedon menetykseen!",
+    "coat.action.save.warnings": "Nykyisessä konfiguraatiossa on joitakin varoituksia.\nKäy ne läpi ja jatka sitten.",
+    "coat.default": "Oletus",
+    "coat.default.hover": "Nollaus:",
+    "coat.list.append": "Luo uusi kirjaus",
+    "coat.message.jump": "Siirry ongelmaan",
+    "coat.message.level.info": "Info",
+    "coat.message.level.warning": "Varoitus",
+    "coat.message.level.error": "Virhe",
+    "coat.tree.expand": "+",
+    "coat.tree.collapse": "-",
+    "coat.tree.open": "Avaa"
+}
