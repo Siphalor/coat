@@ -42,7 +42,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	@Override
 	public void setValue(String value) {
 		setText(value);
-		setCursorToStart(); // Required because otherwise the text doesn't render sometimes
+		setCursorToStart(false); // Required because otherwise the text doesn't render sometimes
 	}
 
 	/**
@@ -61,18 +61,13 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 		super.setFocused(focused);
 	}
 
-	@Override
-	public void tickConfigInput() {
-		super.tick();
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		setPosition(x + 2, y + 2);
-		this.width = width - 4;
+		setPosition(x, y);
+		this.width = width;
 		render(drawContext, mouseX, mouseY, tickDelta);
 	}
 }

@@ -522,16 +522,14 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
 		Entry entry = getEntryAtPosition(mouseX, mouseY);
-		if (entry != null && entry.mouseScrolled(mouseX, mouseY, amount)) {
+		if (entry != null && entry.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)) {
 			return true;
 		}
 		double prevScroll = getScrollAmount();
-		this.setScrollAmount(this.getScrollAmount() - amount * 10.0D);
+		this.setScrollAmount(this.getScrollAmount() - verticalAmount * 10.0D);
 		return getScrollAmount() != prevScroll;
 	}
 
