@@ -118,8 +118,9 @@ public class CoatTestmod implements ClientModInitializer {
 
 		@Override
 		public boolean onPressedPriority() {
-			if (MinecraftClient.getInstance().currentScreen instanceof TitleScreen) {
-				MinecraftClient.getInstance().setScreen(createScreen());
+			MinecraftClient client = MinecraftClient.getInstance();
+			if (client.currentScreen instanceof TitleScreen || client.world != null) {
+				client.setScreen(createScreen());
 			}
 			return false;
 		}
