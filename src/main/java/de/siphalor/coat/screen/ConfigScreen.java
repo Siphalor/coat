@@ -1,6 +1,5 @@
 package de.siphalor.coat.screen;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
@@ -15,7 +14,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -302,28 +300,12 @@ public class ConfigScreen extends Screen {
 
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-		RenderSystem.disableAlphaTest();
-		RenderSystem.shadeModel(7425);
-		RenderSystem.disableTexture();
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(panelWidth,      height, 0D).color(0, 0, 0, 200).next();
-		bufferBuilder.vertex(panelWidth + 8D, height, 0D).color(0, 0, 0,   0).next();
-		bufferBuilder.vertex(panelWidth + 8D, 20D,    0D).color(0, 0, 0,   0).next();
-		bufferBuilder.vertex(panelWidth,      20D,    0D).color(0, 0, 0, 200).next();
-		tessellator.draw();
+
+		CoatUtil.drawHorizontalGradient(panelWidth, 20, panelWidth + 8, height, 0x00000077, 0x00000000);
 
 		RenderSystem.disableDepthTest();
-		RenderSystem.disableBlend();
-		RenderSystem.enableTexture();
-		client.getTextureManager().bindTexture(contentWidget.getBackground());
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(0D,    20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
-		bufferBuilder.vertex(width, 20D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
-		bufferBuilder.vertex(width,  0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 0F).next();
-		bufferBuilder.vertex(0D,     0D, 0D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
-		tessellator.draw();
+
+		CoatUtil.drawVerticalGradientTexture(0, 0, width, 20, contentWidget.getBackground(), 32F, 0x777777ff, 0x777777ff);
 
 		drawCenteredText(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
 
