@@ -331,22 +331,14 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * Renders the background of this widget.
 	 *
-	 * @param tessellator   The tesselator to use
-	 * @param bufferBuilder The buffer builder to use
 	 */
-	protected void renderBackground(Tessellator tessellator, BufferBuilder bufferBuilder) {
+	protected void renderBackground() {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-		RenderSystem.setShaderTexture(0,background);
-		RenderSystem.setShaderColor(backgroundBrightness, backgroundBrightness, backgroundBrightness, 1F);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-		bufferBuilder.vertex(left, bottom, -100D).texture(left / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, bottom, -100D).texture(right / 32F, (bottom + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(right, top, -100D).texture(right / 32F, (top + (int) getScrollAmount()) / 32F).next();
-		bufferBuilder.vertex(left, top, -100D).texture(left / 32F, (top + (int) getScrollAmount()) / 32F).next();
-		tessellator.draw();
-		RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+
+		int colorPart = (int) (backgroundBrightness * 255F);
+		int color = colorPart << 24 | colorPart << 16 | colorPart << 8 | 0xFF;
+		CoatUtil.drawTintedTexture(left, top, right, bottom, -100, background, 32F, (int) getScrollAmount(), color);
 	}
 
 	/**
@@ -355,10 +347,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	public void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		int scrollbarXBegin = this.getScrollbarPositionX();
 		int scrollbarXEnd = scrollbarXBegin + 6;
+
+		renderBackground();
+
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-
-		renderBackground(tessellator, bufferBuilder);
 
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
