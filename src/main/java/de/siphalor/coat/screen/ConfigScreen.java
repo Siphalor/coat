@@ -7,7 +7,9 @@ import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.list.complex.ConfigCategoryWidget;
+import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
+import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -31,6 +33,7 @@ import java.util.List;
 public class ConfigScreen extends Screen {
 	private static final Text ABORT_TEXT = new TranslatableText(Coat.MOD_ID + ".action.abort");
 	private static final Text SAVE_TEXT =  new TranslatableText(Coat.MOD_ID + ".action.save");
+	private static final CoatColor BACKGROUND_TEXTURE_TINT_COLOR = CoatColor.rgb(0x777777);
 
 	private final Screen parent;
 	private final Collection<ConfigCategoryWidget> widgets;
@@ -39,9 +42,17 @@ public class ConfigScreen extends Screen {
 	private Text visualTitle;
 
 	private int panelWidth;
+	/**
+	 * The tree pane widget
+	 */
+	@Getter
 	private DynamicEntryListWidget<ConfigTreeEntry> treeWidget;
 	private ButtonWidget abortButton;
 	private ButtonWidget saveButton;
+	/**
+	 * The currently opened list widget.
+	 */
+	@Getter
 	private ConfigContentWidget contentWidget;
 
 	/**
@@ -83,23 +94,8 @@ public class ConfigScreen extends Screen {
 	}
 
 	/**
-	 * Gets the tree pane widget.
-	 *
-	 * @return The tree widget
+	 * {@inheritDoc}
 	 */
-	public DynamicEntryListWidget<ConfigTreeEntry> getTreeWidget() {
-		return treeWidget;
-	}
-
-	/**
-	 * Gets the currently opened list widget.
-	 *
-	 * @return The list widget
-	 */
-	public ConfigContentWidget getContentWidget() {
-		return contentWidget;
-	}
-
 	@Override
 	public void close() {
 		MinecraftClient.getInstance().setScreen(
@@ -294,14 +290,14 @@ public class ConfigScreen extends Screen {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL32.GL_LEQUAL);
 
-		CoatUtil.drawHorizontalGradient(panelWidth, 20, panelWidth + 8, height, 0x00000077, 0x00000000);
+		CoatUtil.drawHorizontalGradient(panelWidth, 20, panelWidth + 8, height, CoatColor.BLACK.withAlpha(0x77), CoatColor.TRANSPARENT);
 
 		RenderSystem.disableDepthTest();
 
-		CoatUtil.drawVerticalGradientTexture(0, 0, width, 20, contentWidget.getBackground(), 32F, 0x777777ff, 0x777777ff);
+		CoatUtil.drawTintedTexture(0, 0, width, 20, 0, contentWidget.getBackground(), 32F, 0, BACKGROUND_TEXTURE_TINT_COLOR);
 
 		matrices.translate(0, 0, 10);
-		drawCenteredText(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
+		drawCenteredText(matrices, this.textRenderer, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
 		matrices.translate(0, 0, -10);
 	}
 }
