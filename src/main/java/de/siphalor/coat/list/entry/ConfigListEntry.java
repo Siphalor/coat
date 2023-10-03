@@ -5,6 +5,7 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.list.complex.ConfigListWidget;
 import de.siphalor.coat.util.CoatUtil;
+import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -19,6 +20,7 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 
 	private final ConfigInput<V> input;
 	private final ButtonWidget deleteWidget;
+	@Getter
 	private boolean dragFollow;
 
 	public ConfigListEntry(ConfigInput<V> input) {
@@ -33,10 +35,6 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 
 	public void setDragFollow(boolean dragFollow) {
 		this.dragFollow = dragFollow;
-	}
-
-	public boolean isDragFollow() {
-		return dragFollow;
 	}
 
 	@Override

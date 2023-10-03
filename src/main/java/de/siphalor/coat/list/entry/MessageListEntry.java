@@ -86,7 +86,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 */
 	@Override
 	public void render(int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		MinecraftClient.getInstance().textRenderer.draw(text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR);
+		MinecraftClient.getInstance().textRenderer.draw(text, x + CoatUtil.MARGIN, y + 6.5F, CoatUtil.TEXT_COLOR.getArgb());
 		jumpButton.y = y;
 		jumpButton.x = x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN;
 		jumpButton.render(mouseX, mouseY, tickDelta);

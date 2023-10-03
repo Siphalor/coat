@@ -21,7 +21,7 @@ public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 	public void render(int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LESS);
-		fill(x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR);
+		fill(x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 		RenderSystem.disableDepthTest();
 	}
 
