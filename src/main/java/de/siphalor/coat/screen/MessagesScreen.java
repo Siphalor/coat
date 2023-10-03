@@ -100,7 +100,7 @@ public class MessagesScreen extends Screen {
 
 		super.render(drawContext, mouseX, mouseY, delta);
 
-		titleLines.draw(drawContext, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR);
+		titleLines.draw(drawContext, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
 		// messagesList.render(matrices, mouseX, mouseY, delta);
 	}
 
