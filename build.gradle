@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -12,13 +12,21 @@ group = project.maven_group
 
 repositories {
 	maven { url "https://maven.siphalor.de" }
-	maven { url "https://jitpack.io"}
+	maven { url "https://jitpack.io" }
 }
 
 sourceSets {
 	testmod {
 		compileClasspath += main.compileClasspath
 		runtimeClasspath += main.runtimeClasspath
+	}
+}
+
+// Fixes issues because of multiple loader instances:
+// https://canary.discord.com/channels/507304429255393322/566418023372816394/1102931059332616214
+configurations.configureEach {
+	resolutionStrategy {
+		force("net.fabricmc:fabric-loader:$loader_version")
 	}
 }
 
