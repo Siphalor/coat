@@ -2,11 +2,13 @@ package de.siphalor.coat.list;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
+import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TickableElement;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
+import lombok.Getter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -32,6 +34,10 @@ import java.util.List;
 public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> extends AbstractParentElement implements Drawable, Selectable, EntryContainer, TickableElement {
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
+	private static final CoatColor SCROLLBAR_BACKGROUND_COLOR = CoatColor.rgb(0x000000);
+	private static final CoatColor SCROLLBAR_HANDLE_SHADOW_COLOR = CoatColor.rgb(0x808080);
+	private static final CoatColor SCROLLBAR_HANDLE_COLOR = CoatColor.rgb(0xC0C0C0);
+
 	protected final MinecraftClient client;
 	private final Entries entries = new Entries();
 	protected int width;
@@ -41,8 +47,16 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	protected int right;
 	protected int left;
 	private int rowWidth;
+	/**
+	 * The current scroll position - aka the vertical offset.
+	 */
+	@Getter
 	private double scrollAmount;
 	private float backgroundBrightness = 0.27F;
+	/**
+	 * The identifier for the background texture to use for this widget.
+	 */
+	@Getter
 	private Identifier background = DrawableHelper.OPTIONS_BACKGROUND_TEXTURE;
 	private boolean scrolling;
 
@@ -87,15 +101,6 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	public int getHorizontalPadding() {
 		return 4;
-	}
-
-	/**
-	 * Gets the identifier for the background texture to use for this widget.
-	 *
-	 * @return The identifier
-	 */
-	public Identifier getBackground() {
-		return background;
 	}
 
 	/**
@@ -337,7 +342,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
 
 		int colorPart = (int) (backgroundBrightness * 255F);
-		int color = colorPart << 24 | colorPart << 16 | colorPart << 8 | 0xFF;
+		CoatColor color = CoatColor.rgb(colorPart, colorPart, colorPart);
 		CoatUtil.drawTintedTexture(left, top, right, bottom, -100, background, 32F, (int) getScrollAmount(), color);
 	}
 
@@ -366,9 +371,9 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			}
 
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, top, scrollbarXEnd, bottom, 0, 0, 0, 255);
-			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, 128, 128, 128, 255);
-			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, 192, 192, 192, 255);
+			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, top, scrollbarXEnd, bottom, SCROLLBAR_BACKGROUND_COLOR);
+			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, SCROLLBAR_HANDLE_SHADOW_COLOR);
+			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, SCROLLBAR_HANDLE_COLOR);
 			tessellator.draw();
 			RenderSystem.enableTexture();
 		}
@@ -421,15 +426,6 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	private void scroll(int amount) {
 		this.setScrollAmount(this.getScrollAmount() + amount);
-	}
-
-	/**
-	 * Gets the current scroll position.
-	 *
-	 * @return The current offset by scrolling
-	 */
-	public double getScrollAmount() {
-		return this.scrollAmount;
 	}
 
 	/**
