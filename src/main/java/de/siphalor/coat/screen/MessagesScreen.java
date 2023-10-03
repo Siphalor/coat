@@ -103,7 +103,7 @@ public class MessagesScreen extends Screen {
 		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 		float y = CoatUtil.DOUBLE_MARGIN;
 		for (String titleLine : titleLines) {
-			textRenderer.draw(titleLine, left, y, CoatUtil.TEXT_COLOR);
+			textRenderer.draw(titleLine, left, y, CoatUtil.TEXT_COLOR.getArgb());
 			y += 10F;
 		}
 

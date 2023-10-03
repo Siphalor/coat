@@ -7,14 +7,15 @@ import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.list.complex.ConfigCategoryWidget;
+import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
+import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -29,6 +30,7 @@ import java.util.*;
 public class ConfigScreen extends Screen {
 	private static final String ABORT_TEXT_KEY = Coat.MOD_ID + ".action.abort";
 	private static final String SAVE_TEXT_KEY =  Coat.MOD_ID + ".action.save";
+	private static final CoatColor BACKGROUND_TEXTURE_TINT_COLOR = CoatColor.rgb(0x777777);
 
 	private final Screen parent;
 	private final Collection<ConfigCategoryWidget> widgets;
@@ -37,9 +39,17 @@ public class ConfigScreen extends Screen {
 	private Text visualTitle;
 
 	private int panelWidth;
+	/**
+	 * The tree pane widget
+	 */
+	@Getter
 	private DynamicEntryListWidget<ConfigTreeEntry> treeWidget;
 	private ButtonWidget abortButton;
 	private ButtonWidget saveButton;
+	/**
+	 * The currently opened list widget.
+	 */
+	@Getter
 	private ConfigContentWidget contentWidget;
 
 	protected List<DeferredTooltip> deferredTooltips = new ArrayList<>();
@@ -80,24 +90,6 @@ public class ConfigScreen extends Screen {
 		super.init();
 
 		openCategory(treeWidget.getEntry(0));
-	}
-
-	/**
-	 * Gets the tree pane widget.
-	 *
-	 * @return The tree widget
-	 */
-	public DynamicEntryListWidget<ConfigTreeEntry> getTreeWidget() {
-		return treeWidget;
-	}
-
-	/**
-	 * Gets the currently opened list widget.
-	 *
-	 * @return The list widget
-	 */
-	public ConfigContentWidget getContentWidget() {
-		return contentWidget;
 	}
 
 	/**
@@ -305,30 +297,14 @@ public class ConfigScreen extends Screen {
 
 		GlStateManager.enableDepthTest();
 		GlStateManager.depthFunc(GL11.GL_LEQUAL);
-		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
-		GlStateManager.disableAlphaTest();
-		GlStateManager.shadeModel(GL11.GL_SMOOTH);
-		GlStateManager.disableTexture();
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(panelWidth,      height, 0D).color(0, 0, 0, 200).next();
-		bufferBuilder.vertex(panelWidth + 8D, height, 0D).color(0, 0, 0,   0).next();
-		bufferBuilder.vertex(panelWidth + 8D, 20D,    0D).color(0, 0, 0,   0).next();
-		bufferBuilder.vertex(panelWidth,      20D,    0D).color(0, 0, 0, 200).next();
-		tessellator.draw();
+
+		CoatUtil.drawHorizontalGradient(panelWidth, 20, panelWidth + 8, height, CoatColor.BLACK.withAlpha(0x77), CoatColor.TRANSPARENT);
 
 		GlStateManager.disableDepthTest();
-		GlStateManager.disableBlend();
-		GlStateManager.enableTexture();
-		MinecraftClient.getInstance().getTextureManager().bindTexture(contentWidget.getBackground());
-		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-		bufferBuilder.vertex(0D,    20D, 0D).texture(0F,          20F / 32F).color(0x77, 0x77, 0x77, 0xff).next();
-		bufferBuilder.vertex(width, 20D, 0D).texture(width / 32F, 20F / 32F).color(0x77, 0x77, 0x77, 0xff).next();
-		bufferBuilder.vertex(width,  0D, 0D).texture(width / 32F, 0F       ).color(0x77, 0x77, 0x77, 0xff).next();
-		bufferBuilder.vertex(0D,     0D, 0D).texture(0F,          0F       ).color(0x77, 0x77, 0x77, 0xff).next();
-		tessellator.draw();
 
-		drawCenteredString(MinecraftClient.getInstance().textRenderer, visualTitle.asFormattedString(), width / 2, 8, 0xffffff);
+		CoatUtil.drawTintedTexture(0, 0, width, 20, 0, contentWidget.getBackground(), 32F, 0, BACKGROUND_TEXTURE_TINT_COLOR);
+
+		drawCenteredString(MinecraftClient.getInstance().textRenderer, visualTitle.asFormattedString(), width / 2, 8, CoatColor.WHITE.getArgb());
 
 		super.render(mouseX, mouseY, delta);
 
