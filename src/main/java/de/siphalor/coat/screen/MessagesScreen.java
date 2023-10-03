@@ -70,7 +70,7 @@ public class MessagesScreen extends Screen {
 		addDrawableChild(abortButton);
 		addDrawableChild(acceptButton);
 
-		messagesList = new DynamicEntryListWidget(MinecraftClient.getInstance(), width, height - 62, 62, 260);
+		messagesList = new DynamicEntryListWidget<>(MinecraftClient.getInstance(), width, height - 62, 62, 260);
 		messagesList.addEntries(messages.stream().map(MessageListEntry::new).collect(Collectors.toList()));
 		addDrawableChild(messagesList);
 
@@ -95,12 +95,17 @@ public class MessagesScreen extends Screen {
 	@Override
 	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		int left = width / 2 - 130;
-		renderBackground(drawContext, mouseX, mouseY, delta);
 		abortButton.setX(width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
 		acceptButton.setX(width / 2 + CoatUtil.MARGIN);
-		titleLines.draw(drawContext, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR);
-		// messagesList.render(matrices, mouseX, mouseY, delta);
 
 		super.render(drawContext, mouseX, mouseY, delta);
+
+		titleLines.draw(drawContext, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR);
+		// messagesList.render(matrices, mouseX, mouseY, delta);
+	}
+
+	@Override
+	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+		renderBackgroundTexture(context);
 	}
 }

@@ -15,7 +15,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 * @param value The initial value of this text field
 	 */
 	public TextConfigInput(String value) {
-		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 16, Text.empty());
+		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 20, Text.empty());
 		setMaxLength(Integer.MAX_VALUE);
 		setValue(value);
 	}
@@ -25,7 +25,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 */
 	@Override
 	public int getHeight() {
-		return super.getHeight() + 4;
+		return super.getHeight();
 	}
 
 	/**

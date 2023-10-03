@@ -13,7 +13,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL32;
@@ -303,5 +302,10 @@ public class ConfigScreen extends Screen {
 		drawContext.getMatrices().translate(0, 0, 10);
 		drawContext.drawCenteredTextWithShadow(this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
 		drawContext.getMatrices().translate(0, 0, -10);
+	}
+
+	@Override
+	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+		renderBackgroundTexture(context);
 	}
 }
