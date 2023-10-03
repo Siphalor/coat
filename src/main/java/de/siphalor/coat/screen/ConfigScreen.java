@@ -291,30 +291,14 @@ public class ConfigScreen extends Screen {
 	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		super.render(drawContext, mouseX, mouseY, delta);
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL32.GL_LEQUAL);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(panelWidth,      height, 0D).color(0, 0, 0, 200).next();
-		bufferBuilder.vertex(panelWidth + 8D, height, 0D).color(0, 0, 0,   0).next();
-		bufferBuilder.vertex(panelWidth + 8D, 20D,    0D).color(0, 0, 0,   0).next();
-		bufferBuilder.vertex(panelWidth,      20D,    0D).color(0, 0, 0, 200).next();
-		tessellator.draw();
 
-		RenderSystem.disableBlend();
-		RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
-		RenderSystem.setShaderTexture(0, contentWidget.getBackground());
-		RenderSystem.depthFunc(GL32.GL_LEQUAL);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(0D,    20D, 10D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 20F / 32F).next();
-		bufferBuilder.vertex(width, 20D, 10D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 20F / 32F).next();
-		bufferBuilder.vertex(width,  0D, 10D).color(0x77, 0x77, 0x77, 0xff).texture(width / 32F, 0F).next();
-		bufferBuilder.vertex(0D,     0D, 10D).color(0x77, 0x77, 0x77, 0xff).texture(0F, 0F).next();
-		tessellator.draw();
+		CoatUtil.drawHorizontalGradient(panelWidth, 20, panelWidth + 8, height, 0x00000077, 0x00000000);
+
+		RenderSystem.disableDepthTest();
+
+		CoatUtil.drawVerticalGradientTexture(0, 0, width, 20, contentWidget.getBackground(), 32F, 0x777777ff, 0x777777ff);
 
 		drawContext.getMatrices().translate(0, 0, 10);
 		drawContext.drawCenteredTextWithShadow(this.textRenderer, this.visualTitle, this.width / 2, 8, 0xffffff);
