@@ -5,6 +5,7 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.screen.ConfigContentWidget;
 import de.siphalor.coat.screen.ConfigScreen;
+import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -22,6 +23,8 @@ import java.util.List;
  */
 public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	private static final Text OPEN_TEXT = Text.translatable(Coat.MOD_ID + ".tree.open");
+	private static final CoatColor BACKGROUND_OUTER_COLOR = CoatColor.rgb(0x333333);
+	private static final CoatColor BACKGROUND_INNER_COLOR = CoatColor.rgb(0x777777);
 
 	private final ConfigContentWidget configWidget;
 	private final ButtonWidget button;
@@ -65,11 +68,11 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	@Override
 	public void render(MatrixStack matrices, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 
-		CoatUtil.drawInsetGradientTexture(x, y, x + entryWidth, y + entryHeight, -100, configWidget.getBackground(), 32F, 0x333333ff, 0x777777ff);
+		CoatUtil.drawInsetGradientTexture(x, y, x + entryWidth, y + entryHeight, -100, configWidget.getBackground(), 32F, BACKGROUND_OUTER_COLOR, BACKGROUND_INNER_COLOR);
 
 		button.x = x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN;
 		button.y = y + CoatUtil.MARGIN;
-		MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR);
+		MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2F, CoatUtil.TEXT_COLOR.getArgb());
 		button.render(matrices, mouseX, mouseY, tickDelta);
 
 		if (hovered && nameText != configWidget.getName() && !button.isMouseOver(mouseX, mouseY)) {
