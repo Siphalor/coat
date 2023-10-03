@@ -23,15 +23,15 @@ public class CoatUtil {
 	/**
 	 * The primary text color to use in Coat.
 	 */
-	public static final int TEXT_COLOR = 0xffdddddd;
+	public static final CoatColor TEXT_COLOR = CoatColor.rgb(0xdddddd);
 	/**
 	 * The secondary text color to use in Coat.
 	 */
-	public static final int SECONDARY_TEXT_COLOR = 0xffaaaaaa;
+	public static final CoatColor SECONDARY_TEXT_COLOR = CoatColor.rgb(0xaaaaaa);
 	/**
 	 * A semi-transparent light color to use as background for hovered elements.
 	 */
-	public static final int HOVER_BG_COLOR = 0x2dffffff;
+	public static final CoatColor HOVER_BG_COLOR = CoatColor.argb(0x2dffffff);
 	/**
 	 * A predefined margin that'll always™ be <code>2</code>.
 	 * I really don't like having constant numeric values in my code.
@@ -108,21 +108,17 @@ public class CoatUtil {
 	 * @param stroke The width of the outline
 	 * @param color  The color to draw with
 	 */
-	public static void drawStrokeRect(int x1, int y1, int x2, int y2, int stroke, int color) {
-		int alpha = color >> 24 & 255;
-		int red = color >> 16 & 255;
-		int green = color >> 8 & 255;
-		int blue = color & 255;
+	public static void drawStrokeRect(int x1, int y1, int x2, int y2, int stroke, CoatColor color) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-		addRect(buffer, x1, y1, x2, y1 + stroke, red, green, blue, alpha);
-		addRect(buffer, x1, y2 - stroke, x2, y2, red, green, blue, alpha);
-		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, red, green, blue, alpha);
-		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, red, green, blue, alpha);
+		addRect(buffer, x1, y1, x2, y1 + stroke, color);
+		addRect(buffer, x1, y2 - stroke, x2, y2, color);
+		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, color);
+		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, color);
 		tessellator.draw();
 	}
 
@@ -133,19 +129,16 @@ public class CoatUtil {
 	 * @param y1     y1
 	 * @param x2     x2
 	 * @param y2     y2, duh
-	 * @param red    The red part of the rect color
-	 * @param green  The green part of the rect color
-	 * @param blue   The blue part of the rect color
-	 * @param alpha  The opacity of the rectangle
+	 * @param color  the color of the rect
 	 */
-	public static void addRect(BufferBuilder buffer, int x1, int y1, int x2, int y2, int red, int green, int blue, int alpha) {
-		buffer.vertex(x1, y2, 0).color(red, green, blue, alpha).next();
-		buffer.vertex(x2, y2, 0).color(red, green, blue, alpha).next();
-		buffer.vertex(x2, y1, 0).color(red, green, blue, alpha).next();
-		buffer.vertex(x1, y1, 0).color(red, green, blue, alpha).next();
+	public static void addRect(BufferBuilder buffer, int x1, int y1, int x2, int y2, CoatColor color) {
+		withColor(buffer.vertex(x1, y2, 0), color).next();
+		withColor(buffer.vertex(x2, y2, 0), color).next();
+		withColor(buffer.vertex(x2, y1, 0), color).next();
+		withColor(buffer.vertex(x1, y1, 0), color).next();
 	}
 
-	public static void drawHorizontalGradient(int left, int top, int right, int bottom, int leftColor, int rightColor) {
+	public static void drawHorizontalGradient(int left, int top, int right, int bottom, CoatColor leftColor, CoatColor rightColor) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -153,50 +146,17 @@ public class CoatUtil {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-		int leftRed = leftColor >> 24 & 255;
-		int leftGreen = leftColor >> 16 & 255;
-		int leftBlue = leftColor >> 8 & 255;
-		int leftAlpha = leftColor & 255;
-		int rightRed = rightColor >> 24 & 255;
-		int rightGreen = rightColor >> 16 & 255;
-		int rightBlue = rightColor >> 8 & 255;
-		int rightAlpha = rightColor & 255;
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(left, bottom, 0D).color(leftRed, leftGreen, leftBlue, leftAlpha).next();
-		bufferBuilder.vertex(right, bottom, 0D).color(rightRed, rightGreen, rightBlue, rightAlpha).next();
-		bufferBuilder.vertex(right, top, 0D).color(rightRed, rightGreen, rightBlue, rightAlpha).next();
-		bufferBuilder.vertex(left, top, 0D).color(leftRed, leftGreen, leftBlue, leftAlpha).next();
+		withColor(bufferBuilder.vertex(left, bottom, 0D), leftColor).next();
+		withColor(bufferBuilder.vertex(right, bottom, 0D), rightColor).next();
+		withColor(bufferBuilder.vertex(right, top, 0D), rightColor).next();
+		withColor(bufferBuilder.vertex(left, top, 0D), leftColor).next();
 		tessellator.draw();
 
 		RenderSystem.disableBlend();
 	}
 
-	public static void drawVerticalGradientTexture(int left, int top, int right, int bottom, Identifier texture, float textureScale, int topColor, int bottomColor) {
-		RenderSystem.disableBlend();
-		RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
-		RenderSystem.setShaderTexture(0, texture);
-
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-
-		int topRed = topColor >> 24 & 255;
-		int topGreen = topColor >> 16 & 255;
-		int topBlue = topColor >> 8 & 255;
-		int topAlpha = topColor & 255;
-		int bottomRed = bottomColor >> 24 & 255;
-		int bottomGreen = bottomColor >> 16 & 255;
-		int bottomBlue = bottomColor >> 8 & 255;
-		int bottomAlpha = bottomColor & 255;
-
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-		bufferBuilder.vertex(left, bottom, 0D).color(topRed, topGreen, topBlue, topAlpha).texture(left / textureScale, top / textureScale).next();
-		bufferBuilder.vertex(right, bottom, 0D).color(topRed, topGreen, topBlue, topAlpha).texture(right / textureScale, top / textureScale).next();
-		bufferBuilder.vertex(right, top, 0D).color(bottomRed, bottomGreen, bottomBlue, bottomAlpha).texture(right / textureScale, bottom / textureScale).next();
-		bufferBuilder.vertex(left, top, 0D).color(bottomRed, bottomGreen, bottomBlue, bottomAlpha).texture(left / textureScale, bottom / textureScale).next();
-		tessellator.draw();
-	}
-
-	public static void drawInsetGradientTexture(int left, int top, int right, int bottom, int z, Identifier texture, float textureScale, int outerColor, int innerColor) {
+	public static void drawInsetGradientTexture(int left, int top, int right, int bottom, int z, Identifier texture, float textureScale, CoatColor outerColor, CoatColor innerColor) {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
 		RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
@@ -208,36 +168,22 @@ public class CoatUtil {
 		int height = bottom - top;
 		int middleOffset = height / 2;
 
-		int outerRed = outerColor >> 24 & 255;
-		int outerGreen = outerColor >> 16 & 255;
-		int outerBlue = outerColor >> 8 & 255;
-		int outerAlpha = outerColor & 255;
-		int innerRed = innerColor >> 24 & 255;
-		int innerGreen = innerColor >> 16 & 255;
-		int innerBlue = innerColor >> 8 & 255;
-		int innerAlpha = innerColor & 255;
-
 		buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE);
-		buffer.vertex(left, top, z).color(outerRed, outerGreen, outerBlue, outerAlpha).texture(0F, 0F).next();
-		buffer.vertex(left + middleOffset, top + middleOffset, z).color(innerRed, innerGreen, innerBlue, innerAlpha).texture(middleOffset / textureScale, middleOffset / textureScale).next();
-		buffer.vertex(right, top, z).color(outerRed, outerGreen, outerBlue, outerAlpha).texture(width / textureScale, 0F).next();
-		buffer.vertex(right - middleOffset, top + middleOffset, z).color(innerRed, innerGreen, innerBlue, innerAlpha).texture((width - middleOffset) / textureScale, middleOffset / textureScale).next();
-		buffer.vertex(right, bottom, z).color(outerRed, outerGreen, outerBlue, outerAlpha).texture(width / textureScale, height / textureScale).next();
-		buffer.vertex(left + middleOffset, bottom - middleOffset, z).color(innerRed, innerGreen, innerBlue, innerAlpha).texture(middleOffset / textureScale, (height - middleOffset) / textureScale).next();
-		buffer.vertex(left, bottom, z).color(outerRed, outerGreen, outerBlue, outerAlpha).texture(0F, height / textureScale).next();
-		buffer.vertex(left, top, z).color(outerRed, outerGreen, outerBlue, outerAlpha).texture(0F, 0F).next();
+		withColor(buffer.vertex(left, top, z), outerColor).texture(0F, 0F).next();
+		withColor(buffer.vertex(left + middleOffset, top + middleOffset, z), innerColor).texture(middleOffset / textureScale, middleOffset / textureScale).next();
+		withColor(buffer.vertex(right, top, z), outerColor).texture(width / textureScale, 0F).next();
+		withColor(buffer.vertex(right - middleOffset, top + middleOffset, z), innerColor).texture((width - middleOffset) / textureScale, middleOffset / textureScale).next();
+		withColor(buffer.vertex(right, bottom, z), outerColor).texture(width / textureScale, height / textureScale).next();
+		withColor(buffer.vertex(left + middleOffset, bottom - middleOffset, z), innerColor).texture(middleOffset / textureScale, (height - middleOffset) / textureScale).next();
+		withColor(buffer.vertex(left, bottom, z), outerColor).texture(0F, height / textureScale).next();
+		withColor(buffer.vertex(left, top, z), outerColor).texture(0F, 0F).next();
 		tessellator.draw();
 	}
 
-	public static void drawTintedTexture(int left, int top, int right, int bottom, int z, Identifier texture, float textureScale, int textureYOffset, int color) {
+	public static void drawTintedTexture(int left, int top, int right, int bottom, int z, Identifier texture, float textureScale, int textureYOffset, CoatColor color) {
 		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		RenderSystem.setShaderTexture(0, texture);
-		RenderSystem.setShaderColor(
-				(color >> 24 & 255) / 255F,
-				(color >> 16 & 255) / 255F,
-				(color >> 8 & 255) / 255F,
-				(color & 255) / 255F
-		);
+		setShaderColor(color);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
@@ -246,6 +192,19 @@ public class CoatUtil {
 		bufferBuilder.vertex(right, top, z).texture(right / textureScale, (top + textureYOffset) / textureScale).next();
 		bufferBuilder.vertex(left, top, z).texture(left / textureScale, (top + textureYOffset) / textureScale).next();
 		tessellator.draw();
+		resetShaderColor();
+	}
+
+	private static <V extends VertexConsumer> V withColor(V vertexConsumer, CoatColor color) {
+		vertexConsumer.color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+		return vertexConsumer;
+	}
+
+	public static void setShaderColor(CoatColor color) {
+		RenderSystem.setShaderColor(color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF());
+	}
+
+	public static void resetShaderColor() {
 		RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 	}
 

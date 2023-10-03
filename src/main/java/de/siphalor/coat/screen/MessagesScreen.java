@@ -98,7 +98,7 @@ public class MessagesScreen extends Screen {
 		renderBackground(drawContext);
 		abortButton.setX(width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
 		acceptButton.setX(width / 2 + CoatUtil.MARGIN);
-		titleLines.draw(drawContext, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR);
+		titleLines.draw(drawContext, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
 		// messagesList.render(matrices, mouseX, mouseY, delta);
 
 		super.render(drawContext, mouseX, mouseY, delta);

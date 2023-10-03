@@ -1,16 +1,20 @@
 package de.siphalor.coat.util;
 
+import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 
 /**
  * A button widget that only renders as text.
  */
 public class TextButtonWidget extends ButtonWidget {
+	/**
+	 *  The original, untrimmed button text
+	 */
+	@Getter
 	private Text originalMessage;
 	private boolean hoverEffect = true;
 
@@ -29,15 +33,6 @@ public class TextButtonWidget extends ButtonWidget {
 		setMessage(message);
 	}
 
-	/**
-	 * Gets the original, untrimmed button text
-	 *
-	 * @return The original message
-	 */
-	public Text getOriginalMessage() {
-		return originalMessage;
-	}
-
 	public void setHoverEffect(boolean hoverEffect) {
 		this.hoverEffect = hoverEffect;
 	}
@@ -49,16 +44,16 @@ public class TextButtonWidget extends ButtonWidget {
 	public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		int x = getX();
 		int y = getY();
-		final int color = CoatUtil.TEXT_COLOR | MathHelper.ceil(alpha * 255F) << 24;
+		final CoatColor color = CoatUtil.TEXT_COLOR.withAlpha((int) (alpha * 255F));
 		int textY = y + (height - 7) / 2;
 		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-		drawContext.drawTextWithShadow(textRenderer, getMessage(), x, textY, color);
+		drawContext.drawTextWithShadow(textRenderer, getMessage(), x, textY, color.getArgb());
 		if (isFocused()) {
 			CoatUtil.drawStrokeRect(x - 2, y - 2, x + width + 2, y + height + 2, 1, color);
 		}
 		if (hovered) {
 			if (hoverEffect) {
-				drawContext.fill(x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR);
+				drawContext.fill(x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
 			}
 			if (originalMessage != getMessage()) {
 				CoatUtil.renderTooltip(drawContext, mouseX, mouseY, originalMessage);

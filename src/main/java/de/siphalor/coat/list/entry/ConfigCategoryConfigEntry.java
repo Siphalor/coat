@@ -210,7 +210,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 
 		this.hovered = hovered;
 		if (hovered) {
-			drawContext.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR);
+			drawContext.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
 		}
 
 		int textY = top + (int) ((inputHeight - 8) / 2F);
@@ -248,7 +248,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 				}
 			}
 
-			descriptionMultiline.draw(drawContext, x + TEXT_INDENT, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR);
+			descriptionMultiline.draw(drawContext, x + TEXT_INDENT, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 		}
 	}
 

@@ -52,7 +52,7 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	@Override
 	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		for (int i = 0; i < multilineText.size(); i++) {
-			drawContext.drawText(textRenderer, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR, false);
+			drawContext.drawText(textRenderer, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
 		}
 	}
 
