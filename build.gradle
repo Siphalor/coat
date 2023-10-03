@@ -28,6 +28,12 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+	// Lombok
+	compileOnly "org.projectlombok:lombok:${lombok_version}"
+	annotationProcessor "org.projectlombok:lombok:${lombok_version}"
+	testCompileOnly "org.projectlombok:lombok:${lombok_version}"
+	testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
+
 	// for testmod
 	modImplementation("de.siphalor:amecsapi-$project.minecraft_major_version:$amecsapi_version")
 	modImplementation(fabricApi.module("fabric-api-base", fabric_version))
