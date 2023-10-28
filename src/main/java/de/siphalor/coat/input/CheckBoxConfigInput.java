@@ -1,5 +1,6 @@
 package de.siphalor.coat.input;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.text.Text;
@@ -17,7 +18,7 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 * @param showMessage Whether the message should be displayed
 	 */
 	public CheckBoxConfigInput(Text message, boolean checked, boolean showMessage) {
-		super(0, 0, 20, 20, message, checked, showMessage);
+		super(0, 0, showMessage ? message : Text.empty(), MinecraftClient.getInstance().textRenderer, checked, (checkbox, checked1) -> {});
 	}
 
 	@Override
