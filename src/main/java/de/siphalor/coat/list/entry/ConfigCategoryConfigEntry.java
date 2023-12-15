@@ -204,6 +204,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	@Override
 	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 		int inputHeight = input.getHeight();
+		int messageHeight = Math.max(20, inputHeight);
 		int top = y + CoatUtil.MARGIN;
 		int right = x + entryWidth;
 		int bottom = y + entryHeight;
@@ -213,16 +214,16 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 			drawContext.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
 		}
 
-		int textY = top + (int) ((inputHeight - 8) / 2F);
+		int textY = top + (int) ((messageHeight - 8) / 2F);
 
-		input.render(drawContext, x + leftInputOffset, top, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		input.render(drawContext, x + leftInputOffset, top + (messageHeight - inputHeight) / 2, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		defaultButton.setY(top);
 		defaultButton.setX(x + entryWidth - defaultButton.getWidth() + CoatUtil.HALF_MARGIN);
 		defaultButton.render(drawContext, mouseX, mouseY, tickDelta);
 		nameWidget.setPosition(x, textY - 2);
 		nameWidget.render(drawContext, mouseX, mouseY, tickDelta);
 
-		int curY = top + Math.max(20, inputHeight) + CoatUtil.MARGIN;
+		int curY = top + messageHeight + CoatUtil.MARGIN;
 		int msgX = x + TEXT_INDENT;
 		int msgWidth = entryWidth - TEXT_INDENT;
 		for (Message message : messages) {
