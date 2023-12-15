@@ -41,7 +41,7 @@ public class TextButtonWidget extends ButtonWidget {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+	public void renderWidget(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		int x = getX();
 		int y = getY();
 		final CoatColor color = CoatUtil.TEXT_COLOR.withAlpha((int) (alpha * 255F));
