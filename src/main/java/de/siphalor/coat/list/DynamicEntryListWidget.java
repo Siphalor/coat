@@ -13,8 +13,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.*;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -54,10 +54,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	private double scrollAmount;
 	private float backgroundBrightness = 0.27F;
 	/**
-	 * The identifier for the background texture to use for this widget.
+	 * The identifier for the background associated with this widget
 	 */
 	@Getter
-	private Identifier background = Screen.OPTIONS_BACKGROUND_TEXTURE;
+	private Identifier background = new Identifier("textures/block/cherry_log.png");
 	private boolean scrolling;
 
 	/**
@@ -87,11 +87,13 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @param entries    A collection of entries to be immediately added to this widget
 	 * @param background An identifier referring to a background texture for this widget
 	 */
-	public DynamicEntryListWidget(MinecraftClient client, Collection<E> entries, Identifier background) {
+	public DynamicEntryListWidget(MinecraftClient client, Collection<E> entries, @Nullable Identifier background) {
 		this.client = client;
 		top = 20;
 		addEntries(entries);
-		this.background = background;
+		if (background != null) {
+			this.background = background;
+		}
 	}
 
 	/**
@@ -335,7 +337,6 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 	/**
 	 * Renders the background of this widget.
-	 *
 	 */
 	protected void renderBackground() {
 		RenderSystem.enableDepthTest();
@@ -343,7 +344,13 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 		int colorPart = (int) (backgroundBrightness * 255F);
 		CoatColor color = CoatColor.rgb(colorPart, colorPart, colorPart);
-		CoatUtil.drawTintedTexture(left, top, right, bottom, -100, background, 32F, (int) getScrollAmount(), color);
+		CoatUtil.drawTintedTexture(left, top, right, bottom, -100, getListBackground(), 32F, (int) getScrollAmount(), color);
+	}
+
+	protected Identifier getListBackground() {
+		return this.client.world == null
+				? EntryListWidget.MENU_LIST_BACKGROUND_TEXTURE
+				: EntryListWidget.INWORLD_MENU_LIST_BACKGROUND_TEXTURE;
 	}
 
 	/**
@@ -379,7 +386,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		this.renderList(drawContext, mouseX, mouseY, delta);
 
 		// render top shadow
-		drawContext.fillGradient(left, top, right, top + TOP_PADDING, 0xcc000000, 0x00000000);
+		drawContext.fillGradient(left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
 	}
 
 	@Override

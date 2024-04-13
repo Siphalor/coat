@@ -103,9 +103,4 @@ public class MessagesScreen extends Screen {
 		titleLines.draw(drawContext, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
 		// messagesList.render(matrices, mouseX, mouseY, delta);
 	}
-
-	@Override
-	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-		renderBackgroundTexture(context);
-	}
 }

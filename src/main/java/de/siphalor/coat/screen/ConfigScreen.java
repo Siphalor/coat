@@ -16,7 +16,6 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL32;
 
 import java.util.Collection;
@@ -73,7 +72,6 @@ public class ConfigScreen extends Screen {
 		panelWidth = 200;
 		treeWidget = new DynamicEntryListWidget<>(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.5F);
-		treeWidget.setBackground(new Identifier("textures/block/cherry_log.png"));
 		addDrawableChild(treeWidget);
 
 		for (ConfigCategoryWidget widget : widgets) {
@@ -293,14 +291,12 @@ public class ConfigScreen extends Screen {
 
 		RenderSystem.disableDepthTest();
 
+		RenderSystem.enableBlend();
 		CoatUtil.drawTintedTexture(0, 0, width, 20, 0, contentWidget.getBackground(), 32F, 0, BACKGROUND_TEXTURE_TINT_COLOR);
+		RenderSystem.disableBlend();
 
 		drawContext.getMatrices().translate(0, 0, 10);
 		drawContext.drawCenteredTextWithShadow(this.textRenderer, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
 		drawContext.getMatrices().translate(0, 0, -10);
-	}
-
-	@Override
-	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
 	}
 }

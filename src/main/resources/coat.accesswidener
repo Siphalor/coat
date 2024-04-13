@@ -1,3 +1,5 @@
 accessWidener	v1	named
 accessible	method	net/minecraft/client/gui/tooltip/Tooltip	<init>	(Lnet/minecraft/text/Text;Lnet/minecraft/text/Text;)V
 accessible	method	net/minecraft/client/gui/widget/CheckboxWidget	<init>	(IILnet/minecraft/text/Text;Lnet/minecraft/client/font/TextRenderer;ZLnet/minecraft/client/gui/widget/CheckboxWidget$Callback;)V
+accessible  field   net/minecraft/client/gui/widget/EntryListWidget MENU_LIST_BACKGROUND_TEXTURE    Lnet/minecraft/util/Identifier;
+accessible  field   net/minecraft/client/gui/widget/EntryListWidget INWORLD_MENU_LIST_BACKGROUND_TEXTURE Lnet/minecraft/util/Identifier;

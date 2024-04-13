@@ -11,6 +11,7 @@ import de.siphalor.coat.screen.ConfigContentWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -34,7 +35,7 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 	 * @param entries    A collection of entries to directly add to the widget
 	 * @param background An identifier referring to a background texture
 	 */
-	public ConfigCategoryWidget(MinecraftClient client, Text name, Collection<ConfigContainerEntry> entries, Identifier background) {
+	public ConfigCategoryWidget(MinecraftClient client, Text name, Collection<ConfigContainerEntry> entries, @Nullable Identifier background) {
 		super(client, entries, background);
 		this.name = name;
 		subTrees = new LinkedList<>();
