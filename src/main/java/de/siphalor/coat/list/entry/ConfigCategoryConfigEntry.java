@@ -9,18 +9,23 @@ import de.siphalor.coat.input.InputChangeListener;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.CustomTooltip;
 import de.siphalor.coat.util.TextButtonWidget;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import lombok.Getter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A config entry with an input, a description and a reset button.
@@ -28,16 +33,20 @@ import java.util.*;
  * @param <V> The value type
  */
 public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry implements InputChangeListener<V> {
-	private static final Text DEFAULT_TEXT = Text.translatable(Coat.MOD_ID + ".default");
+	private static final Component DEFAULT_TEXT = Component.translatable(Coat.MOD_ID + ".default");
 	private static final int TEXT_INDENT = 8;
-	private final TextRenderer textRenderer;
+	private final Font font;
 	private final TextButtonWidget nameWidget;
-	private final Text description;
-	private MultilineText descriptionMultiline;
+	private final Component description;
+	private MultiLineLabel descriptionMultiline;
 	private final ConfigEntryHandler<V> entryHandler;
 	private final ConfigInput<V> input;
-	private final ButtonWidget defaultButton;
+	private final Button defaultButton;
 	private Collection<Message> messages;
+	/**
+	 * Whether the description and messages of this entry are currently displayed.
+	 */
+	@Getter
 	private boolean expanded;
 	private boolean hovered;
 	private int leftInputOffset;
@@ -51,7 +60,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * @param entryHandler An entry handler for this entry
 	 * @param input        The config input to use
 	 */
-	public ConfigCategoryConfigEntry(MutableText name, MutableText description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
+	public ConfigCategoryConfigEntry(MutableComponent name, MutableComponent description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
 		nameWidget = new TextButtonWidget(0, 0, 100, 12, name, button -> setExpanded(!isExpanded()));
 		nameWidget.setHoverEffect(false);
@@ -60,19 +69,19 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		this.entryHandler = entryHandler;
 		this.input = input;
 		input.setChangeListener(this);
-		MinecraftClient client = MinecraftClient.getInstance();
-		textRenderer = client.textRenderer;
-		defaultButton = ButtonWidget.builder(DEFAULT_TEXT, button ->
+		Minecraft minecraft = Minecraft.getInstance();
+		font = minecraft.font;
+		defaultButton = Button.builder(DEFAULT_TEXT, button ->
 				input.setValue(entryHandler.getDefault())
 		).size(10, 20).tooltip(
 				new CustomTooltip(() -> {
 					if (!getDefaultButton().active) {
 						return Collections.emptyList();
 					}
-					List<OrderedText> wrappedLines = CoatUtil.wrapTooltip(textRenderer, client, entryHandler.asText(entryHandler.getDefault()));
-					ArrayList<OrderedText> list = new ArrayList<>(wrappedLines.size() + 1);
+					List<FormattedCharSequence> wrappedLines = CoatUtil.wrapTooltip(font, minecraft, entryHandler.asText(entryHandler.getDefault()));
+					ArrayList<FormattedCharSequence> list = new ArrayList<>(wrappedLines.size() + 1);
 					list.addAll(wrappedLines);
-					list.add(0, Text.translatable(Coat.MOD_ID + ".default.hover").asOrderedText());
+					list.add(0, Component.translatable(Coat.MOD_ID + ".default.hover").getVisualOrderText());
 					return list;
 				}, null)
 		).build();
@@ -80,17 +89,8 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		inputChanged(input.getValue());
 	}
 
-	private ButtonWidget getDefaultButton() {
+	private Button getDefaultButton() {
 		return defaultButton;
-	}
-
-	/**
-	 * Gets whether the description and messages of this entry are currently displayed.
-	 *
-	 * @return Whether it is expanded
-	 */
-	public boolean isExpanded() {
-		return expanded;
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * @param width The new width of this entry
 	 */
 	protected void updateExpanded(int width) {
-		descriptionMultiline = MultilineText.create(MinecraftClient.getInstance().textRenderer, description, width - TEXT_INDENT);
+		descriptionMultiline = MultiLineLabel.create(Minecraft.getInstance().font, description, width - TEXT_INDENT);
 	}
 
 	/**
@@ -172,7 +172,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 *
 	 * @param name The new name
 	 */
-	protected void setName(MutableText name) {
+	protected void setName(MutableComponent name) {
 		Message.Level level = getHighestMessageLevel();
 		if (level == null) {
 			name.setStyle(Style.EMPTY);
@@ -186,7 +186,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<? extends Element> children() {
+	public List<? extends GuiEventListener> children() {
 		return ImmutableList.of(nameWidget, input, defaultButton);
 	}
 
@@ -202,7 +202,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
 		int inputHeight = input.getHeight();
 		int messageHeight = Math.max(20, inputHeight);
 		int top = y + CoatUtil.MARGIN;
@@ -211,26 +215,34 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 
 		this.hovered = hovered;
 		if (hovered) {
-			drawContext.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
+			//# if RENDERING == "POSE_STACK"
+			//- fill(graphics, x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
+			//# elif RENDERING == "GUI_GRAPHICS"
+			graphics.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
+			//# end
 		}
 
 		int textY = top + (int) ((messageHeight - 8) / 2F);
 
-		input.render(drawContext, x + leftInputOffset, top + (messageHeight - inputHeight) / 2, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		input.render(graphics, x + leftInputOffset, top + (messageHeight - inputHeight) / 2, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		defaultButton.setY(top);
 		defaultButton.setX(x + entryWidth - defaultButton.getWidth() + CoatUtil.HALF_MARGIN);
-		defaultButton.render(drawContext, mouseX, mouseY, tickDelta);
+		defaultButton.render(graphics, mouseX, mouseY, tickDelta);
 		nameWidget.setPosition(x, textY - 2);
-		nameWidget.render(drawContext, mouseX, mouseY, tickDelta);
+		nameWidget.render(graphics, mouseX, mouseY, tickDelta);
 
 		int curY = top + messageHeight + CoatUtil.MARGIN;
 		int msgX = x + TEXT_INDENT;
 		int msgWidth = entryWidth - TEXT_INDENT;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
-				List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
-				for (OrderedText line : lines) {
-					drawContext.drawText(textRenderer, line, msgX, curY, 0xffffff, false);
+				List<FormattedCharSequence> lines = font.split(message.getText(), msgWidth);
+				for (FormattedCharSequence line : lines) {
+					//# if RENDERING != "GUI_GRAPHICS"
+					//- font.draw(graphics, line, msgX, curY, 0xffffff);
+					//# else
+					graphics.drawString(font, line, msgX, curY, 0xffffff, false);
+					//# end
 					curY += 9;
 				}
 				curY += CoatUtil.MARGIN;
@@ -240,16 +252,20 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		if (isExpanded()) {
 			for (Message message : messages) {
 				if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
-					List<OrderedText> lines = textRenderer.wrapLines(message.getText(), msgWidth);
-					for (OrderedText line : lines) {
-						drawContext.drawText(textRenderer, line, msgX, curY, 0xffffff, false);
+					List<FormattedCharSequence> lines = font.split(message.getText(), msgWidth);
+					for (FormattedCharSequence line : lines) {
+						//# if RENDERING != "GUI_GRAPHICS"
+						//- font.draw(graphics, line, msgX, curY, 0xffffff);
+						//# else
+						graphics.drawString(font, line, msgX, curY, 0xffffff, false);
+						//# end
 						curY += 9;
 					}
 					curY += CoatUtil.MARGIN;
 				}
 			}
 
-			descriptionMultiline.draw(drawContext, x + TEXT_INDENT, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+			descriptionMultiline.renderLeftAlignedNoShadow(graphics, x + TEXT_INDENT, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 		}
 	}
 
@@ -262,7 +278,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		int msgHeight = 0;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
-				msgHeight += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + CoatUtil.MARGIN;
+				msgHeight += font.split(message.getText(), parent.getEntryWidth()).size() * 9 + CoatUtil.MARGIN;
 			}
 		}
 		if (msgHeight > 0) {
@@ -278,12 +294,12 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 */
 	public int getExpansionHeight() {
 		int height = 0;
-		if (descriptionMultiline != MultilineText.EMPTY) {
-			height += CoatUtil.MARGIN + descriptionMultiline.count() * 9;
+		if (descriptionMultiline != MultiLineLabel.EMPTY) {
+			height += CoatUtil.MARGIN + descriptionMultiline.getLineCount() * 9;
 		}
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
-				height += textRenderer.wrapLines(message.getText(), parent.getEntryWidth()).size() * 9 + CoatUtil.MARGIN;
+				height += font.split(message.getText(), parent.getEntryWidth()).size() * 9 + CoatUtil.MARGIN;
 			}
 		}
 		return height;
@@ -305,8 +321,8 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFocused(Element focused) {
-		Element old = getFocused();
+	public void setFocused(GuiEventListener focused) {
+		GuiEventListener old = getFocused();
 		if (old != focused) {
 			if (old == input) {
 				input.setFocused(false);
@@ -395,7 +411,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 			parent.entryHeightChanged(this);
 		}
 		// shallow copy is required because the OrderedText in MutableText is cached, so the style needs to be force updated
-		setName(nameWidget.getOriginalMessage().copyContentOnly());
+		setName(nameWidget.getOriginalMessage().plainCopy());
 	}
 
 	@Override

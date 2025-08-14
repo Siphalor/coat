@@ -1,16 +1,18 @@
 package de.siphalor.coat.screen;
 
+//- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.entry.MessageListEntry;
 import de.siphalor.coat.util.CoatUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import lombok.Getter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,12 +22,13 @@ import java.util.stream.Collectors;
  * or to return to the previous screen.
  */
 public class MessagesScreen extends Screen {
+	@Getter
 	private final ConfigScreen parent;
 	private final Runnable acceptRunnable;
 	private final List<Message> messages;
-	private MultilineText titleLines;
-	private ButtonWidget acceptButton;
-	private ButtonWidget abortButton;
+	private MultiLineLabel titleLines;
+	private Button acceptButton;
+	private Button abortButton;
 	private DynamicEntryListWidget<MessageListEntry> messagesList;
 
 	/**
@@ -36,20 +39,11 @@ public class MessagesScreen extends Screen {
 	 * @param acceptRunnable A runnable that gets executed when the user acknowledges the messages
 	 * @param messages       A list of messages to show
 	 */
-	public MessagesScreen(Text title, ConfigScreen parent, Runnable acceptRunnable, List<Message> messages) {
+	public MessagesScreen(Component title, ConfigScreen parent, Runnable acceptRunnable, List<Message> messages) {
 		super(title);
 		this.parent = parent;
 		this.acceptRunnable = acceptRunnable;
 		this.messages = messages;
-	}
-
-	/**
-	 * Get the screen to return to.
-	 *
-	 * @return The parent screen
-	 */
-	public ConfigScreen getParent() {
-		return parent;
 	}
 
 	/**
@@ -59,48 +53,55 @@ public class MessagesScreen extends Screen {
 	protected void init() {
 		super.init();
 
-		abortButton = ButtonWidget.builder(
-				Text.translatable(Coat.MOD_ID + ".action.abort"),
-				button -> MinecraftClient.getInstance().setScreen(parent)
-		).position(0, 38).size(100, 20).build();
-		acceptButton = ButtonWidget.builder(
-				Text.translatable(Coat.MOD_ID + ".action.accept_risk"),
+		abortButton = Button.builder(
+				Component.translatable(Coat.MOD_ID + ".action.abort"),
+				button -> Minecraft.getInstance().setScreen(parent)
+		).pos(0, 38).size(100, 20).build();
+		acceptButton = Button.builder(
+				Component.translatable(Coat.MOD_ID + ".action.accept_risk"),
 				button -> acceptRunnable.run()
-		).position(0, 38).size(100, 20).build();
-		addDrawableChild(abortButton);
-		addDrawableChild(acceptButton);
+		).pos(0, 38).size(100, 20).build();
+		addRenderableWidget(abortButton);
+		addRenderableWidget(acceptButton);
 
-		messagesList = new DynamicEntryListWidget<>(MinecraftClient.getInstance(), width, height - 62, 62, 260);
+		messagesList = new DynamicEntryListWidget<>(Minecraft.getInstance(), width, height - 62, 62, 260);
 		messagesList.addEntries(messages.stream().map(MessageListEntry::new).collect(Collectors.toList()));
-		addDrawableChild(messagesList);
+		addRenderableWidget(messagesList);
 
-		resize(MinecraftClient.getInstance(), width, height);
+		resize(Minecraft.getInstance(), width, height);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void resize(MinecraftClient client, int width, int height) {
+	public void resize(Minecraft minecraft, int width, int height) {
 		this.width = width;
 		this.height = height;
 
 		messagesList.resize(width, height);
-		titleLines = MultilineText.create(client.textRenderer, title, 260);
+		titleLines = MultiLineLabel.create(minecraft.font, title, 260);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# end
 		int left = width / 2 - 130;
+		//# if !TRANSPARENT_MENUS
+		//- renderBackground(graphics);
+		//# end
 		abortButton.setX(width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
 		acceptButton.setX(width / 2 + CoatUtil.MARGIN);
 
-		super.render(drawContext, mouseX, mouseY, delta);
+		super.render(graphics, mouseX, mouseY, delta);
 
-		titleLines.draw(drawContext, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
+		titleLines.renderLeftAligned(graphics, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
 		// messagesList.render(matrices, mouseX, mouseY, delta);
 	}
 }

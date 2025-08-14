@@ -1,14 +1,18 @@
 package de.siphalor.coat.handler;
 
 import de.siphalor.coat.Coat;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.Formatting;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Defines an information message to be shown to the user.
  */
+@Getter
 public class Message {
 	/**
 	 * The severity level of this message.
@@ -17,53 +21,19 @@ public class Message {
 	/**
 	 * The text of this message.
 	 */
-	private final MutableText text;
+	private final MutableComponent text;
 	/**
-	 * An object that identifies where this messages originates from.
+	 * The origin where this message originates from.
+	 * Typically a {@link net.minecraft.client.gui.components.events.GuiEventListener}.
+	 * <code>null</code> if unknown or not applicable.
 	 */
-	private Object origin;
+	@Setter
+	private @Nullable Object origin;
 
-	public Message(Level level, MutableText text) {
+	public Message(Level level, MutableComponent text) {
 		this.level = level;
 		text.setStyle(level.getTextStyle());
 		this.text = text;
-	}
-
-	/**
-	 * Gets the severity level of this message.
-	 *
-	 * @return The severity level
-	 */
-	public Level getLevel() {
-		return level;
-	}
-
-	/**
-	 * Gets the text associated with this message.
-	 *
-	 * @return The text
-	 */
-	public MutableText getText() {
-		return text;
-	}
-
-	/**
-	 * Gets where this message originates from. Typically a GUI {@link net.minecraft.client.gui.Element}.
-	 * <code>null</code> if unknown or not applicable.
-	 *
-	 * @return An arbitrary object
-	 */
-	public Object getOrigin() {
-		return origin;
-	}
-
-	/**
-	 * Sets the object where this message originates from.
-	 *
-	 * @param origin The origin to set
-	 */
-	public void setOrigin(Object origin) {
-		this.origin = origin;
 	}
 
 	/**
@@ -81,11 +51,11 @@ public class Message {
 		/**
 		 * Defines a warning message level.
 		 */
-		public static final Level WARNING = new Level(200, Coat.MOD_ID + ".message.level.warning", Style.EMPTY.withColor(Formatting.YELLOW));
+		public static final Level WARNING = new Level(200, Coat.MOD_ID + ".message.level.warning", Style.EMPTY.withColor(ChatFormatting.YELLOW));
 		/**
 		 * Defines an error message level.
 		 */
-		public static final Level ERROR = new Level(300, Coat.MOD_ID + ".message.level.error", Style.EMPTY.withColor(Formatting.RED));
+		public static final Level ERROR = new Level(300, Coat.MOD_ID + ".message.level.error", Style.EMPTY.withColor(ChatFormatting.RED));
 
 		/**
 		 * A threshold of levels that should always be shown to the user. To be compared with {@link Level#severity}
@@ -95,10 +65,12 @@ public class Message {
 		/**
 		 * An internal representation of the severity. Usable for comparison of levels.
 		 */
+		@Getter
 		private final int severity;
 		/**
 		 * A translation key which refers to a message that describes this level appropriately.
 		 */
+		@Getter
 		private final String translationKey;
 		/**
 		 * Describes how messages of this level should be formatted.
@@ -109,24 +81,6 @@ public class Message {
 			this.severity = severity;
 			this.translationKey = translationKey;
 			this.formatting = formatting;
-		}
-
-		/**
-		 * The internal representation of the severity.
-		 *
-		 * @return The severity
-		 */
-		public int getSeverity() {
-			return severity;
-		}
-
-		/**
-		 * Gets a translation key for an appropriate translation of this level.
-		 *
-		 * @return The translation key
-		 */
-		public String getTranslationKey() {
-			return translationKey;
 		}
 
 		/**

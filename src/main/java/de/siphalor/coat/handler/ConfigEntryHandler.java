@@ -1,6 +1,6 @@
 package de.siphalor.coat.handler;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -41,5 +41,5 @@ public interface ConfigEntryHandler<V> {
 	 * @param value The value to convert
 	 * @return The equivalent text
 	 */
-	Text asText(V value);
+	Component asText(V value);
 }

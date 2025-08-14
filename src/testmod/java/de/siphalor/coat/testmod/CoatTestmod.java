@@ -12,11 +12,11 @@ import de.siphalor.coat.list.entry.*;
 import de.siphalor.coat.screen.ConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -33,92 +33,92 @@ public class CoatTestmod implements ClientModInitializer {
 
 	public static ConfigScreen createScreen() {
 		LinkedList<ConfigContainerEntry> list = new LinkedList<>();
-		list.add(new ConfigListTextEntry(Text.literal("This is some stupidly long text!")));
-		list.add(new ConfigListTextEntry(Text.literal("This is some stupidly long text! this is even fucking hell longer.")));
-		list.add(new ConfigListTextEntry(Text.literal("This is some stupidly long text!")));
-		list.add(new ConfigListTextEntry(Text.literal("I'd probably just kill all humans if it came to it - profjb")));
+		list.add(new ConfigListTextEntry(Component.literal("This is some stupidly long text!")));
+		list.add(new ConfigListTextEntry(Component.literal("This is some stupidly long text! this is even fucking hell longer.")));
+		list.add(new ConfigListTextEntry(Component.literal("This is some stupidly long text!")));
+		list.add(new ConfigListTextEntry(Component.literal("I'd probably just kill all humans if it came to it - profjb")));
 		list.add(new ConfigCategoryConfigEntry<>(
-				Text.literal("A boolean with a pretty long name to demonstrate the spacing improvements"),
-				Text.literal("The checkbox needs less space, so more space for the name :)"),
+				Component.literal("A boolean with a pretty long name to demonstrate the spacing improvements"),
+				Component.literal("The checkbox needs less space, so more space for the name :)"),
 				new GenericEntryHandler<>(true, s -> Collections.emptyList()),
 				new CheckBoxConfigInput(null, true, false)
 		));
 		list.add(new ConfigCategoryConfigEntry<>(
-				Text.literal("Blub"),
-				Text.literal("This is a fine description"),
+				Component.literal("Blub"),
+				Component.literal("This is a fine description"),
 				new GenericEntryHandler<>("default", s ->
-						Collections.singleton(new Message(Message.Level.WARNING, Text.literal("Requires restart!")))
+						Collections.singleton(new Message(Message.Level.WARNING, Component.literal("Requires restart!")))
 				),
 				new TextConfigInput("Some value")
 		));
 		list.add(new ConfigCategoryConfigEntry<>(
-				Text.literal("This is a really long title for a config entry"),
-				Text.literal("This is a fine description"),
+				Component.literal("This is a really long title for a config entry"),
+				Component.literal("This is a fine description"),
 				new GenericEntryHandler<>("test", s ->
 						StringUtils.isAllLowerCase(s)
 								? Collections.emptyList()
 								: ImmutableList.of(
-										new Message(Message.Level.INFO, Text.literal("Some information about why this config aught to be lowercase letters only")),
-										new Message(Message.Level.ERROR, Text.literal("Must be all lowercase!"))
+										new Message(Message.Level.INFO, Component.literal("Some information about why this config aught to be lowercase letters only")),
+										new Message(Message.Level.ERROR, Component.literal("Must be all lowercase!"))
 								)
 				),
 				new TextConfigInput("Another value")
 		));
 		list.add(new ConfigCategoryConfigEntry<>(
-				Text.literal("Blub"),
-				Text.literal("This is a fine description"),
+				Component.literal("Blub"),
+				Component.literal("This is a fine description"),
 				new GenericEntryHandler<>("default", s -> Collections.emptyList()),
 				new TextConfigInput("Blub")
 		));
 		list.add(new ConfigCategoryConfigEntry<>(
-				Text.literal("Integer Slider"),
-				Text.literal("Some rounding slider"),
+				Component.literal("Integer Slider"),
+				Component.literal("Some rounding slider"),
 				new GenericEntryHandler<>(23, v -> Collections.emptyList()),
 				new SliderConfigInput<>(23, -50, 50)
 		));
 		list.add(new ConfigCategoryConfigEntry<>(
-				Text.literal("Double Slider"),
-				Text.literal(""),
+				Component.literal("Double Slider"),
+				Component.literal(""),
 				new GenericEntryHandler<>(3.14D, v -> Collections.emptyList()),
 				new SliderConfigInput<>(0D, -10D, 90D)
 		));
 
-		ConfigCategoryWidget widget = new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("Hi, my name is Fry"), list, null);
+		ConfigCategoryWidget widget = new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("Hi, my name is Fry"), list, null);
 
 		LinkedList<ConfigContainerEntry> list1 = new LinkedList<>();
-		list1.add(new ConfigListTextEntry(Text.literal("You know the rules and so do I")));
-		list1.add(new ConfigListTextEntry(Text.literal("A full commitment's what I'm thinking of")));
-		widget.addSubTree(new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("Abc Def"), list1, new Identifier("textures/block/acacia_planks.png")));
+		list1.add(new ConfigListTextEntry(Component.literal("You know the rules and so do I")));
+		list1.add(new ConfigListTextEntry(Component.literal("A full commitment's what I'm thinking of")));
+		widget.addSubTree(new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("Abc Def"), list1, new ResourceLocation("textures/block/acacia_planks.png")));
 
 		LinkedList<ConfigContainerEntry> list2 = new LinkedList<>();
-		list2.add(new ConfigListTextEntry(Text.literal("Heyho")));
-		widget.addSubTree(new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("This is a kinda long category name"), list2, new Identifier("textures/block/end_stone.png")));
+		list2.add(new ConfigListTextEntry(Component.literal("Heyho")));
+		widget.addSubTree(new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("This is a kinda long category name"), list2, new ResourceLocation("textures/block/end_stone.png")));
 
-		ConfigCategoryWidget widget2 = new ConfigCategoryWidget(MinecraftClient.getInstance(), Text.literal("Ho, this is a no go"), Collections.emptyList(), null);
+		ConfigCategoryWidget widget2 = new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("Ho, this is a no go"), Collections.emptyList(), null);
 
-		ConfigListWidget<String> listWidget = new ConfigListWidget<>(MinecraftClient.getInstance(), Arrays.asList(
+		ConfigListWidget<String> listWidget = new ConfigListWidget<>(Minecraft.getInstance(), Arrays.asList(
 				new ConfigListEntry<>(new TextConfigInput("a")),
 				new ConfigListEntry<>(new TextConfigInput("bcdef"))
-		), new Identifier("textures/block/cobblestone.png"), widget2, Text.literal("A list"), new GenericEntryHandler<>(
+		), new ResourceLocation("textures/block/cobblestone.png"), widget2, Component.literal("A list"), new GenericEntryHandler<>(
 				Arrays.asList("Hello", "World"), v -> Collections.emptyList()
 		), () -> new ConfigListEntry<>(new TextConfigInput("")));
 
 		widget2.addEntry(new ConfigContainerLinkEntry(listWidget));
 
-		ConfigScreen screen = new ConfigScreen(MinecraftClient.getInstance().currentScreen, Text.literal("Coat Test Mod"), ImmutableList.of(widget, widget2));
+		ConfigScreen screen = new ConfigScreen(Minecraft.getInstance().screen, Component.literal("Coat Test Mod"), ImmutableList.of(widget, widget2));
 
 		return screen;
 	}
 
-	public static class ScreenBinding extends KeyBinding implements PriorityKeyBinding {
+	public static class ScreenBinding extends KeyMapping implements PriorityKeyBinding {
 		public ScreenBinding(String translationKey, int code, String category) {
 			super(translationKey, code, category);
 		}
 
 		@Override
 		public boolean onPressedPriority() {
-			MinecraftClient client = MinecraftClient.getInstance();
-			if (client.currentScreen instanceof TitleScreen || client.world != null) {
+			Minecraft client = Minecraft.getInstance();
+			if (client.screen instanceof TitleScreen || client.level != null) {
 				client.setScreen(createScreen());
 			}
 			return false;

@@ -2,15 +2,15 @@ package de.siphalor.coat.list.entry;
 
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.list.EntryContainer;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.ParentElement;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * An abstract entry that consists of several sub elements.
  */
-public abstract class ConfigContainerCompoundEntry extends ConfigContainerEntry implements ParentElement, EntryContainer {
-	private Element focused;
+public abstract class ConfigContainerCompoundEntry extends ConfigContainerEntry implements ContainerEventHandler, EntryContainer {
+	private GuiEventListener focused;
 	private boolean dragging;
 
 	/**
@@ -34,7 +34,7 @@ public abstract class ConfigContainerCompoundEntry extends ConfigContainerEntry 
 	 */
 	@Nullable
 	@Override
-	public Element getFocused() {
+	public GuiEventListener getFocused() {
 		return focused;
 	}
 
@@ -42,9 +42,9 @@ public abstract class ConfigContainerCompoundEntry extends ConfigContainerEntry 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFocused(Element focused) {
-		if (this.focused instanceof ParentElement) {
-			((ParentElement) this.focused).setFocused(null);
+	public void setFocused(GuiEventListener focused) {
+		if (this.focused instanceof ContainerEventHandler) {
+			((ContainerEventHandler) this.focused).setFocused(null);
 		} else if (this.focused instanceof ConfigInput) {
 			((ConfigInput<?>) this.focused).setFocused(false);
 		}
@@ -64,7 +64,7 @@ public abstract class ConfigContainerCompoundEntry extends ConfigContainerEntry 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void entryHeightChanged(Element element) {
+	public void entryHeightChanged(GuiEventListener element) {
 		parent.entryHeightChanged(this);
 	}
 }

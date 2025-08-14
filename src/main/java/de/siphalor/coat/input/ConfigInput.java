@@ -1,15 +1,16 @@
 package de.siphalor.coat.input;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
+//- import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 
 /**
  * A user input for a configuration entry.
  *
  * @param <V> The value type to be read and written
  */
-public interface ConfigInput<V> extends Drawable, Element {
+public interface ConfigInput<V> extends Renderable, GuiEventListener {
 	/**
 	 * Get a hint for how wide the input should render.
 	 * If the render method provides a greater width, the input should render with that width,
@@ -24,7 +25,7 @@ public interface ConfigInput<V> extends Drawable, Element {
 
 	/**
 	 * Gets the current height of the input.
-	 * Call to {@link de.siphalor.coat.list.EntryContainer#entryHeightChanged(Element)} to propagate height changes.
+	 * Call to {@link de.siphalor.coat.list.EntryContainer#entryHeightChanged(GuiEventListener)} to propagate height changes.
 	 *
 	 * @return The current height
 	 */
@@ -60,6 +61,7 @@ public interface ConfigInput<V> extends Drawable, Element {
 
 	/**
 	 * Called on every render tick.
+	 *
 	 * @deprecated Use {@link ConfigInput#tickConfigInput()} instead.
 	 */
 	@Deprecated
@@ -77,7 +79,7 @@ public interface ConfigInput<V> extends Drawable, Element {
 	/**
 	 * Renders this config input
 	 *
-	 * @param drawContext The matrix stack used for rendering
+	 * @param graphics    The matrix stack used for rendering
 	 * @param x           The x position where the render area for this input begins
 	 * @param y           The y position to render this
 	 * @param width       The maximum width to render this width
@@ -87,5 +89,5 @@ public interface ConfigInput<V> extends Drawable, Element {
 	 * @param hovered     Whether this input is currently hovered by the mouse
 	 * @param tickDelta   The render tick delta
 	 */
-	void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+	void render(/*# if rendering == "POSE_STACK" */ /*- PoseStack *//*# else */ GuiGraphics/*# end */ graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 }

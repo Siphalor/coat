@@ -2,6 +2,10 @@ package de.siphalor.coat.list;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TickableElement;
@@ -9,15 +13,20 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
 import lombok.Getter;
+import lombok.Setter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.*;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.render.*;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -28,17 +37,17 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This is a reimplementation of {@link net.minecraft.client.gui.widget.EntryListWidget} to enable variable item heights.
+ * This is a reimplementation of {@link net.minecraft.client.gui.components.AbstractSelectionList} to enable variable item heights.
  */
 @Environment(EnvType.CLIENT)
-public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> extends AbstractParentElement implements Drawable, Selectable, EntryContainer, TickableElement {
+public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> extends AbstractContainerEventHandler implements Renderable, NarratableEntry, EntryContainer, TickableElement {
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
 	private static final CoatColor SCROLLBAR_BACKGROUND_COLOR = CoatColor.rgb(0x000000);
 	private static final CoatColor SCROLLBAR_HANDLE_SHADOW_COLOR = CoatColor.rgb(0x808080);
 	private static final CoatColor SCROLLBAR_HANDLE_COLOR = CoatColor.rgb(0xC0C0C0);
 
-	protected final MinecraftClient client;
+	protected final Minecraft minecraft;
 	private final Entries entries = new Entries();
 	protected int width;
 	protected int height;
@@ -52,25 +61,37 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	@Getter
 	private double scrollAmount;
+	/**
+	 * The brightness with which to render the background.
+	 * The value must be between 0 (completely black) and 1 (normal image).
+	 * The default value is <code>0.27F</code>
+	 */
+	@Setter
 	private float backgroundBrightness = 0.27F;
 	/**
 	 * The identifier for the background associated with this widget
 	 */
 	@Getter
-	private Identifier background = new Identifier("textures/block/cherry_log.png");
+	@Setter
+	private ResourceLocation background =
+			//# if MC_MAJOR_VERSION == "1.19"
+			//- new ResourceLocation("textures/block/mangrove_log.png");
+			//# elif MC_MAJOR_VERSION == "1.20"
+			new ResourceLocation("textures/block/cherry_log.png");
+			//# end
 	private boolean scrolling;
 
 	/**
 	 * Constructs a new instance. You can ignore this constructor safely under most circumstances.
 	 *
-	 * @param client   The {@link MinecraftClient} instance
+	 * @param minecraft   The {@link Minecraft} instance
 	 * @param width    The width to take up
 	 * @param height   The height to take up
 	 * @param top      The top position
 	 * @param rowWidth The maximum width of the contained entries
 	 */
-	public DynamicEntryListWidget(MinecraftClient client, int width, int height, int top, int rowWidth) {
-		this.client = client;
+	public DynamicEntryListWidget(Minecraft minecraft, int width, int height, int top, int rowWidth) {
+		this.minecraft = minecraft;
 		this.width = width;
 		this.height = height;
 		this.top = top;
@@ -83,12 +104,12 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * Constructs a new instance. Typically used for config screens.
 	 *
-	 * @param client     The {@link MinecraftClient} instance
+	 * @param minecraft     The {@link Minecraft} instance
 	 * @param entries    A collection of entries to be immediately added to this widget
 	 * @param background An identifier referring to a background texture for this widget
 	 */
-	public DynamicEntryListWidget(MinecraftClient client, Collection<E> entries, @Nullable Identifier background) {
-		this.client = client;
+	public DynamicEntryListWidget(Minecraft minecraft, Collection<E> entries, @Nullable ResourceLocation background) {
+		this.minecraft = minecraft;
 		top = 20;
 		addEntries(entries);
 		if (background != null) {
@@ -103,26 +124,6 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	public int getHorizontalPadding() {
 		return 4;
-	}
-
-	/**
-	 * Sets the background texture of this widget.
-	 *
-	 * @param background An identifier pointing to the new background texture
-	 */
-	public void setBackground(Identifier background) {
-		this.background = background;
-	}
-
-	/**
-	 * Sets the brightness with which to render the background.
-	 * The value must be between 0 (completely black) and 1 (normal image).
-	 * The default value is <code>0.27F</code>
-	 *
-	 * @param backgroundBrightness The new background brightness
-	 */
-	public void setBackgroundBrightness(float backgroundBrightness) {
-		this.backgroundBrightness = backgroundBrightness;
 	}
 
 	/**
@@ -142,7 +143,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	}
 
 	@Override
-	public List<? extends Element> children() {
+	public List<? extends GuiEventListener> children() {
 		return entries;
 	}
 
@@ -255,7 +256,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void entryHeightChanged(Element element) {
+	public void entryHeightChanged(GuiEventListener element) {
 		//noinspection SuspiciousMethodCalls
 		int index = entries.indexOf(element);
 		int bottom = index == 0 ? 0 : entries.bottoms.getInt(index - 1);
@@ -347,51 +348,67 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		CoatUtil.drawTintedTexture(left, top, right, bottom, -100, getListBackground(), 32F, (int) getScrollAmount(), color);
 	}
 
-	protected Identifier getListBackground() {
-		return this.client.world == null
-				? EntryListWidget.MENU_LIST_BACKGROUND_TEXTURE
-				: EntryListWidget.INWORLD_MENU_LIST_BACKGROUND_TEXTURE;
+	protected ResourceLocation getListBackground() {
+		//# if TRANSPARENT_MENUS
+		return this.minecraft.level == null
+				? AbstractSelectionList.MENU_LIST_BACKGROUND
+				: AbstractSelectionList.INWORLD_MENU_LIST_BACKGROUND;
+		//# else
+		//- return background;
+		//# end
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void renderWidget(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# end
 		int scrollbarXBegin = this.getScrollbarPositionX();
 		int scrollbarXEnd = scrollbarXBegin + 6;
 
 		renderBackground();
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		Tesselator tessellator = Tesselator.getInstance();
+		BufferBuilder bufferBuilder = tessellator.getBuilder();
 
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
-			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 			int p = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getMaxPosition());
-			p = MathHelper.clamp(p, 32, this.bottom - this.top - 8);
+			p = Mth.clamp(p, 32, this.bottom - this.top - 8);
 			int q = (int) this.getScrollAmount() * (this.bottom - this.top - p) / maxScroll + this.top;
 			if (q < this.top) {
 				q = this.top;
 			}
 
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, top, scrollbarXEnd, bottom, SCROLLBAR_BACKGROUND_COLOR);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, SCROLLBAR_HANDLE_SHADOW_COLOR);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, SCROLLBAR_HANDLE_COLOR);
-			tessellator.draw();
+			tessellator.end();
 		}
 
-		this.renderList(drawContext, mouseX, mouseY, delta);
+		this.renderList(graphics, mouseX, mouseY, delta);
 
 		// render top shadow
-		drawContext.fillGradient(left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
+		//# if RENDERING == "POSE_STACK"
+		//- fillGradient(graphics, left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
+		//# elif RENDERING == "GUI_GRAPHICS"
+		graphics.fillGradient(left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
+		//# end
 	}
 
 	@Override
-	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-		renderWidget(drawContext, mouseX, mouseY, delta);
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# end
+		renderWidget(graphics, mouseX, mouseY, delta);
 	}
 
 	/**
@@ -439,7 +456,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @param amount The new scroll position
 	 */
 	public void setScrollAmount(double amount) {
-		this.scrollAmount = MathHelper.clamp(amount, 0.0D, this.getMaxScroll());
+		this.scrollAmount = Mth.clamp(amount, 0.0D, this.getMaxScroll());
 	}
 
 	/**
@@ -507,7 +524,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			} else {
 				double d = Math.max(1, this.getMaxScroll());
 				int i = this.bottom - this.top;
-				int j = MathHelper.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
+				int j = Mth.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
 				double e = Math.max(1.0D, d / (double) (i - j));
 				this.setScrollAmount(this.getScrollAmount() + deltaY * e);
 			}
@@ -519,9 +536,17 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	}
 
 	@Override
+	//# if SCROLL_DIRECTIONS == "BOTH"
 	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+	//# elif SCROLL_DIRECTIONS == "VERTICAL"
+	//- public boolean mouseScrolled(double mouseX, double mouseY, double verticalAmount) {
+	//# end
 		Entry entry = getEntryAtPosition(mouseX, mouseY);
+		//# if SCROLL_DIRECTIONS == "BOTH"
 		if (entry != null && entry.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)) {
+		//# elif SCROLL_DIRECTIONS == "VERTICAL"
+		//- if (entry != null && entry.mouseScrolled(mouseX, mouseY, verticalAmount)) {
+		//# end
 			return true;
 		}
 		double prevScroll = getScrollAmount();
@@ -539,12 +564,16 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * Renders all visible entries.
 	 *
-	 * @param drawContext The matrix stack to use for rendering
-	 * @param mouseX      The current mouse x position
-	 * @param mouseY      The current mouse y position
-	 * @param delta       The tick delta
+	 * @param graphics The matrix stack to use for rendering
+	 * @param mouseX   The current mouse x position
+	 * @param mouseY   The current mouse y position
+	 * @param delta    The tick delta
 	 */
-	protected void renderList(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "POSE_STACK"
+	//- protected void renderList(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void renderList(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# end
 		IntListIterator bottomIter = entries.bottoms.iterator();
 		Iterator<E> entryIter = entries.iterator();
 		int relBottom = 0, relTop = 0;
@@ -571,7 +600,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 			int rowTop = relTop + entryAreaTop;
 
-			entry.render(drawContext, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
+			entry.render(graphics, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
 
 			if (bottomIter.hasNext()) {
 				relTop = relBottom;
@@ -614,8 +643,8 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFocused(@Nullable Element focused) {
-		Element old = getFocused();
+	public void setFocused(@Nullable GuiEventListener focused) {
+		GuiEventListener old = getFocused();
 		if (old != null && old != focused) {
 			if (old instanceof Entry) {
 				((Entry) old).focusLost();
@@ -666,13 +695,13 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	}
 
 	@Override
-	public void appendNarrations(NarrationMessageBuilder builder) {
+	public void updateNarration(NarrationElementOutput narrationElementOutput) {
 		// TODO: narrations
 	}
 
 	@Override
-	public SelectionType getType() {
-		return SelectionType.NONE;
+	public NarrationPriority narrationPriority() {
+		return NarrationPriority.NONE;
 	}
 
 	/**
@@ -786,7 +815,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * A dynamically sized entry in a {@link DynamicEntryListWidget}.
 	 */
 	@Environment(EnvType.CLIENT)
-	public abstract static class Entry implements Element, TickableElement {
+	public abstract static class Entry
+			//# if RENDERING != "GUI_GRAPHICS"
+			//- extends GuiComponent
+			//# end
+			implements GuiEventListener, TickableElement {
 		/**
 		 * The parent element.
 		 */
@@ -813,7 +846,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		/**
 		 * Renders an entry in a list.
 		 *
-		 * @param drawContext the matrix stack used for rendering
+		 * @param graphics    the matrix stack used for rendering
 		 * @param x           the X coordinate of the entry
 		 * @param y           the Y coordinate of the entry
 		 * @param entryWidth  the width of the entry.
@@ -823,10 +856,14 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		 * @param mouseY      the Y coordinate of the mouse
 		 * @param hovered     whether the mouse is hovering over the entry
 		 */
-		public abstract void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+		//# if RENDERING == "POSE_STACK"
+		//- public abstract void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+		//# elif RENDERING == "GUI_GRAPHICS"
+		public abstract void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+		//# end
 
 		/**
-		 * The current height of this entry. Height updates should be announced via the parent's {@link EntryContainer#entryHeightChanged(Element)}:<br />
+		 * The current height of this entry. Height updates should be announced via the parent's {@link EntryContainer#entryHeightChanged(GuiEventListener)}:<br />
 		 * <code>getParent().entryHeightChanged(this)</code>
 		 *
 		 * @return The current height

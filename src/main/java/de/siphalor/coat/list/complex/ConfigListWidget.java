@@ -1,5 +1,6 @@
 package de.siphalor.coat.list.complex;
 
+//- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.handler.Message;
@@ -8,13 +9,13 @@ import de.siphalor.coat.list.category.ConfigTreeEntry;
 import de.siphalor.coat.list.entry.ConfigListEntry;
 import de.siphalor.coat.screen.ConfigContentWidget;
 import de.siphalor.coat.util.CoatUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -23,23 +24,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<V>> implements ConfigContentWidget {
-	private final MutableText name;
+	private final MutableComponent name;
 	private final ConfigEntryHandler<List<V>> entryHandler;
 	private final ConfigListEntryFactory<V> entryFactory;
-	private final ButtonWidget appendButton = ButtonWidget.builder(
-			Text.translatable(Coat.MOD_ID + ".list.append"),
+	private final Button appendButton = Button.builder(
+			Component.translatable(Coat.MOD_ID + ".list.append"),
 			button -> createEntry(getEntryCount())
 	).size(100, 20).build();
 	private ConfigListEntry<V> dragEntry;
 
-	public ConfigListWidget(MinecraftClient client, int width, int height, int top, int rowWidth, ConfigContentWidget parent, MutableText name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
+	public ConfigListWidget(Minecraft client, int width, int height, int top, int rowWidth, ConfigContentWidget parent, MutableComponent name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
 		super(client, width, height, top, rowWidth);
 		this.name = name;
 		this.entryHandler = entryHandler;
 		this.entryFactory = entryFactory;
 	}
 
-	public ConfigListWidget(MinecraftClient client, Collection<ConfigListEntry<V>> entries, Identifier background, ConfigContentWidget parent, MutableText name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
+	public ConfigListWidget(Minecraft client, Collection<ConfigListEntry<V>> entries, ResourceLocation background, ConfigContentWidget parent, MutableComponent name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
 		super(client, entries, background);
 		this.name = name;
 		this.entryHandler = entryHandler;
@@ -100,11 +101,11 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 
 	@Override
 	public ConfigTreeEntry getTreeEntry() {
-		return new ConfigTreeEntry(name.styled(style -> style.withUnderline(true)), this, true);
+		return new ConfigTreeEntry(name.withStyle(style -> style.withUnderlined(true)), this, true);
 	}
 
 	@Override
-	public Text getName() {
+	public Component getName() {
 		return name;
 	}
 
@@ -138,15 +139,19 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	}
 
 	@Override
-	public void renderWidget(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-		super.renderWidget(drawContext, mouseX, mouseY, delta);
+	//# if RENDERING == "POSE_STACK"
+	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# end
+		super.renderWidget(graphics, mouseX, mouseY, delta);
 		appendButton.setY(super.getEntryAreaTop() + super.getMaxPosition());
 		appendButton.setX(left + (width - appendButton.getWidth()) / 2);
-		appendButton.render(drawContext, mouseX, mouseY, delta);
+		appendButton.render(graphics, mouseX, mouseY, delta);
 	}
 
 	@Override
-	public void setFocused(@Nullable Element focused) {
+	public void setFocused(@Nullable GuiEventListener focused) {
 		super.setFocused(focused);
 		if (focused == appendButton) {
 			setScrollAmount(getMaxPosition());
@@ -154,8 +159,8 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	}
 
 	@Override
-	public List<? extends Element> children() {
-		ArrayList<Element> children = new ArrayList<>(entries());
+	public List<? extends GuiEventListener> children() {
+		ArrayList<GuiEventListener> children = new ArrayList<>(entries());
 		children.add(appendButton);
 		return children;
 	}

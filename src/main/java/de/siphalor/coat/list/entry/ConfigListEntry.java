@@ -6,27 +6,29 @@ import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.list.complex.ConfigListWidget;
 import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import lombok.Setter;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
-	private static final Identifier HANDLE_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
+	private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 
 	private final ConfigInput<V> input;
-	private final ButtonWidget deleteWidget;
+	private final Button deleteWidget;
+	@Setter
 	@Getter
 	private boolean dragFollow;
 
 	public ConfigListEntry(ConfigInput<V> input) {
 		this.input = input;
-		deleteWidget = ButtonWidget.builder(Text.literal("x"), button -> {
+		deleteWidget = Button.builder(Component.literal("x"), button -> {
 			if (parent instanceof ConfigListWidget) {
 				//noinspection unchecked
 				((ConfigListWidget<V>) parent).removeEntry(this);
@@ -34,20 +36,25 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		}).size(20, 20).build();
 	}
 
-	public void setDragFollow(boolean dragFollow) {
-		this.dragFollow = dragFollow;
-	}
-
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
 		if (isDragFollow()) {
 			y = mouseY - entryHeight / 2;
 		}
 
-		drawContext.drawTexture(HANDLE_TEXTURE, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
-		input.render(drawContext, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		//# if RENDERING == "POSE_STACK"
+		//- RenderSystem.setShaderTexture(0, HANDLE_TEXTURE);
+		//- blit(graphics, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
+		//# elif RENDERING == "GUI_GRAPHICS"
+		graphics.blit(HANDLE_TEXTURE, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
+		//# end
+		input.render(graphics, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		deleteWidget.setPosition(x + entryWidth - 20, y);
-		deleteWidget.render(drawContext, mouseX, mouseY, tickDelta);
+		deleteWidget.render(graphics, mouseX, mouseY, tickDelta);
 	}
 
 	@Override
@@ -75,7 +82,7 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 	}
 
 	@Override
-	public List<? extends Element> children() {
+	public List<? extends GuiEventListener> children() {
 		return ImmutableList.of(input, deleteWidget);
 	}
 }

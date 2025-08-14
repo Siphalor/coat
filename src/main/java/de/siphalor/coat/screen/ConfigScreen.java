@@ -10,12 +10,13 @@ import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import lombok.Setter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.opengl.GL32;
 
 import java.util.Collection;
@@ -27,15 +28,20 @@ import java.util.List;
  * A Coat config screen.
  */
 public class ConfigScreen extends Screen {
-	private static final Text ABORT_TEXT = Text.translatable(Coat.MOD_ID + ".action.abort");
-	private static final Text SAVE_TEXT =  Text.translatable(Coat.MOD_ID + ".action.save");
+	private static final Component ABORT_TEXT = Component.translatable(Coat.MOD_ID + ".action.abort");
+	private static final Component SAVE_TEXT =  Component.translatable(Coat.MOD_ID + ".action.save");
 	private static final CoatColor BACKGROUND_TEXTURE_TINT_COLOR = CoatColor.rgb(0x777777);
 
 	private final Screen parent;
 	private final Collection<ConfigCategoryWidget> widgets;
 	private ConfigTreeEntry openCategory;
+	/**
+	 * A {@link Runnable} that runs after all {@link de.siphalor.coat.handler.ConfigEntryHandler#save(Object)}
+	 * calls when the user tries to save the configuration changes.
+	 */
+	@Setter
 	private Runnable onSave = () -> {};
-	private Text visualTitle;
+	private Component visualTitle;
 
 	private int panelWidth;
 	/**
@@ -43,8 +49,8 @@ public class ConfigScreen extends Screen {
 	 */
 	@Getter
 	private DynamicEntryListWidget<ConfigTreeEntry> treeWidget;
-	private ButtonWidget abortButton;
-	private ButtonWidget saveButton;
+	private Button abortButton;
+	private Button saveButton;
 	/**
 	 * The currently opened list widget.
 	 */
@@ -57,7 +63,7 @@ public class ConfigScreen extends Screen {
 	 * @param title   The title of this config screen. Typically contains the name of the mod
 	 * @param widgets The categories/lists that this screen will be displaying
 	 */
-	public ConfigScreen(Screen parent, Text title, Collection<ConfigCategoryWidget> widgets) {
+	public ConfigScreen(Screen parent, Component title, Collection<ConfigCategoryWidget> widgets) {
 		super(title);
 		this.visualTitle = title.copy().append(" - ").append("missingno");
 		this.parent = parent;
@@ -70,20 +76,20 @@ public class ConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		panelWidth = 200;
-		treeWidget = new DynamicEntryListWidget<>(client, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
+		treeWidget = new DynamicEntryListWidget<>(minecraft, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
 		treeWidget.setBackgroundBrightness(0.5F);
-		addDrawableChild(treeWidget);
+		addRenderableWidget(treeWidget);
 
 		for (ConfigCategoryWidget widget : widgets) {
 			treeWidget.addEntry(widget.getTreeEntry());
 		}
 
-		abortButton = ButtonWidget.builder(ABORT_TEXT, button -> close())
-				.position(CoatUtil.MARGIN, 0).size(0, 20).build();
-		saveButton =  ButtonWidget.builder(SAVE_TEXT, this::clickSave)
-				.position(CoatUtil.MARGIN, 0).size(0, 20).build();
-		addDrawableChild(abortButton);
-		addDrawableChild(saveButton);
+		abortButton = Button.builder(ABORT_TEXT, button -> onClose())
+				.pos(CoatUtil.MARGIN, 0).size(0, 20).build();
+		saveButton =  Button.builder(SAVE_TEXT, this::clickSave)
+				.pos(CoatUtil.MARGIN, 0).size(0, 20).build();
+		addRenderableWidget(abortButton);
+		addRenderableWidget(saveButton);
 
 		super.init();
 
@@ -94,27 +100,17 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void close() {
-		MinecraftClient.getInstance().setScreen(
+	public void onClose() {
+		Minecraft.getInstance().setScreen(
 				new ConfirmScreen(action -> {
 					if (action) {
-						MinecraftClient.getInstance().setScreen(parent);
+						Minecraft.getInstance().setScreen(parent);
 					} else {
-						MinecraftClient.getInstance().setScreen(this);
+						Minecraft.getInstance().setScreen(this);
 					}
 				},
-				Text.translatable(Coat.MOD_ID + ".action.abort.screen.title"),
-				Text.translatable(Coat.MOD_ID + ".action.abort.screen.desc")));
-	}
-
-	/**
-	 * Sets a {@link Runnable} that runs after all {@link de.siphalor.coat.handler.ConfigEntryHandler#save(Object)}
-	 * calls when the user tries to save the configuration changes.
-	 *
-	 * @param onSave The runnable
-	 */
-	public void setOnSave(Runnable onSave) {
-		this.onSave = onSave;
+				Component.translatable(Coat.MOD_ID + ".action.abort.screen.title"),
+				Component.translatable(Coat.MOD_ID + ".action.abort.screen.desc")));
 	}
 
 	/**
@@ -134,7 +130,7 @@ public class ConfigScreen extends Screen {
 	 *
 	 * @param button The button that has been clicked on - unused
 	 */
-	protected void clickSave(ButtonWidget button) {
+	protected void clickSave(Button button) {
 		List<Message> warnings = new LinkedList<>();
 		List<Message> errors = new LinkedList<>();
 		int warningSev = Message.Level.WARNING.getSeverity();
@@ -150,12 +146,12 @@ public class ConfigScreen extends Screen {
 
 		Runnable saveRunnable = () -> {
 			onSave();
-			MinecraftClient.getInstance().setScreen(parent);
+			Minecraft.getInstance().setScreen(parent);
 		};
 
 		Runnable warningOpener = () -> {
-			MinecraftClient.getInstance().setScreen(new MessagesScreen(
-					Text.translatable(Coat.MOD_ID + ".action.save.warnings"),
+			Minecraft.getInstance().setScreen(new MessagesScreen(
+					Component.translatable(Coat.MOD_ID + ".action.save.warnings"),
 					this,
 					saveRunnable,
 					warnings
@@ -163,8 +159,8 @@ public class ConfigScreen extends Screen {
 		};
 
 		if (!errors.isEmpty()) {
-			MinecraftClient.getInstance().setScreen(new MessagesScreen(
-					Text.translatable(Coat.MOD_ID + ".action.save.errors"),
+			Minecraft.getInstance().setScreen(new MessagesScreen(
+					Component.translatable(Coat.MOD_ID + ".action.save.errors"),
 					this,
 					warnings.isEmpty() ? saveRunnable : warningOpener,
 					errors
@@ -216,7 +212,7 @@ public class ConfigScreen extends Screen {
 		}
 
 		if (contentWidget != null) {
-			remove(contentWidget);
+			removeWidget(contentWidget);
 		}
 		openCategory = category;
 		category.setOpen(true);
@@ -227,7 +223,7 @@ public class ConfigScreen extends Screen {
 		}
 
 		contentWidget = category.getContentWidget();
-		addDrawableChild(contentWidget);
+		addRenderableWidget(contentWidget);
 		contentWidget.setPosition(panelWidth, 20);
 		contentWidget.setRowWidth(500);
 
@@ -237,7 +233,7 @@ public class ConfigScreen extends Screen {
 			visualTitle = title.copy().append(" - ").append(contentWidget.getName());
 		}
 
-		resize(client, width, height);
+		resize(minecraft, width, height);
 	}
 
 	public void openTemporary(ConfigTreeEntry temporaryTreeEntry) {
@@ -252,7 +248,7 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void resize(MinecraftClient client, int width, int height) {
+	public void resize(Minecraft minecraft, int width, int height) {
 		this.width = width;
 		this.height = height;
 
@@ -281,8 +277,13 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-		super.render(drawContext, mouseX, mouseY, delta);
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# end
+
+		super.render(graphics, mouseX, mouseY, delta);
 
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL32.GL_LEQUAL);
@@ -295,8 +296,14 @@ public class ConfigScreen extends Screen {
 		CoatUtil.drawTintedTexture(0, 0, width, 20, 0, contentWidget.getBackground(), 32F, 0, BACKGROUND_TEXTURE_TINT_COLOR);
 		RenderSystem.disableBlend();
 
-		drawContext.getMatrices().translate(0, 0, 10);
-		drawContext.drawCenteredTextWithShadow(this.textRenderer, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
-		drawContext.getMatrices().translate(0, 0, -10);
+		//# if RENDERING == "POSE_STACK"
+		//- graphics.translate(0, 0, 10);
+		//- drawCenteredString(graphics, font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
+		//- graphics.translate(0, 0, -10);
+		//# elif RENDERING == "GUI_GRAPHICS"
+		graphics.pose().translate(0, 0, 10);
+		graphics.drawCenteredString(this.font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
+		graphics.pose().translate(0, 0, -10);
+		//# end
 	}
 }

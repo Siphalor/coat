@@ -1,14 +1,15 @@
 package de.siphalor.coat.input;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.CheckboxWidget;
-import net.minecraft.text.Text;
+//- import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.network.chat.Component;
 
 /**
  * A boolean {@link ConfigInput} which displays as a checkbox.
  */
-public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<Boolean> {
+public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean> {
 	private InputChangeListener<Boolean> changeListener;
 
 	/**
@@ -17,8 +18,19 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 * @param checked     Whether this checkbox should initially be checked
 	 * @param showMessage Whether the message should be displayed
 	 */
-	public CheckBoxConfigInput(Text message, boolean checked, boolean showMessage) {
-		super(0, 0, showMessage ? message : Text.empty(), MinecraftClient.getInstance().textRenderer, checked, (checkbox, checked1) -> {});
+	public CheckBoxConfigInput(Component message, boolean checked, boolean showMessage) {
+		super(
+				0,
+				0,
+				//# if CHECKBOX_SIZE == "EXPLICIT"
+				//- 20,
+				//- 20,
+				//# end
+				showMessage ? message : Component.empty() /*# if CHECKBOX_SIZE == "FONT" */,
+				Minecraft.getInstance().font/*# end */,
+				checked /*# if CHECKBOX_CHANGE_HANDLER */,
+				(checkbox, checked1) -> {}/*# end */
+		);
 	}
 
 	@Override
@@ -31,7 +43,7 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 */
 	@Override
 	public Boolean getValue() {
-		return isChecked();
+		return selected();
 	}
 
 	/**
@@ -46,9 +58,13 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
 		setPosition(x + width - getWidth(), y);
-		render(drawContext, mouseX, mouseY, tickDelta);
+		render(graphics, mouseX, mouseY, tickDelta);
 	}
 
 	/**
@@ -56,7 +72,7 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	 */
 	@Override
 	public void setValue(Boolean value) {
-		if (isChecked() != value) {
+		if (selected() != value) {
 			onPress();
 		}
 	}
@@ -67,7 +83,7 @@ public class CheckBoxConfigInput extends CheckboxWidget implements ConfigInput<B
 	@Override
 	public void onPress() {
 		super.onPress();
-		changeListener.inputChanged(isChecked());
+		changeListener.inputChanged(selected());
 	}
 
 	/**

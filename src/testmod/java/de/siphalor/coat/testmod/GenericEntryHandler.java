@@ -2,7 +2,7 @@ package de.siphalor.coat.testmod;
 
 import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.handler.Message;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -33,7 +33,7 @@ public class GenericEntryHandler<V> implements ConfigEntryHandler<V> {
 	}
 
 	@Override
-	public Text asText(V value) {
-		return Text.literal(value.toString());
+	public Component asText(V value) {
+		return Component.literal(value.toString());
 	}
 }

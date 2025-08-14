@@ -1,5 +1,6 @@
 package de.siphalor.coat.list.category;
 
+//- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.complex.ConfigCategoryWidget;
@@ -8,10 +9,12 @@ import de.siphalor.coat.screen.ConfigContentWidget;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TextButtonWidget;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.text.Text;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -26,33 +29,44 @@ import java.util.stream.Collectors;
  * @see ConfigCategoryWidget
  */
 public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
-	private static final Text EXPAND_TEXT = Text.translatable(Coat.MOD_ID + ".tree.expand");
-	private static final Text COLLAPSE_TEXT = Text.translatable(Coat.MOD_ID + ".tree.collapse");
+	private static final Component EXPAND_TEXT = Component.translatable(Coat.MOD_ID + ".tree.expand");
+	private static final Component COLLAPSE_TEXT = Component.translatable(Coat.MOD_ID + ".tree.collapse");
 
 	private final TextButtonWidget collapseButton;
 	private final TextButtonWidget nameButton;
 	private final List<ConfigTreeEntry> subTrees;
 	private final ConfigContentWidget contentWidget;
+	@Getter
 	private final boolean temporary;
 	private int x;
 	private int y;
+	/**
+	 *  Whether this config category is currently opened.
+	 */
+	@Getter
 	private boolean open = false;
+	/**
+	 * Whether the subtrees are visible.
+	 */
+	@Getter
 	private boolean expanded;
 
 	/**
 	 * The currently focused element.
 	 */
-	protected Element focused;
+	@Getter
+	@Setter
+	protected @Nullable GuiEventListener focused;
 
-	public ConfigTreeEntry(Text name, ConfigContentWidget contentWidget) {
+	public ConfigTreeEntry(Component name, ConfigContentWidget contentWidget) {
 		this(name, contentWidget, false);
 	}
 
-	public ConfigTreeEntry(Text name, ConfigContentWidget contentWidget, boolean temporary) {
+	public ConfigTreeEntry(Component name, ConfigContentWidget contentWidget, boolean temporary) {
 		this.contentWidget = contentWidget;
 		this.temporary = temporary;
 		collapseButton = new TextButtonWidget(x, y, 7, 9, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
-		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> ((ConfigScreen) MinecraftClient.getInstance().currentScreen).openCategory(this));
+		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> ((ConfigScreen) Minecraft.getInstance().screen).openCategory(this));
 
 		List<ConfigTreeEntry> list = new ArrayList<>();
 		if (contentWidget instanceof ConfigCategoryWidget) {
@@ -69,7 +83,11 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
 		this.x = x;
 		this.y = y;
 
@@ -79,38 +97,25 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 
 		if (!subTrees.isEmpty()) {
 			collapseButton.setPosition(x, y);
-			collapseButton.render(drawContext, mouseX, mouseY, tickDelta);
+			collapseButton.render(graphics, mouseX, mouseY, tickDelta);
 		}
 
 		nameButton.setPosition(indent, y);
 		nameButton.setWidth(innerWidth);
-		nameButton.render(drawContext, mouseX, mouseY, tickDelta);
+		nameButton.render(graphics, mouseX, mouseY, tickDelta);
 
 		if (expanded) {
 			int curY = y + getBaseHeight();
 			for (ConfigTreeEntry entry : subTrees) {
 				if (!hoverFound && mouseY > curY) {
 					hoverFound = true;
-					entry.render(drawContext, indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
+					entry.render(graphics, indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
 				} else {
-					entry.render(drawContext, indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
+					entry.render(graphics, indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
 				}
 				curY += entry.getHeight();
 			}
 		}
-	}
-
-	public boolean isTemporary() {
-		return temporary;
-	}
-
-	/**
-	 * Gets whether this config category is currently opened in the config screen.
-	 *
-	 * @return Whether this category is currently opened
-	 */
-	public boolean isOpen() {
-		return open;
 	}
 
 	/**
@@ -122,12 +127,12 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		if (this.open != open) {
 			if (open) {
 				nameButton.setMessage(
-						nameButton.getOriginalMessage().copy().styled(style -> nameButton.getOriginalMessage().getStyle().withItalic(true))
+						nameButton.getOriginalMessage().copy().withStyle(style -> nameButton.getOriginalMessage().getStyle().withItalic(true))
 				);
 				setExpanded(true);
 			} else {
 				nameButton.setMessage(
-						nameButton.getOriginalMessage().copy().styled(style -> nameButton.getOriginalMessage().getStyle().withItalic(false))
+						nameButton.getOriginalMessage().copy().withStyle(style -> nameButton.getOriginalMessage().getStyle().withItalic(false))
 				);
 			}
 		}
@@ -149,15 +154,6 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		} else {
 			collapseButton.setMessage(EXPAND_TEXT);
 		}
-	}
-
-	/**
-	 * Gets whether the subtrees are visible.
-	 *
-	 * @return Whether the subtrees are visible
-	 */
-	public boolean isExpanded() {
-		return expanded;
 	}
 
 	/**
@@ -208,8 +204,8 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Element> children() {
-		ArrayList<Element> children = new ArrayList<>(subTrees.size() + 2);
+	public List<GuiEventListener> children() {
+		ArrayList<GuiEventListener> children = new ArrayList<>(subTrees.size() + 2);
 		if (!subTrees.isEmpty()) {
 			children.add(collapseButton);
 		}
@@ -259,23 +255,6 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	 */
 	public ConfigContentWidget getContentWidget() {
 		return contentWidget;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Nullable
-	@Override
-	public Element getFocused() {
-		return focused;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setFocused(Element focused) {
-		this.focused = focused;
 	}
 
 	/**

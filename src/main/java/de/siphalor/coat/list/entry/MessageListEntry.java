@@ -1,5 +1,6 @@
 package de.siphalor.coat.list.entry;
 
+//- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.DynamicEntryListWidget;
@@ -8,13 +9,13 @@ import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.screen.MessagesScreen;
 import de.siphalor.coat.util.CoatUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -24,11 +25,11 @@ import java.util.List;
  * A list entry linking to a message and providing functionality to jump to it.
  */
 public class MessageListEntry extends ConfigContainerCompoundEntry {
-	private static final Text JUMP_TEXT = Text.translatable(Coat.MOD_ID + ".message.jump");
+	private static final Component JUMP_TEXT = Component.translatable(Coat.MOD_ID + ".message.jump");
 
 	private final Message message;
-	private Text text;
-	private ButtonWidget jumpButton;
+	private Component text;
+	private Button jumpButton;
 
 	/**
 	 * Constructs a new message list entry.
@@ -37,9 +38,9 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 */
 	public MessageListEntry(Message message) {
 		this.message = message;
-		jumpButton = ButtonWidget.builder(JUMP_TEXT, button -> {
+		jumpButton = Button.builder(JUMP_TEXT, button -> {
 			if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
-				Element last = (Element) message.getOrigin();
+				GuiEventListener last = (GuiEventListener) message.getOrigin();
 				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
 				if (category == null) return;
 				while (!(category instanceof ConfigCategoryWidget)) {
@@ -51,11 +52,11 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 					category.setFocused(last);
 				}
 
-				Screen currentScreen = MinecraftClient.getInstance().currentScreen;
+				Screen currentScreen = Minecraft.getInstance().screen;
 				ConfigScreen configScreen = null;
 				if (currentScreen instanceof MessagesScreen) {
 					configScreen = ((MessagesScreen) currentScreen).getParent();
-					MinecraftClient.getInstance().setScreen(configScreen);
+					Minecraft.getInstance().setScreen(configScreen);
 				} else if (currentScreen instanceof ConfigScreen) {
 					configScreen = (ConfigScreen) currentScreen;
 				}
@@ -78,7 +79,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
 		text = CoatUtil.intelliTrim(
-				MinecraftClient.getInstance().textRenderer, message.getText(),
+				Minecraft.getInstance().font, message.getText(),
 				newWidth - CoatUtil.MARGIN - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN
 		);
 	}
@@ -87,15 +88,27 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-		drawContext.drawText(textRenderer, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb(), false);
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
+		Font font = Minecraft.getInstance().font;
+		//# if RENDERING == "POSE_STACK"
+		//- font.draw(graphics, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb());
+		//# elif RENDERING == "GUI_GRAPHICS"
+		graphics.drawString(font, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb(), false);
+		//# end
 		jumpButton.setY(y);
 		jumpButton.setX(x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN);
-		jumpButton.render(drawContext, mouseX, mouseY, tickDelta);
+		jumpButton.render(graphics, mouseX, mouseY, tickDelta);
 
 		if (hovered && mouseX < jumpButton.getX()) {
-			drawContext.drawTooltip(textRenderer, message.getText(), mouseX, mouseY);
+			//# if RENDERING == "POSE_STACK"
+			//- CoatUtil.renderTooltip(graphics, mouseX, mouseY, message.getText());
+			//# elif RENDERING == "GUI_GRAPHICS"
+			graphics.renderTooltip(font, message.getText(), mouseX, mouseY);
+			//# end
 		}
 	}
 
@@ -135,7 +148,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<? extends Element> children() {
+	public List<? extends GuiEventListener> children() {
 		return Collections.singletonList(jumpButton);
 	}
 }

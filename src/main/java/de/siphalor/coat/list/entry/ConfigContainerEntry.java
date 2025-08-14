@@ -2,7 +2,6 @@ package de.siphalor.coat.list.entry;
 
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.DynamicEntryListWidget;
-import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 
 import java.util.Collection;
 

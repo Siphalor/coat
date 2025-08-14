@@ -1,21 +1,22 @@
 package de.siphalor.coat.input;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
+//- import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 
 /**
  * A string input represented as a text field.
  */
-public class TextConfigInput extends TextFieldWidget implements ConfigInput<String> {
+public class TextConfigInput extends EditBox implements ConfigInput<String> {
 	/**
 	 * Constructs a new text input.
 	 *
 	 * @param value The initial value of this text field
 	 */
 	public TextConfigInput(String value) {
-		super(MinecraftClient.getInstance().textRenderer, 0, 0, 10, 20, Text.empty());
+		super(Minecraft.getInstance().font, 0, 0, 10, 20, Component.empty());
 		setMaxLength(Integer.MAX_VALUE);
 		setValue(value);
 	}
@@ -32,17 +33,14 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getValue() {
-		return getText();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public void setValue(String value) {
-		setText(value);
-		setCursorToStart(false); // Required because otherwise the text doesn't render sometimes
+		super.setValue(value);
+		// Required because otherwise the text doesn't render sometimes
+		//# if EDITBOX_CURSOR_TO_START_PARAM
+		moveCursorToStart(false);
+		//# else
+		//- moveCursorToStart();
+		//# end
 	}
 
 	/**
@@ -50,7 +48,7 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 */
 	@Override
 	public void setChangeListener(InputChangeListener<String> changeListener) {
-		setChangedListener(changeListener);
+		super.setResponder(changeListener);
 	}
 
 	/**
@@ -65,9 +63,13 @@ public class TextConfigInput extends TextFieldWidget implements ConfigInput<Stri
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
 		setPosition(x, y);
 		this.width = width;
-		render(drawContext, mouseX, mouseY, tickDelta);
+		render(graphics, mouseX, mouseY, tickDelta);
 	}
 }

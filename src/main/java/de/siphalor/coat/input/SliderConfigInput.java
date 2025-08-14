@@ -1,9 +1,11 @@
 package de.siphalor.coat.input;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
+//- import com.mojang.blaze3d.vertex.PoseStack;
+import lombok.Setter;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 import java.text.NumberFormat;
 
@@ -13,11 +15,16 @@ import java.text.NumberFormat;
  *
  * @param <N> The number type
  */
-public class SliderConfigInput<N extends Number> extends SliderWidget implements ConfigInput<N> {
+public class SliderConfigInput<N extends Number> extends AbstractSliderButton implements ConfigInput<N> {
 	private final Class<N> valueClass;
 	private final N min;
 	private final N max;
 	private InputChangeListener<N> changeListener;
+	/**
+	 *  The number of fractional digits to be displayed.
+	 *  If not explicitly specified, appropriate precision will be guessed.
+	 */
+	@Setter
 	private int precision;
 
 	/**
@@ -28,7 +35,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	 * @param max   The maximum of the slider
 	 */
 	public SliderConfigInput(N value, N min, N max) {
-		super(0, 0, 100, 20, Text.empty(), toInternalValue(value, min, max));
+		super(0, 0, 100, 20, Component.empty(), toInternalValue(value, min, max));
 		//noinspection unchecked
 		valueClass = (Class<N>) value.getClass();
 		this.min = min;
@@ -43,7 +50,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	}
 
 	protected static double toInternalValue(Number value, Number min, Number max) {
-		return MathHelper.clamp(
+		return Mth.clamp(
 				(value.doubleValue() - min.doubleValue()) / (max.doubleValue() - min.doubleValue()),
 				0D, 1D
 		);
@@ -76,16 +83,6 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	}
 
 	/**
-	 * Sets the amount of fractional digits to be displayed.
-	 * If not explicitly specified an appropriate precision will be guessed.
-	 *
-	 * @param precision The precision of this slider
-	 */
-	public void setPrecision(int precision) {
-		this.precision = precision;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -97,11 +94,15 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
 		setPosition(x, y);
 		setWidth(width);
 
-		render(drawContext, mouseX, mouseY, tickDelta);
+		render(graphics, mouseX, mouseY, tickDelta);
 	}
 
 	/**
@@ -112,7 +113,7 @@ public class SliderConfigInput<N extends Number> extends SliderWidget implements
 		NumberFormat format = NumberFormat.getInstance();
 		format.setMaximumFractionDigits(precision);
 		format.setMinimumFractionDigits(precision);
-		setMessage(Text.literal(format.format(getRealValue())));
+		setMessage(Component.literal(format.format(getRealValue())));
 	}
 
 	/**

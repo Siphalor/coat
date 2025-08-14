@@ -1,12 +1,13 @@
 package de.siphalor.coat.list.entry;
 
+//- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.util.CoatUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,15 +17,15 @@ import java.util.List;
  * A textual entry for config list widgets.
  */
 public class ConfigListTextEntry extends ConfigContainerEntry {
-	private final TextRenderer textRenderer;
-	private final Text text;
-	private List<OrderedText> multilineText;
+	private final Font font;
+	private final Component text;
+	private List<FormattedCharSequence> multilineText;
 	private int height;
 
-	public ConfigListTextEntry(Text text) {
+	public ConfigListTextEntry(Component text) {
 		super();
 		this.text = text;
-		textRenderer = MinecraftClient.getInstance().textRenderer;
+		font = Minecraft.getInstance().font;
 	}
 
 	/**
@@ -33,7 +34,7 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
-		multilineText = textRenderer.wrapLines(text, newWidth);
+		multilineText = font.split(text, newWidth);
 		height = multilineText.size() * 9 + CoatUtil.MARGIN + CoatUtil.MARGIN;
 		parent.entryHeightChanged(this);
 	}
@@ -50,9 +51,17 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
 		for (int i = 0; i < multilineText.size(); i++) {
-			drawContext.drawText(textRenderer, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
+			//# if RENDERING == "POSE_STACK"
+			//- font.draw(graphics, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb());
+			//# elif RENDERING == "GUI_GRAPHICS"
+			graphics.drawString(font, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
+			//# end
 		}
 	}
 

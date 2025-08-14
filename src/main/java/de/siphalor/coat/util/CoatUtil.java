@@ -1,16 +1,21 @@
 package de.siphalor.coat.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundManager;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -54,17 +59,17 @@ public class CoatUtil {
 	 * Intelligently trims the given text to the given width.
 	 * At the end of the string an ellipsis will be placed.
 	 *
-	 * @param textRenderer The text renderer to use for calculations
-	 * @param baseText     The text to trim intelligently
-	 * @param width        The width to trim the text to
+	 * @param font     The text renderer to use for calculations
+	 * @param baseText The text to trim intelligently
+	 * @param width    The width to trim the text to
 	 * @return The trimmed text
 	 */
-	public static Text intelliTrim(TextRenderer textRenderer, Text baseText, int width) {
-		int textWidth = textRenderer.getWidth(baseText);
+	public static Component intelliTrim(Font font, Component baseText, int width) {
+		int textWidth = font.width(baseText);
 		if (textWidth > width) {
-			textWidth = textRenderer.getWidth(ELLIPSIS);
-			String trimmed = textRenderer.trimToWidth(baseText.getString(), width - textWidth);
-			return Text.literal(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
+			textWidth = font.width(ELLIPSIS);
+			String trimmed = font.plainSubstrByWidth(baseText.getString(), width - textWidth);
+			return Component.literal(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
 		} else {
 			return baseText;
 		}
@@ -72,31 +77,43 @@ public class CoatUtil {
 
 	/**
 	 * Wraps a text that's intended for tooltips at a certain length.
-	 * @param textRenderer    The text renderer to use for calculations
-	 * @param minecraftClient The {@link MinecraftClient} instance
+	 * @param font    The text renderer to use for calculations
+	 * @param minecraft The {@link Minecraft} instance
 	 * @param text            The text to wrap
-	 * @return A list of {@link OrderedText}s representing the wrapped tooltip text
+	 * @return A list of {@link FormattedCharSequence}s representing the wrapped tooltip text
 	 */
-	public static List<OrderedText> wrapTooltip(TextRenderer textRenderer, MinecraftClient minecraftClient, Text text) {
-		return textRenderer.wrapLines(text, minecraftClient.currentScreen.width / 2);
+	public static List<FormattedCharSequence> wrapTooltip(Font font, Minecraft minecraft, Component text) {
+		return font.split(text, minecraft.screen.width / 2);
 	}
 
 	/**
 	 * Wraps and renders the given text as a tooltip.
 	 *
-	 * @param drawContext The matrix stack to use for rendering
-	 * @param x           The x position to render to
-	 * @param y           The y position to render to
-	 * @param text        The tooltip text to wrap and render
+	 * @param graphics The matrix stack to use for rendering
+	 * @param x        The x position to render to
+	 * @param y        The y position to render to
+	 * @param text     The tooltip text to wrap and render
 	 */
-	public static void renderTooltip(DrawContext drawContext, int x, int y, Text text) {
-		MinecraftClient client = MinecraftClient.getInstance();
+	//# if RENDERING == "POSE_STACK"
+	//- public static void renderTooltip(PoseStack graphics, int x, int y, Component text) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public static void renderTooltip(GuiGraphics graphics, int x, int y, Component text) {
+	//# end
+		Minecraft minecraft = Minecraft.getInstance();
 		RenderSystem.depthFunc(GL11.GL_ALWAYS);
-		drawContext.drawOrderedTooltip(
-				client.textRenderer,
-				wrapTooltip(client.textRenderer, client, text),
+		//# if RENDERING == "POSE_STACK"
+		//- Minecraft.getInstance().screen.renderTooltip(
+				//- graphics,
+				//- text,
+				//- x, y
+		//- );
+		//# elif RENDERING == "GUI_GRAPHICS"
+		graphics.renderTooltip(
+				minecraft.font,
+				wrapTooltip(minecraft.font, minecraft, text),
 				x, y
 		);
+		//# end
 	}
 
 	/**
@@ -109,17 +126,17 @@ public class CoatUtil {
 	 * @param color  The color to draw with
 	 */
 	public static void drawStrokeRect(int x1, int y1, int x2, int y2, int stroke, CoatColor color) {
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
+		Tesselator tessellator = Tesselator.getInstance();
+		BufferBuilder buffer = tessellator.getBuilder();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 		addRect(buffer, x1, y1, x2, y1 + stroke, color);
 		addRect(buffer, x1, y2 - stroke, x2, y2, color);
 		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, color);
 		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, color);
-		tessellator.draw();
+		tessellator.end();
 	}
 
 	/**
@@ -132,10 +149,10 @@ public class CoatUtil {
 	 * @param color  the color of the rect
 	 */
 	public static void addRect(BufferBuilder buffer, int x1, int y1, int x2, int y2, CoatColor color) {
-		withColor(buffer.vertex(x1, y2, 0), color).next();
-		withColor(buffer.vertex(x2, y2, 0), color).next();
-		withColor(buffer.vertex(x2, y1, 0), color).next();
-		withColor(buffer.vertex(x1, y1, 0), color).next();
+		withColor(buffer.vertex(x1, y2, 0), color).endVertex();
+		withColor(buffer.vertex(x2, y2, 0), color).endVertex();
+		withColor(buffer.vertex(x2, y1, 0), color).endVertex();
+		withColor(buffer.vertex(x1, y1, 0), color).endVertex();
 	}
 
 	public static void drawHorizontalGradient(int left, int top, int right, int bottom, CoatColor leftColor, CoatColor rightColor) {
@@ -143,55 +160,55 @@ public class CoatUtil {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		Tesselator tesselator = Tesselator.getInstance();
+		BufferBuilder bufferBuilder = tesselator.getBuilder();
 
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-		withColor(bufferBuilder.vertex(left, bottom, 0D), leftColor).next();
-		withColor(bufferBuilder.vertex(right, bottom, 0D), rightColor).next();
-		withColor(bufferBuilder.vertex(right, top, 0D), rightColor).next();
-		withColor(bufferBuilder.vertex(left, top, 0D), leftColor).next();
-		tessellator.draw();
+		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		withColor(bufferBuilder.vertex(left, bottom, 0D), leftColor).endVertex();
+		withColor(bufferBuilder.vertex(right, bottom, 0D), rightColor).endVertex();
+		withColor(bufferBuilder.vertex(right, top, 0D), rightColor).endVertex();
+		withColor(bufferBuilder.vertex(left, top, 0D), leftColor).endVertex();
+		tesselator.end();
 
 		RenderSystem.disableBlend();
 	}
 
-	public static void drawInsetGradientTexture(int left, int top, int right, int bottom, int z, Identifier texture, float textureScale, CoatColor outerColor, CoatColor innerColor) {
+	public static void drawInsetGradientTexture(int left, int top, int right, int bottom, int z, ResourceLocation texture, float textureScale, CoatColor outerColor, CoatColor innerColor) {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 		RenderSystem.setShaderTexture(0, texture);
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
+		Tesselator tesselator = Tesselator.getInstance();
+		BufferBuilder buffer = tesselator.getBuilder();
 
 		int width = right - left;
 		int height = bottom - top;
 		int middleOffset = height / 2;
 
-		buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE);
-		withColor(buffer.vertex(left, top, z), outerColor).texture(0F, 0F).next();
-		withColor(buffer.vertex(left + middleOffset, top + middleOffset, z), innerColor).texture(middleOffset / textureScale, middleOffset / textureScale).next();
-		withColor(buffer.vertex(right, top, z), outerColor).texture(width / textureScale, 0F).next();
-		withColor(buffer.vertex(right - middleOffset, top + middleOffset, z), innerColor).texture((width - middleOffset) / textureScale, middleOffset / textureScale).next();
-		withColor(buffer.vertex(right, bottom, z), outerColor).texture(width / textureScale, height / textureScale).next();
-		withColor(buffer.vertex(left + middleOffset, bottom - middleOffset, z), innerColor).texture(middleOffset / textureScale, (height - middleOffset) / textureScale).next();
-		withColor(buffer.vertex(left, bottom, z), outerColor).texture(0F, height / textureScale).next();
-		withColor(buffer.vertex(left, top, z), outerColor).texture(0F, 0F).next();
-		tessellator.draw();
+		buffer.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
+		withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
+		withColor(buffer.vertex(left + middleOffset, top + middleOffset, z), innerColor).uv(middleOffset / textureScale, middleOffset / textureScale).endVertex();
+		withColor(buffer.vertex(right, top, z), outerColor).uv(width / textureScale, 0F).endVertex();
+		withColor(buffer.vertex(right - middleOffset, top + middleOffset, z), innerColor).uv((width - middleOffset) / textureScale, middleOffset / textureScale).endVertex();
+		withColor(buffer.vertex(right, bottom, z), outerColor).uv(width / textureScale, height / textureScale).endVertex();
+		withColor(buffer.vertex(left + middleOffset, bottom - middleOffset, z), innerColor).uv(middleOffset / textureScale, (height - middleOffset) / textureScale).endVertex();
+		withColor(buffer.vertex(left, bottom, z), outerColor).uv(0F, height / textureScale).endVertex();
+		withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
+		tesselator.end();
 	}
 
-	public static void drawTintedTexture(int left, int top, int right, int bottom, int z, Identifier texture, float textureScale, int textureYOffset, CoatColor color) {
-		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+	public static void drawTintedTexture(int left, int top, int right, int bottom, int z, ResourceLocation texture, float textureScale, int textureYOffset, CoatColor color) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, texture);
 		setShaderColor(color);
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-		bufferBuilder.vertex(left, bottom, z).texture(left / textureScale, (bottom + textureYOffset) / textureScale).next();
-		bufferBuilder.vertex(right, bottom, z).texture(right / textureScale, (bottom + textureYOffset) / textureScale).next();
-		bufferBuilder.vertex(right, top, z).texture(right / textureScale, (top + textureYOffset) / textureScale).next();
-		bufferBuilder.vertex(left, top, z).texture(left / textureScale, (top + textureYOffset) / textureScale).next();
-		tessellator.draw();
+		Tesselator tesselator = Tesselator.getInstance();
+		BufferBuilder bufferBuilder = tesselator.getBuilder();
+		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		bufferBuilder.vertex(left, bottom, z).uv(left / textureScale, (bottom + textureYOffset) / textureScale).endVertex();
+		bufferBuilder.vertex(right, bottom, z).uv(right / textureScale, (bottom + textureYOffset) / textureScale).endVertex();
+		bufferBuilder.vertex(right, top, z).uv(right / textureScale, (top + textureYOffset) / textureScale).endVertex();
+		bufferBuilder.vertex(left, top, z).uv(left / textureScale, (top + textureYOffset) / textureScale).endVertex();
+		tesselator.end();
 		resetShaderColor();
 	}
 
@@ -209,7 +226,7 @@ public class CoatUtil {
 	}
 
 	public static void playClickSound() {
-		SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
-		soundManager.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+		SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+		soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 	}
 }

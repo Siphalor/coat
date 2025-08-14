@@ -3,7 +3,7 @@ package de.siphalor.coat.list.entry;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.util.CoatUtil;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import org.lwjgl.opengl.GL32;
 
 import java.util.Collection;
@@ -19,10 +19,18 @@ public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DrawContext drawContext, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# end
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL32.GL_LESS);
-		drawContext.fill(x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+		//# if RENDERING == "POSE_STACK"
+		//- fill(graphics, x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+		//# elif RENDERING == "GUI_GRAPHICS"
+		graphics.fill(x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+		//# end
 		RenderSystem.disableDepthTest();
 	}
 

@@ -2,9 +2,9 @@ package de.siphalor.coat.list;
 
 import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.list.entry.ConfigContainerEntry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 
@@ -16,7 +16,7 @@ public class ConfigListWidget extends ConfigCategoryWidget {
 	/**
 	 * @inheritDoc
 	 */
-	public ConfigListWidget(MinecraftClient client, Text name, Collection<ConfigContainerEntry> entries, Identifier background) {
+	public ConfigListWidget(Minecraft client, Component name, Collection<ConfigContainerEntry> entries, ResourceLocation background) {
 		super(client, name, entries, background);
 	}
 }

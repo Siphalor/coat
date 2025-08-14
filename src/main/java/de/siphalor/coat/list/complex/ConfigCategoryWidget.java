@@ -3,14 +3,14 @@ package de.siphalor.coat.list.complex;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
-import de.siphalor.coat.list.entry.ConfigCategoryConfigEntry;
 import de.siphalor.coat.list.entry.ConfigContainerEntry;
 import de.siphalor.coat.list.entry.ConfigContainerLinkEntry;
 import de.siphalor.coat.list.entry.ConfigListHorizontalBreak;
 import de.siphalor.coat.screen.ConfigContentWidget;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import lombok.Getter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -22,7 +22,9 @@ import java.util.stream.Collectors;
  * A config list with entries and subTrees.
  */
 public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainerEntry> implements ConfigContentWidget {
-	private final Text name;
+	@Getter
+	private final Component name;
+	@Getter
 	private final List<ConfigCategoryWidget> subTrees;
 	private final List<ConfigContainerLinkEntry> subTreeLinks;
 	private ConfigTreeEntry treeEntry;
@@ -30,26 +32,16 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 	/**
 	 * Constructs a new list widget.
 	 *
-	 * @param client     The {@link MinecraftClient} instance
+	 * @param minecraft     The {@link Minecraft} instance
 	 * @param name       The name of this config category
 	 * @param entries    A collection of entries to directly add to the widget
 	 * @param background An identifier referring to a background texture
 	 */
-	public ConfigCategoryWidget(MinecraftClient client, Text name, Collection<ConfigContainerEntry> entries, @Nullable Identifier background) {
-		super(client, entries, background);
+	public ConfigCategoryWidget(Minecraft minecraft, Component name, Collection<ConfigContainerEntry> entries, @Nullable ResourceLocation background) {
+		super(minecraft, entries, background);
 		this.name = name;
 		subTrees = new LinkedList<>();
 		subTreeLinks = new LinkedList<>();
-	}
-
-	/**
-	 * Gets the name of this config list/category.
-	 *
-	 * @return The name
-	 */
-	@Override
-	public Text getName() {
-		return name;
 	}
 
 	/**
@@ -66,15 +58,6 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 		ConfigContainerLinkEntry treeEntry = new ConfigContainerLinkEntry(subWidget);
 		entries().add(subTreeLinks.size(), treeEntry);
 		subTreeLinks.add(treeEntry);
-	}
-
-	/**
-	 * Gets all sub trees/lists.
-	 *
-	 * @return A list of all sub trees
-	 */
-	public List<ConfigCategoryWidget> getSubTrees() {
-		return subTrees;
 	}
 
 	/**
