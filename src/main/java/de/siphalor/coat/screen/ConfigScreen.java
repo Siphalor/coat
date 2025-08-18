@@ -1,6 +1,7 @@
 package de.siphalor.coat.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+//- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.DynamicEntryListWidget;

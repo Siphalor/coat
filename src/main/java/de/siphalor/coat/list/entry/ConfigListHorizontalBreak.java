@@ -1,6 +1,7 @@
 package de.siphalor.coat.list.entry;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+//- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.gui.GuiGraphics;

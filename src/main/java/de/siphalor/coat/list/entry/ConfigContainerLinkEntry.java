@@ -72,7 +72,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 
-		CoatUtil.drawInsetGradientTexture(x, y, x + entryWidth, y + entryHeight, -100, configWidget.getBackground(), 32F, BACKGROUND_OUTER_COLOR, BACKGROUND_INNER_COLOR);
+		CoatUtil.drawInsetGradientTexture(x, y, x + entryWidth, y + entryHeight, 0, configWidget.getBackground(), 32F, BACKGROUND_OUTER_COLOR, BACKGROUND_INNER_COLOR);
 
 		button.setX(x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN);
 		button.setY(y + CoatUtil.MARGIN);

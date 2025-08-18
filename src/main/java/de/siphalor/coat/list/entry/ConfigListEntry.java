@@ -1,6 +1,8 @@
 package de.siphalor.coat.list.entry;
 
 import com.google.common.collect.ImmutableList;
+//- import com.mojang.blaze3d.systems.RenderSystem;
+//- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.list.complex.ConfigListWidget;
@@ -18,7 +20,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
-	private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
+	//# if MC_VERSION_NUMBER < 12000
+	//- private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
+	//# else
+	private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("container/creative_inventory/scroller");
+	//# end
 
 	private final ConfigInput<V> input;
 	private final Button deleteWidget;
@@ -48,9 +54,9 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 
 		//# if RENDERING == "POSE_STACK"
 		//- RenderSystem.setShaderTexture(0, HANDLE_TEXTURE);
-		//- blit(graphics, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
+		//- blit(graphics, x, y + 2, 232, 0, 12, 15);
 		//# elif RENDERING == "GUI_GRAPHICS"
-		graphics.blit(HANDLE_TEXTURE, x, y + 2, isDragFollow() ? 244 : 232, 0, 12, 15);
+		graphics.blitSprite(HANDLE_TEXTURE, x, y + 2, 12, 15);
 		//# end
 		input.render(graphics, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		deleteWidget.setPosition(x + entryWidth - 20, y);
