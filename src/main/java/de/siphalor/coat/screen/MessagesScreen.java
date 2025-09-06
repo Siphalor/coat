@@ -65,9 +65,9 @@ public class MessagesScreen extends Screen {
 		super.init();
 
 		//# if MC_VERSION_NUMBER >= 11903
-		abortButton = Button.builder(ABORT_BUTTON_TEXT, button -> this.abortClicked())
+		abortButton = Button.builder(ABORT_TEXT, button -> this.abortClicked())
 				.pos(0, 38).size(100, 20).build();
-		acceptButton = Button.builder(ACCEPT_BUTTON_TEXT, button -> this.acceptClicked())
+		acceptButton = Button.builder(ACCEPT_TEXT, button -> this.acceptClicked())
 				.pos(0, 38).size(100, 20).build();
 		//# else
 		//- abortButton = new Button(0, 38, 100, 20, ABORT_TEXT, button -> this.abortClicked());

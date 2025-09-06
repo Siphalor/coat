@@ -40,7 +40,7 @@ public class ConfigScreen extends Screen {
 	//# if MC_VERSION_NUMBER >= 11900
 	private static final Component ABORT_TEXT = Component.translatable(ABORT_TEXT_KEY);
 	private static final Component ABORT_SCREEN_TITLE_TEXT = Component.translatable(ABORT_SCREEN_TITLE_TEXT_KEY);
-	private static final Component ABORT_SCREEN_DESC_TEXT = Component.translatable(ABORT_SCREEN_DESC_TEXT_KEY)
+	private static final Component ABORT_SCREEN_DESC_TEXT = Component.translatable(ABORT_SCREEN_DESC_TEXT_KEY);
 	private static final Component SAVE_TEXT = Component.translatable(SAVE_TEXT_KEY);
 	private static final Component SAVE_WARNINGS_TEXT = Component.translatable(SAVE_WARNINGS_TEXT_KEY);
 	private static final Component SAVE_ERRORS_TEXT = Component.translatable(SAVE_ERRORS_TEXT_KEY);
