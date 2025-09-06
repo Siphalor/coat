@@ -16,6 +16,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+//- import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,7 +26,12 @@ import java.util.List;
  * A list entry linking to a message and providing functionality to jump to it.
  */
 public class MessageListEntry extends ConfigContainerCompoundEntry {
-	private static final Component JUMP_TEXT = Component.translatable(Coat.MOD_ID + ".message.jump");
+	private static final String JUMP_TEXT_KEY = Coat.MOD_ID + ".message.jump";
+	//# if MC_VERSION_NUMBER >= 11900
+	private static final Component JUMP_TEXT = Component.translatable(JUMP_TEXT_KEY);
+	//# else
+	//- private static final Component JUMP_TEXT = new TranslatableComponent(JUMP_TEXT_KEY);
+	//# end
 
 	private final Message message;
 	private Component text;

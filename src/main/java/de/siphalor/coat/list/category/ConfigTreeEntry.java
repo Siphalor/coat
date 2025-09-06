@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
+//- import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -29,8 +30,15 @@ import java.util.stream.Collectors;
  * @see ConfigCategoryWidget
  */
 public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
-	private static final Component EXPAND_TEXT = Component.translatable(Coat.MOD_ID + ".tree.expand");
-	private static final Component COLLAPSE_TEXT = Component.translatable(Coat.MOD_ID + ".tree.collapse");
+	private static final String EXPAND_TEXT_KEY = Coat.MOD_ID + ".tree.expand";
+	private static final String COLLAPSE_TEXT_KEY = Coat.MOD_ID + ".tree.collapse";
+	//# if MC_VERSION_NUMBER >= 11900
+	private static final Component EXPAND_TEXT = Component.translatable(EXPAND_TEXT_KEY);
+	private static final Component COLLAPSE_TEXT = Component.translatable(COLLAPSE_TEXT_KEY);
+	//# else
+	//- private static final Component EXPAND_TEXT = new TranslatableComponent(EXPAND_TEXT_KEY);
+	//- private static final Component COLLAPSE_TEXT = new TranslatableComponent(COLLAPSE_TEXT_KEY);
+	//# end
 
 	private final TextButtonWidget collapseButton;
 	private final TextButtonWidget nameButton;

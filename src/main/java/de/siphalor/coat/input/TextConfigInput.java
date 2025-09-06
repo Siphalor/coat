@@ -24,7 +24,7 @@ public class TextConfigInput extends EditBox implements ConfigInput<String> {
 				0,
 				10,
 				20 - AUTO_PADDING * 2,
-				Component.empty()
+				/*# if MC_VERSION_NUMBER >= 11900 */Component.empty()/*# else *//*- null *//*# end */
 		);
 		setMaxLength(Integer.MAX_VALUE);
 		setValue(value);

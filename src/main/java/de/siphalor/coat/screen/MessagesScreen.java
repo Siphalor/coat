@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+//- import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,8 +23,15 @@ import java.util.stream.Collectors;
  * or to return to the previous screen.
  */
 public class MessagesScreen extends Screen {
-	private static final Component ABORT_BUTTON_TEXT = Component.translatable(Coat.MOD_ID + ".action.abort");
-	private static final Component ACCEPT_BUTTON_TEXT = Component.translatable(Coat.MOD_ID + ".action.accept_risk");
+	private static final String ABORT_TEXT_KEY = Coat.MOD_ID + ".action.abort";
+	private static final String ACCEPT_TEXT_KEY = Coat.MOD_ID + ".action.accept_risk";
+	//# if MC_VERSION_NUMBER >= 11900
+	private static final Component ABORT_TEXT = Component.translatable(ABORT_TEXT_KEY);
+	private static final Component ACCEPT_TEXT = Component.translatable(ACCEPT_TEXT_KEY);
+	//# else
+	//- private static final Component ABORT_TEXT = new TranslatableComponent(ABORT_TEXT_KEY);
+	//- private static final Component ACCEPT_TEXT = new TranslatableComponent(ACCEPT_TEXT_KEY);
+	//# end
 
 	@Getter
 	private final ConfigScreen parent;
@@ -62,8 +70,8 @@ public class MessagesScreen extends Screen {
 		acceptButton = Button.builder(ACCEPT_BUTTON_TEXT, button -> this.acceptClicked())
 				.pos(0, 38).size(100, 20).build();
 		//# else
-		//- abortButton = new Button(0, 38, 100, 20, ABORT_BUTTON_TEXT, button -> this.abortClicked());
-		//- acceptButton = new Button(0, 38, 100, 20, ACCEPT_BUTTON_TEXT, button -> this.acceptClicked());
+		//- abortButton = new Button(0, 38, 100, 20, ABORT_TEXT, button -> this.abortClicked());
+		//- acceptButton = new Button(0, 38, 100, 20, ACCEPT_TEXT, button -> this.acceptClicked());
 		//# end
 		addRenderableWidget(abortButton);
 		addRenderableWidget(acceptButton);

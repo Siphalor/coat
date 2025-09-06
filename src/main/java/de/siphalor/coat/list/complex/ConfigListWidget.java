@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+//- import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +25,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<V>> implements ConfigContentWidget {
-	private static final Component APPEND_BUTTON_TEXT = Component.translatable(Coat.MOD_ID + ".list.append");
+	private static final String APPEND_BUTTON_TEXT_KEY = Coat.MOD_ID + ".list.append";
+	//# if MC_VERSION_NUMBER >= 11900
+	private static final Component APPEND_BUTTON_TEXT = Component.translatable(APPEND_BUTTON_TEXT_KEY);
+	//# else
+	//- private static final Component APPEND_BUTTON_TEXT = new TranslatableComponent(APPEND_BUTTON_TEXT_KEY);
+	//# end
 	private final MutableComponent name;
 	private final ConfigEntryHandler<List<V>> entryHandler;
 	private final ConfigListEntryFactory<V> entryFactory;

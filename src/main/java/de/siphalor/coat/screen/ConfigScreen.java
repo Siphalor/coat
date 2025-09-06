@@ -19,6 +19,7 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 //- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
+//- import net.minecraft.network.chat.TranslatableComponent;
 import org.lwjgl.opengl.GL32;
 
 import java.util.Collection;
@@ -30,8 +31,27 @@ import java.util.List;
  * A Coat config screen.
  */
 public class ConfigScreen extends Screen {
-	private static final Component ABORT_TEXT = Component.translatable(Coat.MOD_ID + ".action.abort");
-	private static final Component SAVE_TEXT =  Component.translatable(Coat.MOD_ID + ".action.save");
+	private static final String ABORT_TEXT_KEY = Coat.MOD_ID + ".action.abort";
+	private static final String ABORT_SCREEN_TITLE_TEXT_KEY = Coat.MOD_ID + ".action.abort.screen.title";
+	private static final String ABORT_SCREEN_DESC_TEXT_KEY = Coat.MOD_ID + ".action.abort.screen.desc";
+	private static final String SAVE_TEXT_KEY = Coat.MOD_ID + ".action.save";
+	private static final String SAVE_WARNINGS_TEXT_KEY = Coat.MOD_ID + ".action.save.warnings";
+	private static final String SAVE_ERRORS_TEXT_KEY = Coat.MOD_ID + ".action.save.errors";
+	//# if MC_VERSION_NUMBER >= 11900
+	private static final Component ABORT_TEXT = Component.translatable(ABORT_TEXT_KEY);
+	private static final Component ABORT_SCREEN_TITLE_TEXT = Component.translatable(ABORT_SCREEN_TITLE_TEXT_KEY);
+	private static final Component ABORT_SCREEN_DESC_TEXT = Component.translatable(ABORT_SCREEN_DESC_TEXT_KEY)
+	private static final Component SAVE_TEXT = Component.translatable(SAVE_TEXT_KEY);
+	private static final Component SAVE_WARNINGS_TEXT = Component.translatable(SAVE_WARNINGS_TEXT_KEY);
+	private static final Component SAVE_ERRORS_TEXT = Component.translatable(SAVE_ERRORS_TEXT_KEY);
+	//# else
+	//- private static final Component ABORT_TEXT = new TranslatableComponent(ABORT_TEXT_KEY);
+	//- private static final Component ABORT_SCREEN_TITLE_TEXT = new TranslatableComponent(ABORT_SCREEN_TITLE_TEXT_KEY);
+	//- private static final Component ABORT_SCREEN_DESC_TEXT = new TranslatableComponent(ABORT_SCREEN_DESC_TEXT_KEY);
+	//- private static final Component SAVE_TEXT = new TranslatableComponent(SAVE_TEXT_KEY);
+	//- private static final Component SAVE_WARNINGS_TEXT = new TranslatableComponent(SAVE_WARNINGS_TEXT_KEY);
+	//- private static final Component SAVE_ERRORS_TEXT = new TranslatableComponent(SAVE_ERRORS_TEXT_KEY);
+	//# end
 	private static final CoatColor BACKGROUND_TEXTURE_TINT_COLOR = CoatColor.rgb(0x777777);
 
 	private final Screen parent;
@@ -116,8 +136,8 @@ public class ConfigScreen extends Screen {
 						Minecraft.getInstance().setScreen(this);
 					}
 				},
-				Component.translatable(Coat.MOD_ID + ".action.abort.screen.title"),
-				Component.translatable(Coat.MOD_ID + ".action.abort.screen.desc")));
+				ABORT_SCREEN_TITLE_TEXT,
+				ABORT_SCREEN_DESC_TEXT));
 	}
 
 	/**
@@ -158,7 +178,7 @@ public class ConfigScreen extends Screen {
 
 		Runnable warningOpener = () -> {
 			Minecraft.getInstance().setScreen(new MessagesScreen(
-					Component.translatable(Coat.MOD_ID + ".action.save.warnings"),
+					SAVE_WARNINGS_TEXT,
 					this,
 					saveRunnable,
 					warnings
@@ -167,7 +187,7 @@ public class ConfigScreen extends Screen {
 
 		if (!errors.isEmpty()) {
 			Minecraft.getInstance().setScreen(new MessagesScreen(
-					Component.translatable(Coat.MOD_ID + ".action.save.errors"),
+					SAVE_ERRORS_TEXT,
 					this,
 					warnings.isEmpty() ? saveRunnable : warningOpener,
 					errors

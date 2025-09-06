@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
+//- import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
 
 import java.text.NumberFormat;
@@ -35,7 +36,14 @@ public class SliderConfigInput<N extends Number> extends AbstractSliderButton im
 	 * @param max   The maximum of the slider
 	 */
 	public SliderConfigInput(N value, N min, N max) {
-		super(0, 0, 100, 20, Component.empty(), toInternalValue(value, min, max));
+		super(
+				0,
+				0,
+				100,
+				20,
+				/*# if MC_VERSION_NUMBER >= 11900 */Component.empty()/*# else *//*- null *//*# end */,
+				toInternalValue(value, min, max)
+		);
 		//noinspection unchecked
 		valueClass = (Class<N>) value.getClass();
 		this.min = min;
@@ -120,7 +128,11 @@ public class SliderConfigInput<N extends Number> extends AbstractSliderButton im
 		NumberFormat format = NumberFormat.getInstance();
 		format.setMaximumFractionDigits(precision);
 		format.setMinimumFractionDigits(precision);
+		//# if MC_VERSION_NUMBER >= 11900
 		setMessage(Component.literal(format.format(getRealValue())));
+		//# else
+		//- setMessage(new TextComponent(format.format(getRealValue())));
+		//# end
 	}
 
 	/**

@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
+//- import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
@@ -74,7 +75,11 @@ public class CoatUtil {
 		if (textWidth > width) {
 			textWidth = font.width(ELLIPSIS);
 			String trimmed = font.plainSubstrByWidth(baseText.getString(), width - textWidth);
+			//# if MC_VERSION_NUMBER >= 11900
 			return Component.literal(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
+			//# else
+			//- return new TextComponent(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
+			//# end
 		} else {
 			return baseText;
 		}

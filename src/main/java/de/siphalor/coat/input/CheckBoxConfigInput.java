@@ -29,10 +29,15 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 				//# if MC_VERSION_NUMBER >= 12100
 				20,
 				//# end
-				showMessage ? message : Component.empty() /*# if CHECKBOX_SIZE == "FONT" */,
-				Minecraft.getInstance().font/*# end */,
-				checked /*# if CHECKBOX_CHANGE_HANDLER */,
-				(checkbox, checked1) -> {}/*# end */
+				//# if MC_VERSION_NUMBER >= 11900
+				showMessage ? message : Component.empty()
+				//# else
+				//- message
+				//# end
+				/*# if CHECKBOX_SIZE == "FONT" */, Minecraft.getInstance().font/*# end */
+				, checked
+				/*# if CHECKBOX_CHANGE_HANDLER */, (checkbox, checked1) -> {}/*# end */
+				/*# if MC_VERSION_NUMBER < 11900 *//*- , showMessage *//*# end */
 		);
 	}
 

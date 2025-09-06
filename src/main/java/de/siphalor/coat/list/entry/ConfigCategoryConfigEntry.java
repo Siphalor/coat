@@ -21,6 +21,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+//- import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
@@ -35,7 +36,15 @@ import java.util.Objects;
  * @param <V> The value type
  */
 public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry implements InputChangeListener<V> {
-	private static final Component DEFAULT_TEXT = Component.translatable(Coat.MOD_ID + ".default");
+	private static final String DEFAULT_TEXT_KEY = Coat.MOD_ID + ".default";
+	private static final String DEFAULT_HOVER_TEXT_KEY = Coat.MOD_ID + ".default.hover";
+	//# if MC_VERSION_NUMBER >= 11900
+	private static final Component DEFAULT_TEXT = Component.translatable(DEFAULT_TEXT_KEY);
+	private static final Component DEFAULT_HOVER_TEXT = Component.translatable(DEFAULT_HOVER_TEXT_KEY);
+	//# else
+	//- private static final Component DEFAULT_TEXT = new TranslatableComponent(DEFAULT_TEXT_KEY);
+	//- private static final Component DEFAULT_HOVER_TEXT = new TranslatableComponent(DEFAULT_HOVER_TEXT_KEY);
+	//# end
 	private static final int TEXT_INDENT = 8;
 	private final Font font;
 	private final TextButtonWidget nameWidget;
@@ -100,9 +109,9 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		//- 						entryHandler.asText(entryHandler.getDefault())
 		//- 				);
 		//- 				List<FormattedCharSequence> all = new ArrayList<>(wrappedLines.size() + 1);
-		//- 				all.add(Component.translatable(Coat.MOD_ID + ".default.hover").getVisualOrderText());
+		//- 				all.add(DEFAULT_HOVER_TEXT.getVisualOrderText());
 		//- 				all.addAll(wrappedLines);
-		//- 				minecraft.screen.renderTooltip(context, all, mouseX, mouseX);
+		//- 				minecraft.screen.renderTooltip(context, all, mouseX, mouseY);
 		//- 			}
 		//- 		}
 		//- );

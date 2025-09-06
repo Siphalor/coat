@@ -13,6 +13,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
+//- import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,7 +23,12 @@ import java.util.List;
  * An entry linking to an entry.
  */
 public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
-	private static final Component OPEN_TEXT = Component.translatable(Coat.MOD_ID + ".tree.open");
+	private static final String OPEN_TEXT_KEY = Coat.MOD_ID + ".tree.open";
+	//# if MC_VERSION_NUMBER >= 11900
+	private static final Component OPEN_TEXT = Component.translatable(OPEN_TEXT_KEY);
+	//# else
+	//- private static final Component OPEN_TEXT = new TranslatableComponent(OPEN_TEXT_KEY);
+	//# end
 	private static final CoatColor BACKGROUND_OUTER_COLOR = CoatColor.rgb(0x333333);
 	private static final CoatColor BACKGROUND_INNER_COLOR = CoatColor.rgb(0x777777);
 
