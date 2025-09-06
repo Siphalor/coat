@@ -26,18 +26,18 @@ public interface ConfigContentWidget extends GuiEventListener, Renderable, Narra
 	/**
 	 * @deprecated Override and use {@link #renderWidget} instead.
 	 */
-	//# if RENDERING == "POSE_STACK"
-	//- @Deprecated
-	//- default void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
-		//- renderWidget(graphics, mouseX, mouseY, delta);
-	//- }
-	//- default void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {}
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	@Deprecated
 	default void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 		renderWidget(graphics, mouseX, mouseY, delta);
 	}
 	default void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {}
+	//# elif RENDERING == "POSE_STACK"
+	//- @Deprecated
+	//- default void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//- 	renderWidget(graphics, mouseX, mouseY, delta);
+	//- }
+	//- default void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {}
 	//# end
 
 	@Override

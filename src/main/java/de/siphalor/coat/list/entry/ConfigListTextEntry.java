@@ -51,16 +51,16 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		for (int i = 0; i < multilineText.size(); i++) {
-			//# if RENDERING == "POSE_STACK"
-			//- font.draw(graphics, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb());
-			//# elif RENDERING == "GUI_GRAPHICS"
+			//# if RENDERING == "GUI_GRAPHICS"
 			graphics.drawString(font, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
+			//# elif RENDERING == "POSE_STACK"
+			//- font.draw(graphics, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb());
 			//# end
 		}
 	}
@@ -81,6 +81,7 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 		return Collections.emptyList();
 	}
 
+	//# if MC_VERSION_NUMBER >= 11904
 	@Override
 	public void setFocused(boolean focused) {
 	}
@@ -89,4 +90,5 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	public boolean isFocused() {
 		return false;
 	}
+	//# end
 }

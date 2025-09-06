@@ -66,7 +66,9 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 					configScreen.setFocused(category);
 					ConfigCategoryWidget listWidget = (ConfigCategoryWidget) configScreen.getContentWidget();
 					listWidget.setFocused(last);
+					//# if MC_VERSION_NUMBER >= 11904
 					listWidget.setFocused(true);
+					//# end
 				}
 			}
 		}).size(100, 20).build();
@@ -88,26 +90,26 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		Font font = Minecraft.getInstance().font;
-		//# if RENDERING == "POSE_STACK"
-		//- font.draw(graphics, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb());
-		//# elif RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS"
 		graphics.drawString(font, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb(), false);
+		//# elif RENDERING == "POSE_STACK"
+		//- font.draw(graphics, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb());
 		//# end
 		jumpButton.setY(y);
 		jumpButton.setX(x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN);
 		jumpButton.render(graphics, mouseX, mouseY, tickDelta);
 
 		if (hovered && mouseX < jumpButton.getX()) {
-			//# if RENDERING == "POSE_STACK"
-			//- CoatUtil.renderTooltip(graphics, mouseX, mouseY, message.getText());
-			//# elif RENDERING == "GUI_GRAPHICS"
+			//# if RENDERING == "GUI_GRAPHICS"
 			graphics.renderTooltip(font, message.getText(), mouseX, mouseY);
+			//# elif RENDERING == "POSE_STACK"
+			//- CoatUtil.renderTooltip(graphics, mouseX, mouseY, message.getText());
 			//# end
 		}
 	}

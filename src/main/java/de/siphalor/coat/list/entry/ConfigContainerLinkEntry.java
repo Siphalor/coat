@@ -66,20 +66,20 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 
 		CoatUtil.drawInsetGradientTexture(x, y, x + entryWidth, y + entryHeight, 0, configWidget.getBackground(), 32F, BACKGROUND_OUTER_COLOR, BACKGROUND_INNER_COLOR);
 
 		button.setX(x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN);
 		button.setY(y + CoatUtil.MARGIN);
-		//# if RENDERING == "POSE_STACK"
-		//- Minecraft.getInstance().font.drawShadow(graphics, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2, CoatUtil.TEXT_COLOR.getArgb());
-		//# elif RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS"
 		graphics.drawString(Minecraft.getInstance().font, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2, CoatUtil.TEXT_COLOR.getArgb(), true);
+		//# elif RENDERING == "POSE_STACK"
+		//- Minecraft.getInstance().font.drawShadow(graphics, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2, CoatUtil.TEXT_COLOR.getArgb());
 		//# end
 		button.render(graphics, mouseX, mouseY, tickDelta);
 

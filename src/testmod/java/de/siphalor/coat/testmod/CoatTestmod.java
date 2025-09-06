@@ -88,18 +88,25 @@ public class CoatTestmod implements ClientModInitializer {
 		LinkedList<ConfigContainerEntry> list1 = new LinkedList<>();
 		list1.add(new ConfigListTextEntry(Component.literal("You know the rules and so do I")));
 		list1.add(new ConfigListTextEntry(Component.literal("A full commitment's what I'm thinking of")));
-		widget.addSubTree(new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("Abc Def"), list1, new ResourceLocation("textures/block/acacia_planks.png")));
+
+		ResourceLocation achachaPlanks = createIdentifier("textures/block/acacia_planks.png");
+		widget.addSubTree(new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("Abc Def"), list1, achachaPlanks));
+
 
 		LinkedList<ConfigContainerEntry> list2 = new LinkedList<>();
 		list2.add(new ConfigListTextEntry(Component.literal("Heyho")));
-		widget.addSubTree(new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("This is a kinda long category name"), list2, new ResourceLocation("textures/block/end_stone.png")));
+
+		ResourceLocation endStone = createIdentifier("textures/block/end_stone.png");
+		widget.addSubTree(new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("This is a kinda long category name"), list2, endStone));
 
 		ConfigCategoryWidget widget2 = new ConfigCategoryWidget(Minecraft.getInstance(), Component.literal("Ho, this is a no go"), Collections.emptyList(), null);
 
+
+		ResourceLocation cobblestone = createIdentifier("textures/block/cobblestone.png");
 		ConfigListWidget<String> listWidget = new ConfigListWidget<>(Minecraft.getInstance(), Arrays.asList(
 				new ConfigListEntry<>(new TextConfigInput("a")),
 				new ConfigListEntry<>(new TextConfigInput("bcdef"))
-		), new ResourceLocation("textures/block/cobblestone.png"), widget2, Component.literal("A list"), new GenericEntryHandler<>(
+		), cobblestone, widget2, Component.literal("A list"), new GenericEntryHandler<>(
 				Arrays.asList("Hello", "World"), v -> Collections.emptyList()
 		), () -> new ConfigListEntry<>(new TextConfigInput("")));
 
@@ -108,6 +115,14 @@ public class CoatTestmod implements ClientModInitializer {
 		ConfigScreen screen = new ConfigScreen(Minecraft.getInstance().screen, Component.literal("Coat Test Mod"), ImmutableList.of(widget, widget2));
 
 		return screen;
+	}
+
+	private static ResourceLocation createIdentifier(String text) {
+		//# if MC_VERSION_NUMBER < 12100
+		//- return new ResourceLocation(text);
+		//# else
+		return ResourceLocation.parse(text);
+		//# end
 	}
 
 	public static class ScreenBinding extends KeyMapping implements PriorityKeyBinding {

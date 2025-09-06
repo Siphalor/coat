@@ -39,31 +39,34 @@ public class TextButtonWidget extends Button {
 	/**
 	 * {@inheritDoc}
 	 */
+
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "POSE_STACK" && MC_VERSION_NUMBER >= 11904
+	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void renderButton(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 		int x = getX();
 		int y = getY();
 		final CoatColor color = CoatUtil.TEXT_COLOR.withAlpha((int) (alpha * 255F));
 		int textY = y + (height - 7) / 2;
 		Font font = Minecraft.getInstance().font;
-		//# if RENDERING == "POSE_STACK"
-		//- font.draw(graphics, getMessage(), x, textY, color.getArgb());
-		//# elif RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS"
 		graphics.drawString(font, getMessage(), x, textY, color.getArgb());
+		//# elif RENDERING == "POSE_STACK"
+		//- font.draw(graphics, getMessage(), x, textY, color.getArgb());
 		//# end
 		if (isFocused()) {
 			CoatUtil.drawStrokeRect(x - 2, y - 2, x + width + 2, y + height + 2, 1, color);
 		}
 		if (isHovered) {
 			if (hoverEffect) {
-				//# if RENDERING == "POSE_STACK"
-				//- fill(graphics, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
-				//# elif RENDERING == "GUI_GRAPHICS"
+				//# if RENDERING == "GUI_GRAPHICS"
 				graphics.fill(x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
+				//# elif RENDERING == "POSE_STACK"
+				//- fill(graphics, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
 				//# end
 			}
 			if (originalMessage != getMessage()) {

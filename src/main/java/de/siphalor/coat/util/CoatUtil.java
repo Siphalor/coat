@@ -2,6 +2,7 @@ package de.siphalor.coat.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 //- import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -10,7 +11,9 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+//- import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
@@ -95,25 +98,25 @@ public class CoatUtil {
 	 * @param y        The y position to render to
 	 * @param text     The tooltip text to wrap and render
 	 */
-	//# if RENDERING == "POSE_STACK"
-	//- public static void renderTooltip(PoseStack graphics, int x, int y, Component text) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public static void renderTooltip(GuiGraphics graphics, int x, int y, Component text) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public static void renderTooltip(PoseStack graphics, int x, int y, Component text) {
 	//# end
 		Minecraft minecraft = Minecraft.getInstance();
 		RenderSystem.depthFunc(GL11.GL_ALWAYS);
-		//# if RENDERING == "POSE_STACK"
-		//- Minecraft.getInstance().screen.renderTooltip(
-				//- graphics,
-				//- text,
-				//- x, y
-		//- );
-		//# elif RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS"
 		graphics.renderTooltip(
 				minecraft.font,
 				wrapTooltip(minecraft.font, minecraft, text),
 				x, y
 		);
+		//# elif RENDERING == "POSE_STACK"
+		//- Minecraft.getInstance().screen.renderTooltip(
+		//- 		graphics,
+		//- 		text,
+		//- 		x, y
+		//- );
 		//# end
 	}
 
@@ -127,17 +130,27 @@ public class CoatUtil {
 	 * @param color  The color to draw with
 	 */
 	public static void drawStrokeRect(int x1, int y1, int x2, int y2, int stroke, CoatColor color) {
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder buffer = tessellator.getBuilder();
+		Tesselator tesselator = Tesselator.getInstance();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//# if MC_VERSION_NUMBER >= 12100
+		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
+		BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//# else
+		//- RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+		//- BufferBuilder buffer = tesselator.getBuilder();
+		//- buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//# end
 		addRect(buffer, x1, y1, x2, y1 + stroke, color);
 		addRect(buffer, x1, y2 - stroke, x2, y2, color);
 		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, color);
 		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, color);
-		tessellator.end();
+		//# if MC_VERSION_NUMBER >= 12100
+		BufferUploader.drawWithShader(buffer.buildOrThrow());
+		//# else
+		//- tesselator.end();
+		//# end
 	}
 
 	/**
@@ -150,10 +163,17 @@ public class CoatUtil {
 	 * @param color  the color of the rect
 	 */
 	public static void addRect(BufferBuilder buffer, int x1, int y1, int x2, int y2, CoatColor color) {
-		withColor(buffer.vertex(x1, y2, 0), color).endVertex();
-		withColor(buffer.vertex(x2, y2, 0), color).endVertex();
-		withColor(buffer.vertex(x2, y1, 0), color).endVertex();
-		withColor(buffer.vertex(x1, y1, 0), color).endVertex();
+		//# if MC_VERSION_NUMBER >= 12100
+		withColor(buffer.addVertex(x1, y2, 0), color);
+		withColor(buffer.addVertex(x2, y2, 0), color);
+		withColor(buffer.addVertex(x2, y1, 0), color);
+		withColor(buffer.addVertex(x1, y1, 0), color);
+		//# else
+		//- withColor(buffer.vertex(x1, y2, 0), color).endVertex();
+		//- withColor(buffer.vertex(x2, y2, 0), color).endVertex();
+		//- withColor(buffer.vertex(x2, y1, 0), color).endVertex();
+		//- withColor(buffer.vertex(x1, y1, 0), color).endVertex();
+		//# end
 	}
 
 	public static void drawHorizontalGradient(int left, int top, int right, int bottom, CoatColor leftColor, CoatColor rightColor) {
@@ -162,14 +182,23 @@ public class CoatUtil {
 		RenderSystem.defaultBlendFunc();
 
 		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tesselator.getBuilder();
 
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		withColor(bufferBuilder.vertex(left, bottom, 0D), leftColor).endVertex();
-		withColor(bufferBuilder.vertex(right, bottom, 0D), rightColor).endVertex();
-		withColor(bufferBuilder.vertex(right, top, 0D), rightColor).endVertex();
-		withColor(bufferBuilder.vertex(left, top, 0D), leftColor).endVertex();
-		tesselator.end();
+		//# if MC_VERSION_NUMBER >= 12100
+		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		withColor(bufferBuilder.addVertex(left, bottom, 0), leftColor);
+		withColor(bufferBuilder.addVertex(right, bottom, 0), rightColor);
+		withColor(bufferBuilder.addVertex(right, top, 0), rightColor);
+		withColor(bufferBuilder.addVertex(left, top, 0), leftColor);
+		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+		//# else
+		//- BufferBuilder bufferBuilder = tesselator.getBuilder();
+		//- bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//- withColor(bufferBuilder.vertex(left, bottom, 0D), leftColor).endVertex();
+		//- withColor(bufferBuilder.vertex(right, bottom, 0D), rightColor).endVertex();
+		//- withColor(bufferBuilder.vertex(right, top, 0D), rightColor).endVertex();
+		//- withColor(bufferBuilder.vertex(left, top, 0D), leftColor).endVertex();
+		//- tesselator.end();
+		//# end
 
 		RenderSystem.disableBlend();
 	}
@@ -177,44 +206,77 @@ public class CoatUtil {
 	public static void drawInsetGradientTexture(int left, int top, int right, int bottom, int z, ResourceLocation texture, float textureScale, CoatColor outerColor, CoatColor innerColor) {
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		//# if MC_VERSION_NUMBER >= 12100
+		RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
+		//# else
+		//- RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		//# end
+		resetShaderColor();
 		RenderSystem.setShaderTexture(0, texture);
 		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder buffer = tesselator.getBuilder();
 
 		int width = right - left;
 		int height = bottom - top;
 		int middleOffset = height / 2;
 
-		buffer.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
-		withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
-		withColor(buffer.vertex(left + middleOffset, top + middleOffset, z), innerColor).uv(middleOffset / textureScale, middleOffset / textureScale).endVertex();
-		withColor(buffer.vertex(right, top, z), outerColor).uv(width / textureScale, 0F).endVertex();
-		withColor(buffer.vertex(right - middleOffset, top + middleOffset, z), innerColor).uv((width - middleOffset) / textureScale, middleOffset / textureScale).endVertex();
-		withColor(buffer.vertex(right, bottom, z), outerColor).uv(width / textureScale, height / textureScale).endVertex();
-		withColor(buffer.vertex(left + middleOffset, bottom - middleOffset, z), innerColor).uv(middleOffset / textureScale, (height - middleOffset) / textureScale).endVertex();
-		withColor(buffer.vertex(left, bottom, z), outerColor).uv(0F, height / textureScale).endVertex();
-		withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
-		tesselator.end();
+
+		//# if MC_VERSION_NUMBER >= 12100
+		BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_TEX_COLOR);
+
+		withColor(buffer.addVertex(left, top, z), outerColor).setUv(0F, 0F);
+		withColor(buffer.addVertex(left + middleOffset, top + middleOffset, z), innerColor).setUv(middleOffset / textureScale, middleOffset / textureScale);
+		withColor(buffer.addVertex(right, top, z), outerColor).setUv(width / textureScale, 0F);
+		withColor(buffer.addVertex(right - middleOffset, top + middleOffset, z), innerColor).setUv((width - middleOffset) / textureScale, middleOffset / textureScale);
+		withColor(buffer.addVertex(right, bottom, z), outerColor).setUv(width / textureScale, height / textureScale);
+		withColor(buffer.addVertex(left + middleOffset, bottom - middleOffset, z), innerColor).setUv(middleOffset / textureScale, (height - middleOffset) / textureScale);
+		withColor(buffer.addVertex(left, bottom, z), outerColor).setUv(0F, height / textureScale);
+		withColor(buffer.addVertex(left, top, z), outerColor).setUv(0F, 0F);
+		BufferUploader.drawWithShader(buffer.buildOrThrow());
+		//# else
+		//- BufferBuilder buffer = tesselator.getBuilder();
+		//- buffer.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
+
+		//- withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
+		//- withColor(buffer.vertex(left + middleOffset, top + middleOffset, z), innerColor).uv(middleOffset / textureScale, middleOffset / textureScale).endVertex();
+		//- withColor(buffer.vertex(right, top, z), outerColor).uv(width / textureScale, 0F).endVertex();
+		//- withColor(buffer.vertex(right - middleOffset, top + middleOffset, z), innerColor).uv((width - middleOffset) / textureScale, middleOffset / textureScale).endVertex();
+		//- withColor(buffer.vertex(right, bottom, z), outerColor).uv(width / textureScale, height / textureScale).endVertex();
+		//- withColor(buffer.vertex(left + middleOffset, bottom - middleOffset, z), innerColor).uv(middleOffset / textureScale, (height - middleOffset) / textureScale).endVertex();
+		//- withColor(buffer.vertex(left, bottom, z), outerColor).uv(0F, height / textureScale).endVertex();
+		//- withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
+		//- tesselator.end();
+		//# end
 	}
 
-	public static void drawTintedTexture(int left, int top, int right, int bottom, int z, ResourceLocation texture, float textureScale, int textureYOffset, CoatColor color) {
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderTexture(0, texture);
-		setShaderColor(color);
-		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tesselator.getBuilder();
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		bufferBuilder.vertex(left, bottom, z).uv(left / textureScale, (bottom + textureYOffset) / textureScale).endVertex();
-		bufferBuilder.vertex(right, bottom, z).uv(right / textureScale, (bottom + textureYOffset) / textureScale).endVertex();
-		bufferBuilder.vertex(right, top, z).uv(right / textureScale, (top + textureYOffset) / textureScale).endVertex();
-		bufferBuilder.vertex(left, top, z).uv(left / textureScale, (top + textureYOffset) / textureScale).endVertex();
-		tesselator.end();
-		resetShaderColor();
+	//# if MC_VERSION_NUMBER >= 12100
+	public static void drawTintedTexture(GuiGraphics graphics, int left, int top, int right, int bottom, ResourceLocation texture, int textureScale, int textureYOffset, CoatColor color) {
+		int width = right - left;
+		int height = bottom - top;
+		graphics.blit(RenderType::guiTextured, texture, left, top, right, bottom + textureYOffset, width, height, width, height, textureScale, textureScale, color.getArgb());
 	}
+	//# else
+	//- public static void drawTintedTexture(int left, int top, int right, int bottom, int z, ResourceLocation texture, float textureScale, int textureYOffset, CoatColor color) {
+	//- 	RenderSystem.setShader(GameRenderer::getPositionTexShader);
+	//- 	RenderSystem.setShaderTexture(0, texture);
+	//- 	Tesselator tesselator = Tesselator.getInstance();
+	//- 	setShaderColor(color);
+	//- 	BufferBuilder bufferBuilder = tesselator.getBuilder();
+	//- 	bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+	//- 	bufferBuilder.vertex(left, bottom, z).uv(left / textureScale, (bottom + textureYOffset) / textureScale).endVertex();
+	//- 	bufferBuilder.vertex(right, bottom, z).uv(right / textureScale, (bottom + textureYOffset) / textureScale).endVertex();
+	//- 	bufferBuilder.vertex(right, top, z).uv(right / textureScale, (top + textureYOffset) / textureScale).endVertex();
+	//- 	bufferBuilder.vertex(left, top, z).uv(left / textureScale, (top + textureYOffset) / textureScale).endVertex();
+	//- 	tesselator.end();
+	//- 	resetShaderColor();
+	//- }
+	//# end
 
 	private static <V extends VertexConsumer> V withColor(V vertexConsumer, CoatColor color) {
-		vertexConsumer.color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+		//# if MC_VERSION_NUMBER >= 12100
+		vertexConsumer.setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+		//# else
+		//- vertexConsumer.color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+		//# end
 		return vertexConsumer;
 	}
 

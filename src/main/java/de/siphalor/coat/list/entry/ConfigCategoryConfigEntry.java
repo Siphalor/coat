@@ -203,10 +203,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		int inputHeight = input.getHeight();
 		int messageHeight = Math.max(20, inputHeight);
@@ -216,10 +216,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 
 		this.hovered = hovered;
 		if (hovered) {
-			//# if RENDERING == "POSE_STACK"
-			//- fill(graphics, x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
-			//# elif RENDERING == "GUI_GRAPHICS"
+			//# if RENDERING == "GUI_GRAPHICS"
 			graphics.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
+			//# elif RENDERING == "POSE_STACK"
+			//- fill(graphics, x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
 			//# end
 		}
 
@@ -239,10 +239,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
 				List<FormattedCharSequence> lines = font.split(message.getText(), msgWidth);
 				for (FormattedCharSequence line : lines) {
-					//# if RENDERING != "GUI_GRAPHICS"
-					//- font.draw(graphics, line, msgX, curY, 0xffffff);
-					//# else
+					//# if RENDERING == "GUI_GRAPHICS"
 					graphics.drawString(font, line, msgX, curY, 0xffffff, false);
+					//# else
+					//- font.draw(graphics, line, msgX, curY, 0xffffff);
 					//# end
 					curY += 9;
 				}
@@ -255,10 +255,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 				if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
 					List<FormattedCharSequence> lines = font.split(message.getText(), msgWidth);
 					for (FormattedCharSequence line : lines) {
-						//# if RENDERING != "GUI_GRAPHICS"
-						//- font.draw(graphics, line, msgX, curY, 0xffffff);
-						//# else
+						//# if RENDERING == "GUI_GRAPHICS"
 						graphics.drawString(font, line, msgX, curY, 0xffffff, false);
+						//# else
+						//- font.draw(graphics, line, msgX, curY, 0xffffff);
 						//# end
 						curY += 9;
 					}
@@ -352,7 +352,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 			defaultButton.active = true;
 		} else {
 			if (defaultButton.isFocused()) {
+				//# if MC_VERSION_NUMBER >= 11904
 				setFocused(false);
+				//# else
+				//- setFocused(null);
+				//# end
 			}
 			defaultButton.active = false;
 		}

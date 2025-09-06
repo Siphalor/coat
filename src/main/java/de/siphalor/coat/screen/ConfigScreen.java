@@ -17,6 +17,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+//- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.opengl.GL32;
 
@@ -78,12 +79,9 @@ public class ConfigScreen extends Screen {
 	protected void init() {
 		panelWidth = 200;
 		treeWidget = new DynamicEntryListWidget<>(minecraft, panelWidth, height - 60, 20, (int) (panelWidth * 0.8F));
-		treeWidget.setBackgroundBrightness(0.5F);
-		addRenderableWidget(treeWidget);
-
-		for (ConfigCategoryWidget widget : widgets) {
-			treeWidget.addEntry(widget.getTreeEntry());
-		}
+		//# if !TRANSPARENT_MENUS
+		//- treeWidget.setBackgroundBrightness(0.5F);
+		//# end
 
 		abortButton = Button.builder(ABORT_TEXT, button -> onClose())
 				.pos(CoatUtil.MARGIN, 0).size(0, 20).build();
@@ -91,6 +89,11 @@ public class ConfigScreen extends Screen {
 				.pos(CoatUtil.MARGIN, 0).size(0, 20).build();
 		addRenderableWidget(abortButton);
 		addRenderableWidget(saveButton);
+
+		addRenderableWidget(treeWidget);
+		for (ConfigCategoryWidget widget : widgets) {
+			treeWidget.addEntry(widget.getTreeEntry());
+		}
 
 		super.init();
 
@@ -278,10 +281,10 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 
 		super.render(graphics, mouseX, mouseY, delta);
@@ -294,17 +297,22 @@ public class ConfigScreen extends Screen {
 		RenderSystem.disableDepthTest();
 
 		RenderSystem.enableBlend();
-		CoatUtil.drawTintedTexture(0, 0, width, 20, 0, contentWidget.getBackground(), 32F, 0, BACKGROUND_TEXTURE_TINT_COLOR);
+		//# if MC_VERSION_NUMBER >= 12100
+		CoatUtil.drawTintedTexture(graphics, 0, 0, width, 20, contentWidget.getBackground(), 32, 0, BACKGROUND_TEXTURE_TINT_COLOR);
+		//# else
+		//- CoatUtil.drawTintedTexture(0, 0, width, 20, 0, contentWidget.getBackground(), 32F, 0, BACKGROUND_TEXTURE_TINT_COLOR);
+		//# end
 		RenderSystem.disableBlend();
+		RenderSystem.disableDepthTest();
 
-		//# if RENDERING == "POSE_STACK"
-		//- graphics.translate(0, 0, 10);
-		//- drawCenteredString(graphics, font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
-		//- graphics.translate(0, 0, -10);
-		//# elif RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS"
 		graphics.pose().translate(0, 0, 10);
 		graphics.drawCenteredString(this.font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
 		graphics.pose().translate(0, 0, -10);
+		//# elif RENDERING == "POSE_STACK"
+		//- graphics.translate(0, 0, 10);
+		//- drawCenteredString(graphics, font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
+		//- graphics.translate(0, 0, -10);
 		//# end
 	}
 }

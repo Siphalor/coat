@@ -139,10 +139,10 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	}
 
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 		super.renderWidget(graphics, mouseX, mouseY, delta);
 		appendButton.setY(super.getEntryAreaTop() + super.getMaxPosition());

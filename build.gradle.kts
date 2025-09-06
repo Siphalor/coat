@@ -13,7 +13,7 @@ group = "de.siphalor.coat"
 version = properties["version"]!!
 
 val mcProps = Properties().apply {
-	val propFile = project.layout.settingsDirectory.file("gradle/mc-${project.properties["minecraft_version_descriptor"]}.properties")
+	val propFile = project.layout.settingsDirectory.file("gradle/mc-${project.properties["minecraft_version_descriptor"]}/gradle.properties")
 	load(propFile.asFile.inputStream())
 }
 
@@ -26,8 +26,8 @@ sourceSets {
 	main {
 		extraSources.forEach {
 			java.srcDir(it.resolve("java"))
-			resources.srcDir(mergedAccessWidenerDir)
 		}
+		resources.srcDir(mergedAccessWidenerDir)
 	}
 	create("testmod") {
 		compileClasspath += sourceSets.main.get().compileClasspath
@@ -63,6 +63,7 @@ loom {
 
 repositories {
 	maven { url = uri("https://maven.siphalor.de") }
+	mavenLocal()
 }
 
 dependencies {
@@ -74,7 +75,9 @@ dependencies {
 	modImplementation(libs.fabric.loader)
 
 	// testmod dependencies will not be remapped in the testmodImplementation configuration
-	"modImplementation"(mcLibs.amecs.api)
+	"modImplementation"(mcLibs.amecs.api) {
+		exclude(module = "lazydfu")
+	}
 	"modImplementation"(fabricApi.module("fabric-api-base", mcLibs.versions.fabric.api.get()))
 	"modImplementation"(fabricApi.module("fabric-key-binding-api-v1", mcLibs.versions.fabric.api.get()))
 	"modImplementation"(fabricApi.module("fabric-resource-loader-v0", mcLibs.versions.fabric.api.get()))
@@ -88,9 +91,8 @@ tasks.processResources {
 	from(sourceSets.main.get().resources.srcDirs) {
 		include("fabric.mod.json")
 		expand("version" to project.version)
+		duplicatesStrategy = DuplicatesStrategy.INCLUDE
 	}
-
-	duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 java {
@@ -98,18 +100,24 @@ java {
 	targetCompatibility = JavaVersion.toVersion(mcLibs.versions.java.get())
 }
 
-val jcyo by tasks.register<JcyoTask>("jcyo") {
-	val vars = mcProps.stringPropertyNames()
-		.filter { it.startsWith("preprocessor.") }
-		.map { it to mcProps[it] }
-		.associate { (key, value) -> key.substring("preprocessor.".length) to value }
-
+val jcyoVars = mcProps.stringPropertyNames()
+	.filter { it.startsWith("preprocessor.") }
+	.map { it to mcProps[it] }
+	.associate { (key, value) -> key.substring("preprocessor.".length) to value }
+val jcyo = tasks.register<JcyoTask>("jcyo") {
 	inputDirectory = file("src/main/java")
-	variables = vars
+	variables = jcyoVars
+}
+val testmodJcyo = tasks.register<JcyoTask>("testmodJcyo") {
+	inputDirectory = file("src/testmod/java")
+	variables = jcyoVars
 }
 
 tasks.compileJava {
 	dependsOn(jcyo)
+}
+tasks.named("compileTestmodJava") {
+	dependsOn(testmodJcyo)
 }
 
 tasks.jar {

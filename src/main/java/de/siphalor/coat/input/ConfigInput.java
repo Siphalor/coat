@@ -79,7 +79,7 @@ public interface ConfigInput<V> extends Renderable, GuiEventListener {
 	/**
 	 * Renders this config input
 	 *
-	 * @param graphics    The matrix stack used for rendering
+	 * @param context     The context used for rendering
 	 * @param x           The x position where the render area for this input begins
 	 * @param y           The y position to render this
 	 * @param width       The maximum width to render this width
@@ -89,5 +89,5 @@ public interface ConfigInput<V> extends Renderable, GuiEventListener {
 	 * @param hovered     Whether this input is currently hovered by the mouse
 	 * @param tickDelta   The render tick delta
 	 */
-	void render(/*# if rendering == "POSE_STACK" */ /*- PoseStack *//*# else */ GuiGraphics/*# end */ graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+	void render(/*# if rendering == "GUI_GRAPHICS" */GuiGraphics/*# else *//*- PoseStack *//*# end */ context, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 }

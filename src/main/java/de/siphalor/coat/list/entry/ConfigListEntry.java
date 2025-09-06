@@ -12,6 +12,7 @@ import lombok.Setter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -20,10 +21,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
-	//# if MC_VERSION_NUMBER < 12000
+	//# if MC_VERSION_NUMBER < 12002
 	//- private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
-	//# else
-	private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("container/creative_inventory/scroller");
+	//# elif MC_VERSION_NUMBER < 12100
+	//- private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("container/creative_inventory/scroller");
+	//#else
+	private static final ResourceLocation HANDLE_TEXTURE = ResourceLocation.parse("container/creative_inventory/scroller");
 	//# end
 
 	private final ConfigInput<V> input;
@@ -43,20 +46,26 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 	}
 
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		if (isDragFollow()) {
 			y = mouseY - entryHeight / 2;
 		}
 
-		//# if RENDERING == "POSE_STACK"
+		//# if RENDERING == "GUI_GRAPHICS"
+		//# if MC_VERSION_NUMBER < 12002
+		//- graphics.blit(HANDLE_TEXTURE, x, y + 2, 232, 0, 12, 15);
+		//# elif MC_VERSION_NUMBER < 12100
+		//- graphics.blitSprite(HANDLE_TEXTURE, x, y + 2, 12, 15);
+		//# else
+		graphics.blitSprite(RenderType::guiTextured, HANDLE_TEXTURE, x, y + 2, 12, 15);
+		//# end
+		//# elif RENDERING == "POSE_STACK"
 		//- RenderSystem.setShaderTexture(0, HANDLE_TEXTURE);
 		//- blit(graphics, x, y + 2, 232, 0, 12, 15);
-		//# elif RENDERING == "GUI_GRAPHICS"
-		graphics.blitSprite(HANDLE_TEXTURE, x, y + 2, 12, 15);
 		//# end
 		input.render(graphics, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
 		deleteWidget.setPosition(x + entryWidth - 20, y);

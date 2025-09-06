@@ -20,17 +20,17 @@ public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GL32.GL_LESS);
-		//# if RENDERING == "POSE_STACK"
-		//- fill(graphics, x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
-		//# elif RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS"
 		graphics.fill(x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+		//# elif RENDERING == "POSE_STACK"
+		//- fill(graphics, x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 		//# end
 		RenderSystem.disableDepthTest();
 	}
@@ -59,6 +59,7 @@ public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 
 	}
 
+	//# if MC_VERSION_NUMBER >= 11904
 	@Override
 	public void setFocused(boolean focused) {
 	}
@@ -67,4 +68,5 @@ public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 	public boolean isFocused() {
 		return false;
 	}
+	//# end
 }

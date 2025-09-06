@@ -87,14 +87,18 @@ public class MessagesScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 		int left = width / 2 - 130;
 		//# if !TRANSPARENT_MENUS
+		//- //# if MC_VERSION_NUMBER < 12002
 		//- renderBackground(graphics);
+		//- //# else
+		//- renderBackground(graphics, mouseX, mouseY, delta);
+		//- //# end
 		//# end
 		abortButton.setX(width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
 		acceptButton.setX(width / 2 + CoatUtil.MARGIN);

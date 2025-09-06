@@ -10,13 +10,22 @@ import net.minecraft.network.chat.Component;
  * A string input represented as a text field.
  */
 public class TextConfigInput extends EditBox implements ConfigInput<String> {
+	private static final int AUTO_PADDING = /*# if MC_VERSION_NUMBER >= 12002 */0/*# else *//*- 2 *//*# end */;
+
 	/**
 	 * Constructs a new text input.
 	 *
 	 * @param value The initial value of this text field
 	 */
 	public TextConfigInput(String value) {
-		super(Minecraft.getInstance().font, 0, 0, 10, 20, Component.empty());
+		super(
+				Minecraft.getInstance().font,
+				0,
+				0,
+				10,
+				20 - AUTO_PADDING * 2,
+				Component.empty()
+		);
 		setMaxLength(Integer.MAX_VALUE);
 		setValue(value);
 	}
@@ -36,7 +45,7 @@ public class TextConfigInput extends EditBox implements ConfigInput<String> {
 	public void setValue(String value) {
 		super.setValue(value);
 		// Required because otherwise the text doesn't render sometimes
-		//# if EDITBOX_CURSOR_TO_START_PARAM
+		//# if MC_VERSION_NUMBER >= 12002
 		moveCursorToStart(false);
 		//# else
 		//- moveCursorToStart();
@@ -63,13 +72,13 @@ public class TextConfigInput extends EditBox implements ConfigInput<String> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void render(PoseStack graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
-		setPosition(x, y);
-		this.width = width;
+		setPosition(x + AUTO_PADDING, y);
+		this.width = width - AUTO_PADDING * 2;
 		render(graphics, mouseX, mouseY, tickDelta);
 	}
 }
