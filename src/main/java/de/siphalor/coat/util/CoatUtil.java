@@ -11,6 +11,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 //- import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.RenderType;
@@ -291,5 +292,26 @@ public class CoatUtil {
 	public static void playClickSound() {
 		SoundManager soundManager = Minecraft.getInstance().getSoundManager();
 		soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+	}
+
+	public static void setButtonPosition(Button button, int x, int y) {
+		setButtonX(button, x);
+		setButtonY(button, y);
+	}
+
+	public static void setButtonX(Button button, int x) {
+		//# if MC_VERSION_NUMBER >= 11903
+		button.setX(x);
+		//# else
+		//- button.x = x;
+		//# end
+	}
+
+	public static void setButtonY(Button button, int y) {
+		//# if MC_VERSION_NUMBER >= 11903
+		button.setY(y);
+		//# else
+		//- button.y = y;
+		//# end
 	}
 }

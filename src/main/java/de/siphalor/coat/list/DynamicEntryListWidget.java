@@ -23,6 +23,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 //- import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Renderable;
+//- import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -46,7 +47,10 @@ import java.util.List;
  * This is a reimplementation of {@link net.minecraft.client.gui.components.AbstractSelectionList} to enable variable item heights.
  */
 @Environment(EnvType.CLIENT)
-public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> extends AbstractContainerEventHandler implements Renderable, NarratableEntry, EntryContainer, TickableElement {
+public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> extends AbstractContainerEventHandler
+		implements NarratableEntry, EntryContainer, TickableElement,
+		/*# if MC_VERSION_NUMBER >= 11903 */Renderable/*# else *//*- Widget *//*# end */
+{
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
 	private static final CoatColor SCROLLBAR_BACKGROUND_COLOR = CoatColor.rgb(0x000000);

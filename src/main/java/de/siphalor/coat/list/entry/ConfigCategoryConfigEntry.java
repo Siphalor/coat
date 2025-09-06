@@ -10,6 +10,7 @@ import de.siphalor.coat.input.InputChangeListener;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.CustomTooltip;
 import de.siphalor.coat.util.TextButtonWidget;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -42,6 +43,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	private MultiLineLabel descriptionMultiline;
 	private final ConfigEntryHandler<V> entryHandler;
 	private final ConfigInput<V> input;
+	@Getter(AccessLevel.PRIVATE)
 	private final Button defaultButton;
 	private Collection<Message> messages;
 	/**
@@ -72,6 +74,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		input.setChangeListener(this);
 		Minecraft minecraft = Minecraft.getInstance();
 		font = minecraft.font;
+		//# if MC_VERSION_NUMBER >= 11903
 		defaultButton = Button.builder(DEFAULT_TEXT, button ->
 				input.setValue(entryHandler.getDefault())
 		).size(10, 20).tooltip(
@@ -86,12 +89,26 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 					return list;
 				}, null)
 		).build();
+		//# else
+		//- defaultButton = new Button(
+		//- 		0, 0, 10, 20, DEFAULT_TEXT, button -> input.setValue(entryHandler.getDefault()),
+		//- 		(button, context, mouseX, mouseY) -> {
+		//- 			if (button.active) {
+		//- 				List<FormattedCharSequence> wrappedLines = CoatUtil.wrapTooltip(
+		//- 						font,
+		//- 						minecraft,
+		//- 						entryHandler.asText(entryHandler.getDefault())
+		//- 				);
+		//- 				List<FormattedCharSequence> all = new ArrayList<>(wrappedLines.size() + 1);
+		//- 				all.add(Component.translatable(Coat.MOD_ID + ".default.hover").getVisualOrderText());
+		//- 				all.addAll(wrappedLines);
+		//- 				minecraft.screen.renderTooltip(context, all, mouseX, mouseX);
+		//- 			}
+		//- 		}
+		//- );
+		//# end
 
 		inputChanged(input.getValue());
-	}
-
-	private Button getDefaultButton() {
-		return defaultButton;
 	}
 
 	/**
@@ -226,10 +243,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		int textY = top + (int) ((messageHeight - 8) / 2F);
 
 		input.render(graphics, x + leftInputOffset, top + (messageHeight - inputHeight) / 2, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
-		defaultButton.setY(top);
-		defaultButton.setX(x + entryWidth - defaultButton.getWidth() + CoatUtil.HALF_MARGIN);
+
+		CoatUtil.setButtonPosition(defaultButton, x + entryWidth - defaultButton.getWidth() + CoatUtil.HALF_MARGIN, top);
+		CoatUtil.setButtonPosition(nameWidget, x, textY - 2);
+
 		defaultButton.render(graphics, mouseX, mouseY, tickDelta);
-		nameWidget.setPosition(x, textY - 2);
 		nameWidget.render(graphics, mouseX, mouseY, tickDelta);
 
 		int curY = top + messageHeight + CoatUtil.MARGIN;

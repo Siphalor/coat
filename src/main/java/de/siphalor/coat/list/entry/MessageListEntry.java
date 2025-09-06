@@ -29,7 +29,7 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 
 	private final Message message;
 	private Component text;
-	private Button jumpButton;
+	private final Button jumpButton;
 
 	/**
 	 * Constructs a new message list entry.
@@ -38,40 +38,46 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 */
 	public MessageListEntry(Message message) {
 		this.message = message;
-		jumpButton = Button.builder(JUMP_TEXT, button -> {
-			if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
-				GuiEventListener last = (GuiEventListener) message.getOrigin();
-				EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
-				if (category == null) return;
-				while (!(category instanceof ConfigCategoryWidget)) {
-					last = category;
-					category = category.getParent();
-					if (category == null) {
-						return;
-					}
-					category.setFocused(last);
-				}
+		//# if MC_VERSION_NUMBER >= 11903
+		jumpButton = Button.builder(JUMP_TEXT, button -> this.jumpClicked()).size(100, 20).build();
+		//# else
+		//- jumpButton = new Button(0, 0, 100, 20, JUMP_TEXT, button -> this.jumpClicked());
+		//# end
+	}
 
-				Screen currentScreen = Minecraft.getInstance().screen;
-				ConfigScreen configScreen = null;
-				if (currentScreen instanceof MessagesScreen) {
-					configScreen = ((MessagesScreen) currentScreen).getParent();
-					Minecraft.getInstance().setScreen(configScreen);
-				} else if (currentScreen instanceof ConfigScreen) {
-					configScreen = (ConfigScreen) currentScreen;
+	private void jumpClicked() {
+		if (message.getOrigin() instanceof DynamicEntryListWidget.Entry) {
+			GuiEventListener last = (GuiEventListener) message.getOrigin();
+			EntryContainer category = ((DynamicEntryListWidget.Entry) message.getOrigin()).getParent();
+			if (category == null) return;
+			while (!(category instanceof ConfigCategoryWidget)) {
+				last = category;
+				category = category.getParent();
+				if (category == null) {
+					return;
 				}
-
-				if (configScreen != null) {
-					configScreen.openCategory(((ConfigCategoryWidget) category).getTreeEntry());
-					configScreen.setFocused(category);
-					ConfigCategoryWidget listWidget = (ConfigCategoryWidget) configScreen.getContentWidget();
-					listWidget.setFocused(last);
-					//# if MC_VERSION_NUMBER >= 11904
-					listWidget.setFocused(true);
-					//# end
-				}
+				category.setFocused(last);
 			}
-		}).size(100, 20).build();
+
+			Screen currentScreen = Minecraft.getInstance().screen;
+			ConfigScreen configScreen = null;
+			if (currentScreen instanceof MessagesScreen) {
+				configScreen = ((MessagesScreen) currentScreen).getParent();
+				Minecraft.getInstance().setScreen(configScreen);
+			} else if (currentScreen instanceof ConfigScreen) {
+				configScreen = (ConfigScreen) currentScreen;
+			}
+
+			if (configScreen != null) {
+				configScreen.openCategory(((ConfigCategoryWidget) category).getTreeEntry());
+				configScreen.setFocused(category);
+				ConfigCategoryWidget listWidget = (ConfigCategoryWidget) configScreen.getContentWidget();
+				listWidget.setFocused(last);
+				//# if MC_VERSION_NUMBER >= 11904
+				listWidget.setFocused(true);
+				//# end
+			}
+		}
 	}
 
 	/**
@@ -101,11 +107,12 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 		//# elif RENDERING == "POSE_STACK"
 		//- font.draw(graphics, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb());
 		//# end
-		jumpButton.setY(y);
-		jumpButton.setX(x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN);
+
+		int jumpButtonX = x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN;
+		CoatUtil.setButtonPosition(jumpButton, jumpButtonX, y);
 		jumpButton.render(graphics, mouseX, mouseY, tickDelta);
 
-		if (hovered && mouseX < jumpButton.getX()) {
+		if (hovered && mouseX < jumpButtonX) {
 			//# if RENDERING == "GUI_GRAPHICS"
 			graphics.renderTooltip(font, message.getText(), mouseX, mouseY);
 			//# elif RENDERING == "POSE_STACK"

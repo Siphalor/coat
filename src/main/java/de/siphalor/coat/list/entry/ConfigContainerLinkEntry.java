@@ -37,17 +37,21 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	 */
 	public ConfigContainerLinkEntry(ConfigContentWidget configWidget) {
 		this.configWidget = configWidget;
-		button = Button.builder(OPEN_TEXT,
-				button -> {
-					ConfigScreen screen = ((ConfigScreen) Minecraft.getInstance().screen);
-					ConfigTreeEntry treeEntry = configWidget.getTreeEntry();
-					if (treeEntry.getParent() != null) {
-						screen.openCategory(treeEntry);
-					} else {
-						screen.openTemporary(treeEntry);
-					}
-				}
-		).size(50, 20).build();
+		//# if MC_VERSION_NUMBER >= 11903
+		button = Button.builder(OPEN_TEXT, button -> this.clicked()).size(50, 20).build();
+		//# else
+		//- button = new Button(0, 0, 50, 20, OPEN_TEXT, button -> this.clicked());
+		//# end
+	}
+
+	private void clicked() {
+		ConfigScreen screen = ((ConfigScreen) Minecraft.getInstance().screen);
+		ConfigTreeEntry treeEntry = configWidget.getTreeEntry();
+		if (treeEntry.getParent() != null) {
+			screen.openCategory(treeEntry);
+		} else {
+			screen.openTemporary(treeEntry);
+		}
 	}
 
 	/**
@@ -74,8 +78,8 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 
 		CoatUtil.drawInsetGradientTexture(x, y, x + entryWidth, y + entryHeight, 0, configWidget.getBackground(), 32F, BACKGROUND_OUTER_COLOR, BACKGROUND_INNER_COLOR);
 
-		button.setX(x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN);
-		button.setY(y + CoatUtil.MARGIN);
+		CoatUtil.setButtonPosition(button, x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN, y + CoatUtil.MARGIN);
+
 		//# if RENDERING == "GUI_GRAPHICS"
 		graphics.drawString(Minecraft.getInstance().font, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2, CoatUtil.TEXT_COLOR.getArgb(), true);
 		//# elif RENDERING == "POSE_STACK"

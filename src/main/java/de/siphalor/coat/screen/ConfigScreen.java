@@ -83,10 +83,13 @@ public class ConfigScreen extends Screen {
 		//- treeWidget.setBackgroundBrightness(0.5F);
 		//# end
 
-		abortButton = Button.builder(ABORT_TEXT, button -> onClose())
-				.pos(CoatUtil.MARGIN, 0).size(0, 20).build();
-		saveButton =  Button.builder(SAVE_TEXT, this::clickSave)
-				.pos(CoatUtil.MARGIN, 0).size(0, 20).build();
+		//# if MC_VERSION_NUMBER >= 11903
+		abortButton = Button.builder(ABORT_TEXT, button -> onClose()).pos(CoatUtil.MARGIN, 0).size(0, 20).build();
+		saveButton = Button.builder(SAVE_TEXT, this::clickSave).pos(CoatUtil.MARGIN, 0).size(0, 20).build();
+		//# else
+		//- abortButton = new Button(CoatUtil.MARGIN, 0, 0, 20, ABORT_TEXT, button -> onClose());
+		//- saveButton = new Button(CoatUtil.MARGIN, 0, 0, 20, SAVE_TEXT, this::clickSave);
+		//# end
 		addRenderableWidget(abortButton);
 		addRenderableWidget(saveButton);
 
@@ -261,8 +264,8 @@ public class ConfigScreen extends Screen {
 		contentWidget.setPosition(panelWidth, 20);
 		contentWidget.resize(width - panelWidth, height - 20);
 
-		saveButton.setY(height - 20 - CoatUtil.MARGIN);
-		abortButton.setY(saveButton.getY() - 20 - CoatUtil.MARGIN);
+		CoatUtil.setButtonY(saveButton, height - 20 - CoatUtil.MARGIN);
+		CoatUtil.setButtonY(abortButton, height - 40 - CoatUtil.DOUBLE_MARGIN);
 		saveButton.setWidth(panelWidth - CoatUtil.DOUBLE_MARGIN);
 		abortButton.setWidth(saveButton.getWidth());
 	}

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
 
+//# if MC_VERSION_NUMBER >= 11903
 public class CustomTooltip extends Tooltip {
 	private final Supplier<List<FormattedCharSequence>> tooltipSupplier;
 
@@ -22,3 +23,4 @@ public class CustomTooltip extends Tooltip {
 		return tooltipSupplier.get();
 	}
 }
+//# end

@@ -24,13 +24,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<V>> implements ConfigContentWidget {
+	private static final Component APPEND_BUTTON_TEXT = Component.translatable(Coat.MOD_ID + ".list.append");
 	private final MutableComponent name;
 	private final ConfigEntryHandler<List<V>> entryHandler;
 	private final ConfigListEntryFactory<V> entryFactory;
-	private final Button appendButton = Button.builder(
-			Component.translatable(Coat.MOD_ID + ".list.append"),
-			button -> createEntry(getEntryCount())
-	).size(100, 20).build();
+	//# if MC_VERSION_NUMBER >= 11903
+	private final Button appendButton = Button.builder(APPEND_BUTTON_TEXT, button -> createEntry(getEntryCount()))
+			.size(100, 20)
+			.build();
+	//# else
+	//- private final Button appendButton = new Button(0, 0, 100, 20, APPEND_BUTTON_TEXT, button -> createEntry(getEntryCount()));
+	//# end
 	private ConfigListEntry<V> dragEntry;
 
 	public ConfigListWidget(Minecraft client, int width, int height, int top, int rowWidth, ConfigContentWidget parent, MutableComponent name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
@@ -145,8 +149,11 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 		super.renderWidget(graphics, mouseX, mouseY, delta);
-		appendButton.setY(super.getEntryAreaTop() + super.getMaxPosition());
-		appendButton.setX(left + (width - appendButton.getWidth()) / 2);
+		CoatUtil.setButtonPosition(
+				appendButton,
+				left + (width - appendButton.getWidth()) / 2,
+				super.getEntryAreaTop() + super.getMaxPosition()
+		);
 		appendButton.render(graphics, mouseX, mouseY, delta);
 	}
 

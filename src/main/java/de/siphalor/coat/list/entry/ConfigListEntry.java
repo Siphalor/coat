@@ -28,6 +28,7 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 	//#else
 	private static final ResourceLocation HANDLE_TEXTURE = ResourceLocation.parse("container/creative_inventory/scroller");
 	//# end
+	private static final Component DELETE_BUTTON_TEXT = Component.literal("x");
 
 	private final ConfigInput<V> input;
 	private final Button deleteWidget;
@@ -37,12 +38,18 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 
 	public ConfigListEntry(ConfigInput<V> input) {
 		this.input = input;
-		deleteWidget = Button.builder(Component.literal("x"), button -> {
-			if (parent instanceof ConfigListWidget) {
-				//noinspection unchecked
-				((ConfigListWidget<V>) parent).removeEntry(this);
-			}
-		}).size(20, 20).build();
+		//# if MC_VERSION_NUMBER >= 11903
+		deleteWidget = Button.builder(DELETE_BUTTON_TEXT, button -> this.deleteClicked()).size(20, 20).build();
+		//# else
+		//- deleteWidget = new Button(0, 0, 20, 20, DELETE_BUTTON_TEXT, button -> this.deleteClicked());
+		//# end
+	}
+
+	private void deleteClicked() {
+		if (parent instanceof ConfigListWidget) {
+			//noinspection unchecked
+			((ConfigListWidget<V>) parent).removeEntry(this);
+		}
 	}
 
 	@Override
@@ -68,7 +75,12 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		//- blit(graphics, x, y + 2, 232, 0, 12, 15);
 		//# end
 		input.render(graphics, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		//# if MC_VERSION_NUMBER >= 11903
 		deleteWidget.setPosition(x + entryWidth - 20, y);
+		//# else
+		//- deleteWidget.x = x + entryWidth - 20;
+		//- deleteWidget.y = y;
+		//# end
 		deleteWidget.render(graphics, mouseX, mouseY, tickDelta);
 	}
 

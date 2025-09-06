@@ -32,14 +32,21 @@ public class TextButtonWidget extends Button {
 	 * @param onPress An action to run when the widget gets triggered
 	 */
 	public TextButtonWidget(int x, int y, int width, int height, Component message, OnPress onPress) {
-		super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
+		super(
+				x,
+				y,
+				width,
+				height,
+				message,
+				onPress
+				/*# if MC_VERSION_NUMBER >= 11903 */, DEFAULT_NARRATION/*# end */
+		);
 		setMessage(message);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-
 	@Override
 	//# if RENDERING == "GUI_GRAPHICS"
 	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
@@ -48,8 +55,10 @@ public class TextButtonWidget extends Button {
 	//# elif RENDERING == "POSE_STACK"
 	//- public void renderButton(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
+		//# if MC_VERSION_NUMBER >= 11903
 		int x = getX();
 		int y = getY();
+		//# end
 		final CoatColor color = CoatUtil.TEXT_COLOR.withAlpha((int) (alpha * 255F));
 		int textY = y + (height - 7) / 2;
 		Font font = Minecraft.getInstance().font;

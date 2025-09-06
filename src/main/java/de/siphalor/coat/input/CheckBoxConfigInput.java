@@ -70,6 +70,13 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 		render(graphics, mouseX, mouseY, tickDelta);
 	}
 
+	//# if MC_VERSION_NUMBER < 11903
+	//- private void setPosition(int x, int y) {
+	//- 	this.x = x;
+	//- 	this.y = y;
+	//- }
+	//# end
+
 	/**
 	 * {@inheritDoc}
 	 */

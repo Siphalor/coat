@@ -5,6 +5,7 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
+//- import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
@@ -12,7 +13,10 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 
-public interface ConfigContentWidget extends GuiEventListener, Renderable, NarratableEntry {
+public interface ConfigContentWidget
+		extends GuiEventListener, NarratableEntry,
+		/*# if MC_VERSION_NUMBER >= 11903 */Renderable/*# else *//*- Widget *//*# end */
+{
 	Component getName();
 	ResourceLocation getBackground();
 	ConfigTreeEntry getTreeEntry();

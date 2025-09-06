@@ -3,6 +3,7 @@ package de.siphalor.coat.input;
 //- import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
+//- import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
 /**
@@ -10,7 +11,10 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
  *
  * @param <V> The value type to be read and written
  */
-public interface ConfigInput<V> extends Renderable, GuiEventListener {
+public interface ConfigInput<V>
+		extends GuiEventListener,
+		/*# if MC_VERSION_NUMBER >= 11903 */Renderable/*# else *//*- Widget *//*# end */
+{
 	/**
 	 * Get a hint for how wide the input should render.
 	 * If the render method provides a greater width, the input should render with that width,

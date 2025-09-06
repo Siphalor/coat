@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
  * or to return to the previous screen.
  */
 public class MessagesScreen extends Screen {
+	private static final Component ABORT_BUTTON_TEXT = Component.translatable(Coat.MOD_ID + ".action.abort");
+	private static final Component ACCEPT_BUTTON_TEXT = Component.translatable(Coat.MOD_ID + ".action.accept_risk");
+
 	@Getter
 	private final ConfigScreen parent;
 	private final Runnable acceptRunnable;
@@ -53,14 +56,15 @@ public class MessagesScreen extends Screen {
 	protected void init() {
 		super.init();
 
-		abortButton = Button.builder(
-				Component.translatable(Coat.MOD_ID + ".action.abort"),
-				button -> Minecraft.getInstance().setScreen(parent)
-		).pos(0, 38).size(100, 20).build();
-		acceptButton = Button.builder(
-				Component.translatable(Coat.MOD_ID + ".action.accept_risk"),
-				button -> acceptRunnable.run()
-		).pos(0, 38).size(100, 20).build();
+		//# if MC_VERSION_NUMBER >= 11903
+		abortButton = Button.builder(ABORT_BUTTON_TEXT, button -> this.abortClicked())
+				.pos(0, 38).size(100, 20).build();
+		acceptButton = Button.builder(ACCEPT_BUTTON_TEXT, button -> this.acceptClicked())
+				.pos(0, 38).size(100, 20).build();
+		//# else
+		//- abortButton = new Button(0, 38, 100, 20, ABORT_BUTTON_TEXT, button -> this.abortClicked());
+		//- acceptButton = new Button(0, 38, 100, 20, ACCEPT_BUTTON_TEXT, button -> this.acceptClicked());
+		//# end
 		addRenderableWidget(abortButton);
 		addRenderableWidget(acceptButton);
 
@@ -69,6 +73,14 @@ public class MessagesScreen extends Screen {
 		addRenderableWidget(messagesList);
 
 		resize(Minecraft.getInstance(), width, height);
+	}
+
+	private void abortClicked() {
+		Minecraft.getInstance().setScreen(parent);
+	}
+
+	private void acceptClicked() {
+		acceptRunnable.run();
 	}
 
 	/**
@@ -100,8 +112,9 @@ public class MessagesScreen extends Screen {
 		//- renderBackground(graphics, mouseX, mouseY, delta);
 		//- //# end
 		//# end
-		abortButton.setX(width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
-		acceptButton.setX(width / 2 + CoatUtil.MARGIN);
+
+		CoatUtil.setButtonX(abortButton, width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
+		CoatUtil.setButtonX(acceptButton, width / 2 + CoatUtil.MARGIN);
 
 		super.render(graphics, mouseX, mouseY, delta);
 
