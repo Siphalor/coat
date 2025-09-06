@@ -14,7 +14,8 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Collection;
 
 public interface ConfigContentWidget
-		extends GuiEventListener, NarratableEntry,
+		extends GuiEventListener,
+		/*# if MC_VERSION_NUMBER >= 11700 */NarratableEntry,/*# end */
 		/*# if MC_VERSION_NUMBER >= 11903 */Renderable/*# else *//*- Widget *//*# end */
 {
 	Component getName();
@@ -44,8 +45,10 @@ public interface ConfigContentWidget
 	//- default void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {}
 	//# end
 
+	//# if MC_VERSION_NUMBER >= 11700
 	@Override
 	default NarrationPriority narrationPriority() {
 		return NarrationPriority.NONE;
 	}
+	//# end
 }

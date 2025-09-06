@@ -110,10 +110,17 @@ public class ConfigScreen extends Screen {
 		//- abortButton = new Button(CoatUtil.MARGIN, 0, 0, 20, ABORT_TEXT, button -> onClose());
 		//- saveButton = new Button(CoatUtil.MARGIN, 0, 0, 20, SAVE_TEXT, this::clickSave);
 		//# end
+
+		//# if MC_VERSION_NUMBER >= 11700
 		addRenderableWidget(abortButton);
 		addRenderableWidget(saveButton);
-
 		addRenderableWidget(treeWidget);
+		//# else
+		//- addButton(abortButton);
+		//- addButton(saveButton);
+		//- children.add(treeWidget);
+		//# end
+
 		for (ConfigCategoryWidget widget : widgets) {
 			treeWidget.addEntry(widget.getTreeEntry());
 		}
@@ -239,7 +246,11 @@ public class ConfigScreen extends Screen {
 		}
 
 		if (contentWidget != null) {
+			//# if MC_VERSION_NUMBER >= 11700
 			removeWidget(contentWidget);
+			//# else
+			//- children.remove(contentWidget);
+			//# end
 		}
 		openCategory = category;
 		category.setOpen(true);
@@ -250,7 +261,11 @@ public class ConfigScreen extends Screen {
 		}
 
 		contentWidget = category.getContentWidget();
+		//# if MC_VERSION_NUMBER >= 11700
 		addRenderableWidget(contentWidget);
+		//# else
+		//- children.add(contentWidget);
+		//# end
 		contentWidget.setPosition(panelWidth, 20);
 		contentWidget.setRowWidth(500);
 
@@ -309,6 +324,11 @@ public class ConfigScreen extends Screen {
 	//# elif RENDERING == "POSE_STACK"
 	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
+
+		//# if MC_VERSION_NUMBER < 11700
+		//- treeWidget.render(graphics, mouseX, mouseY, delta);
+		//- contentWidget.renderWidget(graphics, mouseX, mouseY, delta);
+		//# end
 
 		super.render(graphics, mouseX, mouseY, delta);
 

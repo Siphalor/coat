@@ -73,12 +73,22 @@ public class MessagesScreen extends Screen {
 		//- abortButton = new Button(0, 38, 100, 20, ABORT_TEXT, button -> this.abortClicked());
 		//- acceptButton = new Button(0, 38, 100, 20, ACCEPT_TEXT, button -> this.acceptClicked());
 		//# end
+
+		//# if MC_VERSION_NUMBER >= 11700
 		addRenderableWidget(abortButton);
 		addRenderableWidget(acceptButton);
+		//# else
+		//- addButton(abortButton);
+		//- addButton(acceptButton);
+		//# end
 
 		messagesList = new DynamicEntryListWidget<>(Minecraft.getInstance(), width, height - 62, 62, 260);
 		messagesList.addEntries(messages.stream().map(MessageListEntry::new).collect(Collectors.toList()));
+		//# if MC_VERSION_NUMBER >= 11700
 		addRenderableWidget(messagesList);
+		//# else
+		//- addWidget(messagesList);
+		//# end
 
 		resize(Minecraft.getInstance(), width, height);
 	}
@@ -127,6 +137,9 @@ public class MessagesScreen extends Screen {
 		super.render(graphics, mouseX, mouseY, delta);
 
 		titleLines.renderLeftAligned(graphics, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
-		// messagesList.render(matrices, mouseX, mouseY, delta);
+
+		//# if MC_VERSION_NUMBER < 11700
+		//- messagesList.render(graphics, mouseX, mouseY, delta);
+		//# end
 	}
 }

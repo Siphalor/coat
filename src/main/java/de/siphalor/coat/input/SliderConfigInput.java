@@ -41,7 +41,7 @@ public class SliderConfigInput<N extends Number> extends AbstractSliderButton im
 				0,
 				100,
 				20,
-				/*# if MC_VERSION_NUMBER >= 11900 */Component.empty()/*# else *//*- null *//*# end */,
+				/*# if MC_VERSION_NUMBER >= 11900 */Component.empty()/*# else *//*- TextComponent.EMPTY *//*# end */,
 				toInternalValue(value, min, max)
 		);
 		//noinspection unchecked

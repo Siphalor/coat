@@ -10,6 +10,7 @@ import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.renderer.RenderType;
@@ -76,7 +77,7 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		graphics.blitSprite(RenderType::guiTextured, HANDLE_TEXTURE, x, y + 2, 12, 15);
 		//# end
 		//# elif RENDERING == "POSE_STACK"
-		//- RenderSystem.setShaderTexture(0, HANDLE_TEXTURE);
+		//- CoatUtil.setShaderTexture(HANDLE_TEXTURE);
 		//- blit(graphics, x, y + 2, 232, 0, 12, 15);
 		//# end
 		input.render(graphics, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);

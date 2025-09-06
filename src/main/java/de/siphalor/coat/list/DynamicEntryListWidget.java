@@ -48,7 +48,8 @@ import java.util.List;
  */
 @Environment(EnvType.CLIENT)
 public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> extends AbstractContainerEventHandler
-		implements NarratableEntry, EntryContainer, TickableElement,
+		implements EntryContainer, TickableElement,
+		/*# if MC_VERSION_NUMBER >= 11700 */NarratableEntry,/*# end */
 		/*# if MC_VERSION_NUMBER >= 11903 */Renderable/*# else *//*- Widget *//*# end */
 {
 	private static final int TOP_PADDING = 8;
@@ -96,6 +97,8 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			//- new ResourceLocation("textures/block/dripstone_block.png");
 			//# elif MC_VERSION_NUMBER >= 11700
 			//- new ResourceLocation("textures/block/smooth_basalt.png");
+			//# elif MC_VERSION_NUMBER >= 11600
+			//- new ResourceLocation("textures/block/blackstone_top.png");
 			//# end
 	private boolean scrolling;
 
@@ -415,10 +418,12 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
+			//# if MC_VERSION_NUMBER >= 11700
 			//# if MC_VERSION_NUMBER < 12100
 			//- RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			//# end
 			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+			//# end
 			int p = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getMaxPosition());
 			p = Mth.clamp(p, 32, this.bottom - this.top - 8);
 			int q = (int) this.getScrollAmount() * (this.bottom - this.top - p) / maxScroll + this.top;
@@ -427,11 +432,14 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			}
 
 			Tesselator tesselator = Tesselator.getInstance();
-			//# if MC_VERSION_NUMBER < 12100
+			//# if MC_VERSION_NUMBER >= 12100
+			BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+			//# elif MC_VERSION_NUMBER >= 11700
 			//- BufferBuilder bufferBuilder = tesselator.getBuilder();
 			//- bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 			//# else
-			BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+			//- BufferBuilder bufferBuilder = tesselator.getBuilder();
+			//- bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
 			//# end
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, top, scrollbarXEnd, bottom, SCROLLBAR_BACKGROUND_COLOR);
 			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, SCROLLBAR_HANDLE_SHADOW_COLOR);
@@ -749,6 +757,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		}
 	}
 
+	//# if MC_VERSION_NUMBER >= 11700
 	@Override
 	public void updateNarration(NarrationElementOutput narrationElementOutput) {
 		// TODO: narrations
@@ -758,6 +767,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	public NarrationPriority narrationPriority() {
 		return NarrationPriority.NONE;
 	}
+	//# end
 
 	/**
 	 * List class that represents the entries of an entry list widget

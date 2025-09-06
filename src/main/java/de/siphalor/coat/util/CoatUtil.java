@@ -142,11 +142,14 @@ public class CoatUtil {
 		//# if MC_VERSION_NUMBER >= 12100
 		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
 		BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		//# else
+		//# elif MC_VERSION_NUMBER >= 11700
 		//- RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
 		//- BufferBuilder buffer = tesselator.getBuilder();
 		//- buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//# else
+		//- RenderSystem.enableTexture();
+		//- BufferBuilder buffer = tesselator.getBuilder();
+		//- buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
 		//# end
 		addRect(buffer, x1, y1, x2, y1 + stroke, color);
 		addRect(buffer, x1, y2 - stroke, x2, y2, color);
@@ -154,7 +157,10 @@ public class CoatUtil {
 		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, color);
 		//# if MC_VERSION_NUMBER >= 12100
 		BufferUploader.drawWithShader(buffer.buildOrThrow());
+		//# elif MC_VERSION_NUMBER >= 11700
+		//- tesselator.end();
 		//# else
+		//- RenderSystem.disableTexture();
 		//- tesselator.end();
 		//# end
 	}
@@ -198,7 +204,12 @@ public class CoatUtil {
 		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 		//# else
 		//- BufferBuilder bufferBuilder = tesselator.getBuilder();
+		//- //# if MC_VERSION_NUMBER >= 11700
 		//- bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//- //# else
+		//- RenderSystem.shadeModel(GL11.GL_SMOOTH);
+		//- bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//- //# end
 		//- withColor(bufferBuilder.vertex(left, bottom, 0D), leftColor).endVertex();
 		//- withColor(bufferBuilder.vertex(right, bottom, 0D), rightColor).endVertex();
 		//- withColor(bufferBuilder.vertex(right, top, 0D), rightColor).endVertex();
@@ -214,11 +225,14 @@ public class CoatUtil {
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
 		//# if MC_VERSION_NUMBER >= 12100
 		RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
-		//# else
+		//# elif MC_VERSION_NUMBER >= 11700
 		//- RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+		//# else
+		//- RenderSystem.shadeModel(GL11.GL_SMOOTH);
+		//- RenderSystem.enableTexture();
 		//# end
+		setShaderTexture(texture);
 		resetShaderColor();
-		RenderSystem.setShaderTexture(0, texture);
 		Tesselator tesselator = Tesselator.getInstance();
 
 		int width = right - left;
@@ -240,7 +254,11 @@ public class CoatUtil {
 		BufferUploader.drawWithShader(buffer.buildOrThrow());
 		//# else
 		//- BufferBuilder buffer = tesselator.getBuilder();
+		//- //# if MC_VERSION_NUMBER >= 11700
 		//- buffer.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
+		//- //# else
+		//- buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
+		//- //# end
 
 		//- withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
 		//- withColor(buffer.vertex(left + middleOffset, top + middleOffset, z), innerColor).uv(middleOffset / textureScale, middleOffset / textureScale).endVertex();
@@ -262,12 +280,18 @@ public class CoatUtil {
 	}
 	//# else
 	//- public static void drawTintedTexture(int left, int top, int right, int bottom, int z, ResourceLocation texture, float textureScale, int textureYOffset, CoatColor color) {
-	//- 	RenderSystem.setShader(GameRenderer::getPositionTexShader);
-	//- 	RenderSystem.setShaderTexture(0, texture);
 	//- 	Tesselator tesselator = Tesselator.getInstance();
+	//- 	setShaderTexture(texture);
 	//- 	setShaderColor(color);
+	//- 	//# if MC_VERSION_NUMBER >= 11700
+	//- 	RenderSystem.setShader(GameRenderer::getPositionTexShader);
 	//- 	BufferBuilder bufferBuilder = tesselator.getBuilder();
 	//- 	bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+	//- 	//# else
+	//- 	RenderSystem.enableTexture();
+	//- 	BufferBuilder bufferBuilder = tesselator.getBuilder();
+	//- 	bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX);
+	//- 	//# end
 	//- 	bufferBuilder.vertex(left, bottom, z).uv(left / textureScale, (bottom + textureYOffset) / textureScale).endVertex();
 	//- 	bufferBuilder.vertex(right, bottom, z).uv(right / textureScale, (bottom + textureYOffset) / textureScale).endVertex();
 	//- 	bufferBuilder.vertex(right, top, z).uv(right / textureScale, (top + textureYOffset) / textureScale).endVertex();
@@ -286,12 +310,28 @@ public class CoatUtil {
 		return vertexConsumer;
 	}
 
+	public static void setShaderTexture(ResourceLocation texture) {
+		//# if MC_VERSION_NUMBER >= 11700
+		RenderSystem.setShaderTexture(0, texture);
+		//# else
+		//- Minecraft.getInstance().getTextureManager().bind(texture);
+		//# end
+	}
+
 	public static void setShaderColor(CoatColor color) {
+		//# if MC_VERSION_NUMBER >= 11700
 		RenderSystem.setShaderColor(color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF());
+		//# else
+		//- RenderSystem.color4f(color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF());
+		//# end
 	}
 
 	public static void resetShaderColor() {
+		//# if MC_VERSION_NUMBER >= 11700
 		RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+		//# else
+		//- RenderSystem.color4f(1F, 1F, 1F, 1F);
+		//# end
 	}
 
 	public static void playClickSound() {
