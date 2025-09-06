@@ -94,6 +94,8 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			//- new ResourceLocation("textures/block/mangrove_log.png");
 			//# elif MC_VERSION_NUMBER >= 11800
 			//- new ResourceLocation("textures/block/dripstone_block.png");
+			//# elif MC_VERSION_NUMBER >= 11700
+			//- new ResourceLocation("textures/block/smooth_basalt.png");
 			//# end
 	private boolean scrolling;
 
