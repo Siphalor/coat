@@ -23,6 +23,7 @@
 		"modmenu:api": true
 	},
 	"accessWidener": "coat.accesswidener",
+	"mixins": [${mixins}],
 	"depends": {
 		"fabricloader": ">=0.14.17"
 	}

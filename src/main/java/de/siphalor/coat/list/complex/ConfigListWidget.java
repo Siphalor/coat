@@ -167,7 +167,7 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	public void setFocused(@Nullable GuiEventListener focused) {
 		super.setFocused(focused);
 		if (focused == appendButton) {
-			setScrollAmount(getMaxPosition());
+			setScrollYOffset(getMaxPosition());
 		}
 	}
 

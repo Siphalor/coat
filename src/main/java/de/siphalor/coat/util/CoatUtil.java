@@ -1,30 +1,40 @@
 package de.siphalor.coat.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+//- import com.mojang.blaze3d.systems.RenderSystem;
+//- import com.mojang.blaze3d.vertex.BufferBuilder;
+//- import com.mojang.blaze3d.vertex.BufferUploader;
+//- import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 //- import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
+//- import com.mojang.blaze3d.vertex.Tesselator;
+//- import com.mojang.blaze3d.vertex.VertexConsumer;
+//- import com.mojang.blaze3d.vertex.VertexFormat;
+//- import de.siphalor.coat.mixin.renderstate.GuiGraphicsMixin;
+import de.siphalor.coat.util.renderstate.CoatGuiGraphics;
+import de.siphalor.coat.util.renderstate.IndividuallyColoredBlitRenderState;
+import de.siphalor.coat.util.renderstate.IndividuallyColoredRectangleRenderState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 //- import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.CoreShaders;
-import net.minecraft.client.renderer.RenderType;
+//- import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.renderer.RenderPipelines;
+//- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.FormattedCharSequence;
-import org.lwjgl.opengl.GL11;
+import org.joml.Matrix3x2f;
+import org.joml.Vector4f;
+//- import net.minecraft.util.FormattedCharSequence;
+//- import org.lwjgl.opengl.GL11;
 
-import java.util.List;
+//- import java.util.List;
 
 /**
  * Utility class for Coat that collects everything that doesn't have a better place.
@@ -56,153 +66,196 @@ public class CoatUtil {
 	 * Half the {@link CoatUtil#MARGIN}.
 	 */
 	public static final int HALF_MARGIN = MARGIN / 2;
-	/**
-	 * An ellipsis - what did you expect?
-	 */
-	public static final String ELLIPSIS = "...";
 
+	//# if MC_VERSION_NUMBER >= 12108
 	/**
-	 * Intelligently trims the given text to the given width.
-	 * At the end of the string an ellipsis will be placed.
-	 *
-	 * @param font     The text renderer to use for calculations
-	 * @param baseText The text to trim intelligently
-	 * @param width    The width to trim the text to
-	 * @return The trimmed text
+	 * Renders a string either scrolling or left-aligned depending on the width.
 	 */
-	public static Component intelliTrim(Font font, Component baseText, int width) {
-		int textWidth = font.width(baseText);
-		if (textWidth > width) {
-			textWidth = font.width(ELLIPSIS);
-			String trimmed = font.plainSubstrByWidth(baseText.getString(), width - textWidth);
-			//# if MC_VERSION_NUMBER >= 11900
-			return Component.literal(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
-			//# else
-			//- return new TextComponent(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
-			//# end
+	public static void drawLeftAlignedText(
+			GuiGraphics graphics, Font font,
+			Component text,
+			ScreenRectangle rect,
+			CoatColor color
+	) {
+		int textWidth = font.width(text);
+		if (textWidth <= rect.width()) {
+			graphics.drawString(font, text, rect.left(), rect.top(), color.getArgb());
 		} else {
-			return baseText;
+			AbstractWidget.renderScrollingString(
+					graphics,
+					font,
+					text,
+					rect.left(),
+					rect.top(),
+					rect.right(),
+					rect.bottom(),
+					color.getArgb()
+			);
 		}
 	}
+	//# else
+	//- /**
+	//-  * An ellipsis - what did you expect?
+	//-  */
+	//- public static final String ELLIPSIS = "...";
 
-	/**
-	 * Wraps a text that's intended for tooltips at a certain length.
-	 * @param font    The text renderer to use for calculations
-	 * @param minecraft The {@link Minecraft} instance
-	 * @param text            The text to wrap
-	 * @return A list of {@link FormattedCharSequence}s representing the wrapped tooltip text
-	 */
-	public static List<FormattedCharSequence> wrapTooltip(Font font, Minecraft minecraft, Component text) {
-		return font.split(text, minecraft.screen.width / 2);
-	}
+	//- /**
+	//-  * Intelligently trims the given text to the given width.
+	//-  * At the end of the string an ellipsis will be placed.
+	//-  *
+	//-  * @param font     The text renderer to use for calculations
+	//-  * @param baseText The text to trim intelligently
+	//-  * @param width    The width to trim the text to
+	//-  * @return The trimmed text
+	//-  */
+	//- public static Component intelliTrim(Font font, Component baseText, int width) {
+	//- 	int textWidth = font.width(baseText);
+	//- 	if (textWidth > width) {
+	//- 		textWidth = font.width(ELLIPSIS);
+	//- 		String trimmed = font.plainSubstrByWidth(baseText.getString(), width - textWidth);
+	//- 		//# if MC_VERSION_NUMBER >= 11900
+	//- 		return Component.literal(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
+	//- 		//# else
+	//- 		return new TextComponent(trimmed.trim() + ELLIPSIS).setStyle(baseText.getStyle());
+	//- 		//# end
+	//- 	} else {
+	//- 		return baseText;
+	//- 	}
+	//- }
 
-	/**
-	 * Wraps and renders the given text as a tooltip.
-	 *
-	 * @param graphics The matrix stack to use for rendering
-	 * @param x        The x position to render to
-	 * @param y        The y position to render to
-	 * @param text     The tooltip text to wrap and render
-	 */
-	//# if RENDERING == "GUI_GRAPHICS"
-	public static void renderTooltip(GuiGraphics graphics, int x, int y, Component text) {
-	//# elif RENDERING == "POSE_STACK"
+	//- /**
+	//-  * Wraps a text that's intended for tooltips at a certain length.
+	//-  * @param font    The text renderer to use for calculations
+	//-  * @param minecraft The {@link Minecraft} instance
+	//-  * @param text            The text to wrap
+	//-  * @return A list of {@link FormattedCharSequence}s representing the wrapped tooltip text
+	//-  */
+	//- public static List<FormattedCharSequence> wrapTooltip(Font font, Minecraft minecraft, Component text) {
+	//- 	return font.split(text, minecraft.screen.width / 2);
+	//- }
+
+	//- /**
+	//-  * Wraps and renders the given text as a tooltip.
+	//-  *
+	//-  * @param graphics The matrix stack to use for rendering
+	//-  * @param x        The x position to render to
+	//-  * @param y        The y position to render to
+	//-  * @param text     The tooltip text to wrap and render
+	//-  */
+	//- //# if RENDERING == "GUI_GRAPHICS"
+	//- public static void renderTooltip(GuiGraphics graphics, int x, int y, Component text) {
+	//- //# elif RENDERING == "POSE_STACK"
 	//- public static void renderTooltip(PoseStack graphics, int x, int y, Component text) {
+	//- //# end
+	//- 	Minecraft minecraft = Minecraft.getInstance();
+	//- 	RenderSystem.depthFunc(GL11.GL_ALWAYS);
+	//- 	//# if RENDERING == "GUI_GRAPHICS"
+	//- 	graphics.renderTooltip(
+	//- 			minecraft.font,
+	//- 			wrapTooltip(minecraft.font, minecraft, text),
+	//- 			x, y
+	//- 	);
+	//- 	//# elif RENDERING == "POSE_STACK"
+	//- 	Minecraft.getInstance().screen.renderTooltip(
+	//- 			graphics,
+	//- 			text,
+	//- 			x, y
+	//- 	);
+	//- 	//# end
+	//- }
 	//# end
-		Minecraft minecraft = Minecraft.getInstance();
-		RenderSystem.depthFunc(GL11.GL_ALWAYS);
-		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.renderTooltip(
-				minecraft.font,
-				wrapTooltip(minecraft.font, minecraft, text),
-				x, y
-		);
-		//# elif RENDERING == "POSE_STACK"
-		//- Minecraft.getInstance().screen.renderTooltip(
-		//- 		graphics,
-		//- 		text,
-		//- 		x, y
-		//- );
-		//# end
-	}
 
 	/**
 	 * Draws the outline of a rectangle.
-	 * @param x1     x1
-	 * @param y1     y1
-	 * @param x2     x2
-	 * @param y2     y2, duh
-	 * @param stroke The width of the outline
 	 * @param color  The color to draw with
 	 */
-	public static void drawStrokeRect(int x1, int y1, int x2, int y2, int stroke, CoatColor color) {
-		Tesselator tesselator = Tesselator.getInstance();
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		//# if MC_VERSION_NUMBER >= 12100
-		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
-		BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		//# elif MC_VERSION_NUMBER >= 11700
-		//- RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		//- BufferBuilder buffer = tesselator.getBuilder();
-		//- buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		//# else
-		//- RenderSystem.enableTexture();
-		//- BufferBuilder buffer = tesselator.getBuilder();
-		//- buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
-		//# end
-		addRect(buffer, x1, y1, x2, y1 + stroke, color);
-		addRect(buffer, x1, y2 - stroke, x2, y2, color);
-		addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, color);
-		addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, color);
-		//# if MC_VERSION_NUMBER >= 12100
-		BufferUploader.drawWithShader(buffer.buildOrThrow());
-		//# elif MC_VERSION_NUMBER >= 11700
-		//- tesselator.end();
-		//# else
-		//- RenderSystem.disableTexture();
-		//- tesselator.end();
-		//# end
+	//# if RENDERING == "GUI_GRAPHICS"
+	public static void drawOutline(GuiGraphics graphics, int x1, int y1, int x2, int y2, CoatColor color) {
+		graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
 	}
+	//# else
+	//- public static void drawOutline(int x1, int y1, int x2, int y2, CoatColor color) {
+	//- 	final int stroke = 1;
+	//- 	Tesselator tesselator = Tesselator.getInstance();
+	//- 	RenderSystem.enableBlend();
+	//- 	RenderSystem.defaultBlendFunc();
+	//- 	//# if MC_VERSION_NUMBER >= 11700
+	//- 	RenderSystem.setShader(GameRenderer::getPositionColorShader);
+	//- 	BufferBuilder buffer = tesselator.getBuilder();
+	//- 	buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+	//- 	//# else
+	//- 	RenderSystem.enableTexture();
+	//- 	BufferBuilder buffer = tesselator.getBuilder();
+	//- 	buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+	//- 	//# end
+	//- 	addRect(buffer, x1, y1, x2, y1 + stroke, color);
+	//- 	addRect(buffer, x1, y2 - stroke, x2, y2, color);
+	//- 	addRect(buffer, x1, y1 + stroke, x1 + stroke, y2 - stroke, color);
+	//- 	addRect(buffer, x2 - stroke, y1 + stroke, x2, y2 - stroke, color);
+	//- 	//# if MC_VERSION_NUMBER >= 11700
+	//- 	tesselator.end();
+	//- 	//# else
+	//- 	RenderSystem.disableTexture();
+	//- 	tesselator.end();
+	//- 	//# end
+	//- }
+	//# end
 
-	/**
-	 * Adds a rectangle to the given buffer builder.
-	 * @param buffer The builder to append to
-	 * @param x1     x1
-	 * @param y1     y1
-	 * @param x2     x2
-	 * @param y2     y2, duh
-	 * @param color  the color of the rect
-	 */
-	public static void addRect(BufferBuilder buffer, int x1, int y1, int x2, int y2, CoatColor color) {
-		//# if MC_VERSION_NUMBER >= 12100
-		withColor(buffer.addVertex(x1, y2, 0), color);
-		withColor(buffer.addVertex(x2, y2, 0), color);
-		withColor(buffer.addVertex(x2, y1, 0), color);
-		withColor(buffer.addVertex(x1, y1, 0), color);
+	//# if RENDERING != "GUI_GRAPHICS"
+	//- /**
+	//-  * Adds a rectangle to the given buffer builder.
+	//-  * @param buffer The builder to append to
+	//-  * @param color  the color of the rect
+	//-  */
+	//- public static void addRect(BufferBuilder buffer, int x1, int y1, int x2, int y2, CoatColor color) {
+	//- 	withColor(buffer.vertex(x1, y2, 0), color).endVertex();
+	//- 	withColor(buffer.vertex(x2, y2, 0), color).endVertex();
+	//- 	withColor(buffer.vertex(x2, y1, 0), color).endVertex();
+	//- 	withColor(buffer.vertex(x1, y1, 0), color).endVertex();
+	//- }
+	//# end
+
+	public static void drawHorizontalGradient(
+			//# if RENDERING == "GUI_GRAPHICS"
+			GuiGraphics graphics,
+			//# end
+			int left,
+			int top,
+			int right,
+			int bottom,
+			CoatColor leftColor,
+			CoatColor rightColor
+	) {
+		//# if MC_VERSION_NUMBER >= 12108
+		ScreenRectangle rect = new ScreenRectangle(left, top, right - left, bottom - top);
+		CoatGuiGraphics coatGraphics = (CoatGuiGraphics) graphics;
+		coatGraphics.coat_submitGuiRenderState(
+				new IndividuallyColoredRectangleRenderState(
+						RenderPipelines.GUI,
+						TextureSetup.noTexture(),
+						new Matrix3x2f(graphics.pose()),
+						rect,
+						leftColor.getArgb(),
+						rightColor.getArgb(),
+						rightColor.getArgb(),
+						leftColor.getArgb(),
+						coatGraphics.coat_currentScissorArea()
+				)
+		);
 		//# else
-		//- withColor(buffer.vertex(x1, y2, 0), color).endVertex();
-		//- withColor(buffer.vertex(x2, y2, 0), color).endVertex();
-		//- withColor(buffer.vertex(x2, y1, 0), color).endVertex();
-		//- withColor(buffer.vertex(x1, y1, 0), color).endVertex();
-		//# end
-	}
+		//- RenderSystem.enableBlend();
+		//- RenderSystem.defaultBlendFunc();
 
-	public static void drawHorizontalGradient(int left, int top, int right, int bottom, CoatColor leftColor, CoatColor rightColor) {
-		RenderSystem.enableBlend();
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
+		//- Tesselator tesselator = Tesselator.getInstance();
 
-		Tesselator tesselator = Tesselator.getInstance();
-
-		//# if MC_VERSION_NUMBER >= 12100
-		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		withColor(bufferBuilder.addVertex(left, bottom, 0), leftColor);
-		withColor(bufferBuilder.addVertex(right, bottom, 0), rightColor);
-		withColor(bufferBuilder.addVertex(right, top, 0), rightColor);
-		withColor(bufferBuilder.addVertex(left, top, 0), leftColor);
-		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
-		//# else
+		//- //# if MC_VERSION_NUMBER >= 12100
+		//- BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//- withColor(bufferBuilder.addVertex(left, bottom, 0), leftColor);
+		//- withColor(bufferBuilder.addVertex(right, bottom, 0), rightColor);
+		//- withColor(bufferBuilder.addVertex(right, top, 0), rightColor);
+		//- withColor(bufferBuilder.addVertex(left, top, 0), leftColor);
+		//- BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+		//- //# else
 		//- BufferBuilder bufferBuilder = tesselator.getBuilder();
 		//- //# if MC_VERSION_NUMBER >= 11700
 		//- bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
@@ -215,71 +268,126 @@ public class CoatUtil {
 		//- withColor(bufferBuilder.vertex(right, top, 0D), rightColor).endVertex();
 		//- withColor(bufferBuilder.vertex(left, top, 0D), leftColor).endVertex();
 		//- tesselator.end();
-		//# end
-
-		RenderSystem.disableBlend();
-	}
-
-	public static void drawInsetGradientTexture(int left, int top, int right, int bottom, int z, ResourceLocation texture, float textureScale, CoatColor outerColor, CoatColor innerColor) {
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		//# if MC_VERSION_NUMBER >= 12100
-		RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
-		//# elif MC_VERSION_NUMBER >= 11700
-		//- RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
-		//# else
-		//- RenderSystem.shadeModel(GL11.GL_SMOOTH);
-		//- RenderSystem.enableTexture();
-		//# end
-		setShaderTexture(texture);
-		resetShaderColor();
-		Tesselator tesselator = Tesselator.getInstance();
-
-		int width = right - left;
-		int height = bottom - top;
-		int middleOffset = height / 2;
-
-
-		//# if MC_VERSION_NUMBER >= 12100
-		BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_TEX_COLOR);
-
-		withColor(buffer.addVertex(left, top, z), outerColor).setUv(0F, 0F);
-		withColor(buffer.addVertex(left + middleOffset, top + middleOffset, z), innerColor).setUv(middleOffset / textureScale, middleOffset / textureScale);
-		withColor(buffer.addVertex(right, top, z), outerColor).setUv(width / textureScale, 0F);
-		withColor(buffer.addVertex(right - middleOffset, top + middleOffset, z), innerColor).setUv((width - middleOffset) / textureScale, middleOffset / textureScale);
-		withColor(buffer.addVertex(right, bottom, z), outerColor).setUv(width / textureScale, height / textureScale);
-		withColor(buffer.addVertex(left + middleOffset, bottom - middleOffset, z), innerColor).setUv(middleOffset / textureScale, (height - middleOffset) / textureScale);
-		withColor(buffer.addVertex(left, bottom, z), outerColor).setUv(0F, height / textureScale);
-		withColor(buffer.addVertex(left, top, z), outerColor).setUv(0F, 0F);
-		BufferUploader.drawWithShader(buffer.buildOrThrow());
-		//# else
-		//- BufferBuilder buffer = tesselator.getBuilder();
-		//- //# if MC_VERSION_NUMBER >= 11700
-		//- buffer.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
-		//- //# else
-		//- buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
 		//- //# end
 
-		//- withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
-		//- withColor(buffer.vertex(left + middleOffset, top + middleOffset, z), innerColor).uv(middleOffset / textureScale, middleOffset / textureScale).endVertex();
-		//- withColor(buffer.vertex(right, top, z), outerColor).uv(width / textureScale, 0F).endVertex();
-		//- withColor(buffer.vertex(right - middleOffset, top + middleOffset, z), innerColor).uv((width - middleOffset) / textureScale, middleOffset / textureScale).endVertex();
-		//- withColor(buffer.vertex(right, bottom, z), outerColor).uv(width / textureScale, height / textureScale).endVertex();
-		//- withColor(buffer.vertex(left + middleOffset, bottom - middleOffset, z), innerColor).uv(middleOffset / textureScale, (height - middleOffset) / textureScale).endVertex();
-		//- withColor(buffer.vertex(left, bottom, z), outerColor).uv(0F, height / textureScale).endVertex();
-		//- withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
-		//- tesselator.end();
+		//- RenderSystem.disableBlend();
 		//# end
 	}
 
-	//# if MC_VERSION_NUMBER >= 12100
-	public static void drawTintedTexture(GuiGraphics graphics, int left, int top, int right, int bottom, ResourceLocation texture, int textureScale, int textureYOffset, CoatColor color) {
+	//# if RENDERING == "GUI_GRAPHICS"
+	public static void drawTexture(
+			GuiGraphics graphics,
+			ResourceLocation texture,
+			int left,
+			int top,
+			int width,
+			int height
+	) {
+		//# if MC_VERSION_NUMBER >= 12108
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, left, top, width, height);
+		//# elif MC_VERSION_NUMBER >= 12100
+		//- graphics.blitSprite(RenderType::guiTextured, texture, left, top, width, height);
+		//# elif MC_VERSION_NUMBER >= 12002
+		//- graphics.blitSprite(texture, left, top, width, height);
+		//# else
+		//- drawTexture(graphics, texture, left, top, 0, 0, width, height);
+		//# end
+	}
+
+	//# if MC_VERSION_NUMBER < 12002
+	//- public static void drawTexture(
+	//- 		GuiGraphics graphics,
+	//- 		ResourceLocation texture,
+	//- 		int left,
+	//- 		int top,
+	//- 		int textureLeft,
+	//- 		int textureTop,
+	//- 		int width,
+	//- 		int height
+	//- ) {
+	//- 	graphics.blit(texture, left, top, textureLeft, textureTop, width, height);
+	//- }
+	//# end
+
+	public static void drawTintedTiledTexture(
+			GuiGraphics graphics,
+			ResourceLocation texture,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			int textureScale,
+			int textureYOffset,
+			CoatColor color
+	) {
+		//# if MC_VERSION_NUMBER >= 12100
 		int width = right - left;
 		int height = bottom - top;
-		graphics.blit(RenderType::guiTextured, texture, left, top, right, bottom + textureYOffset, width, height, width, height, textureScale, textureScale, color.getArgb());
+		graphics.blit(
+				//# if MC_VERSION_NUMBER >= 12108
+				RenderPipelines.GUI_TEXTURED,
+				//# elif MC_VERSION_NUMBER >=12100
+				//- RenderType::guiTextured,
+				//# end
+				texture,
+				left,
+				top,
+				right,
+				bottom + textureYOffset,
+				width,
+				height,
+				textureScale,
+				textureScale,
+				color.getArgb()
+		);
+		//# else
+		//- setShaderColor(color);
+		//- drawTiledTexture(graphics, texture, left, top, right, bottom, textureScale, textureYOffset);
+		//- resetShaderColor();
+		//# end
+	}
+
+	public static void drawTiledTexture(
+			GuiGraphics graphics,
+			ResourceLocation texture,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			int textureScale,
+			int textureYOffset
+	) {
+		int width = right - left;
+		int height = bottom - top;
+		graphics.blit(
+				//# if MC_VERSION_NUMBER >= 12108
+				RenderPipelines.GUI_TEXTURED,
+				//#elif MC_VERSION_NUMBER >=12100
+				//- RenderType::guiTextured,
+				//# end
+				texture,
+				left,
+				top,
+				right,
+				bottom + textureYOffset,
+				width,
+				height,
+				textureScale,
+				textureScale
+		);
 	}
 	//# else
-	//- public static void drawTintedTexture(int left, int top, int right, int bottom, int z, ResourceLocation texture, float textureScale, int textureYOffset, CoatColor color) {
+	//- public static void drawTintedTiledTexture(
+	//- 		ResourceLocation texture,
+	//- 		int left,
+	//- 		int top,
+	//- 		int right,
+	//- 		int bottom,
+	//- 		int z,
+	//- 		float textureScale,
+	//- 		int textureYOffset,
+	//- 		CoatColor color
+	//- ) {
 	//- 	Tesselator tesselator = Tesselator.getInstance();
 	//- 	setShaderTexture(texture);
 	//- 	setShaderColor(color);
@@ -301,38 +409,244 @@ public class CoatUtil {
 	//- }
 	//# end
 
-	private static <V extends VertexConsumer> V withColor(V vertexConsumer, CoatColor color) {
-		//# if MC_VERSION_NUMBER >= 12100
-		vertexConsumer.setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+	//# if MC_VERSION_NUMBER >= 12100
+	public static void drawInsetGradientTexture(
+			GuiGraphics graphics,
+			ResourceLocation texture,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			int textureScale,
+			CoatColor outerColor,
+			CoatColor innerColor
+	) {
+		int width = right - left;
+		int height = bottom - top;
+		int middleOffset = height / 2;
+
+		//# if MC_VERSION_NUMBER >= 12108
+		TextureSetup textureSetup = TextureSetup.singleTexture(
+				Minecraft.getInstance().getTextureManager().getTexture(texture).getTextureView()
+		);
+		submitIndividuallyColoredBlitRectable(
+				graphics,
+				textureSetup,
+				new ScreenRectangle(left, top, middleOffset, middleOffset),
+				textureScale,
+				outerColor,
+				outerColor,
+				innerColor,
+				outerColor
+		);
+		submitIndividuallyColoredBlitRectable(
+				graphics,
+				textureSetup,
+				new ScreenRectangle(left + middleOffset, top, width - 2 * middleOffset, middleOffset),
+				textureScale,
+				outerColor,
+				outerColor,
+				innerColor,
+				innerColor
+		);
+		submitIndividuallyColoredBlitRectable(
+				graphics,
+				textureSetup,
+				new ScreenRectangle(right - middleOffset, top, middleOffset, middleOffset),
+				textureScale,
+				outerColor,
+				outerColor,
+				outerColor,
+				innerColor
+		);
+		submitIndividuallyColoredBlitRectable(
+				graphics,
+				textureSetup,
+				new ScreenRectangle(left, top + middleOffset, middleOffset, middleOffset),
+				textureScale,
+				outerColor,
+				innerColor,
+				outerColor,
+				outerColor
+		);
+		submitIndividuallyColoredBlitRectable(
+				graphics,
+				textureSetup,
+				new ScreenRectangle(left + middleOffset, top + middleOffset, width - 2 * middleOffset, middleOffset),
+				textureScale,
+				innerColor,
+				innerColor,
+				outerColor,
+				outerColor
+		);
+		submitIndividuallyColoredBlitRectable(
+				graphics,
+				textureSetup,
+				new ScreenRectangle(right - middleOffset, top + middleOffset, middleOffset, middleOffset),
+				textureScale,
+				innerColor,
+				outerColor,
+				outerColor,
+				outerColor
+		);
 		//# else
-		//- vertexConsumer.color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+		//- graphics.drawSpecial(bufferSource -> {
+		//- 	bufferSource.getBuffer(RenderType.guiTextured(texture))
+		//- 			.addVertex(left, top, 0)
+		//- 			.setUv(0, 0)
+		//- 			.setColor(outerColor.getArgb())
+		//- 			.addVertex(middleOffset, top, 0)
+		//- 			.setUv(middleOffset / textureScale, 0)
+		//- 			.setColor(outerColor.getArgb())
+		//- 			.addVertex(middleOffset, middleOffset, 0)
+		//- 			.setUv(middleOffset / textureScale, middleOffset / textureScale)
+		//- 			.setColor(innerColor.getArgb())
+		//- 			.addVertex(left, middleOffset, 0)
+		//- 			.setUv(0, middleOffset / textureScale)
+		//- 			.setColor(outerColor.getArgb())
+		//- 			.addVertex(middleOffset, 0, 0)
+		//- 			.setUv(middleOffset / textureScale, 0)
+		//- 			.setColor(outerColor.getArgb())
+		//- 			.addVertex(width - middleOffset, 0, 0)
+		//- 			.setUv((width - middleOffset) / textureScale, 0)
+		//- 			.setColor(outerColor.getArgb())
+		//- 			.addVertex(width - middleOffset, middleOffset, 0)
+		//- 			.setUv((width - middleOffset) / textureScale, middleOffset / textureScale)
+		//- 			.setColor(innerColor.getArgb())
+		//- 			.addVertex(left, middleOffset, 0)
+		//- 			;
+		//- });
 		//# end
-		return vertexConsumer;
+	}
+	//# else
+	//- public static void drawInsetGradientTexture(
+	//- 		ResourceLocation texture,
+	//- 		int left,
+	//- 		int top,
+	//- 		int right,
+	//- 		int bottom,
+	//- 		int z,
+	//- 		float textureScale,
+	//- 		CoatColor outerColor,
+	//- 		CoatColor innerColor
+	//- ) {
+	//- 	RenderSystem.enableDepthTest();
+	//- 	RenderSystem.depthFunc(GL11.GL_LEQUAL);
+	//- 	//# if MC_VERSION_NUMBER >= 12100
+	//- 	RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
+	//- 	//# elif MC_VERSION_NUMBER >= 11700
+	//- 	RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+	//- 	//# else
+	//- 	RenderSystem.shadeModel(GL11.GL_SMOOTH);
+	//- 	RenderSystem.enableTexture();
+	//- 	//# end
+	//- 	setShaderTexture(texture);
+	//- 	resetShaderColor();
+	//- 	Tesselator tesselator = Tesselator.getInstance();
+
+	//- 	int width = right - left;
+	//- 	int height = bottom - top;
+	//- 	int middleOffset = height / 2;
+
+
+	//- 	//# if MC_VERSION_NUMBER >= 12100
+	//- 	BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_TEX_COLOR);
+
+	//- 	withColor(buffer.addVertex(left, top, z), outerColor).setUv(0F, 0F);
+	//- 	withColor(buffer.addVertex(left + middleOffset, top + middleOffset, z), innerColor).setUv(middleOffset / textureScale, middleOffset / textureScale);
+	//- 	withColor(buffer.addVertex(right, top, z), outerColor).setUv(width / textureScale, 0F);
+	//- 	withColor(buffer.addVertex(right - middleOffset, top + middleOffset, z), innerColor).setUv((width - middleOffset) / textureScale, middleOffset / textureScale);
+	//- 	withColor(buffer.addVertex(right, bottom, z), outerColor).setUv(width / textureScale, height / textureScale);
+	//- 	withColor(buffer.addVertex(left + middleOffset, bottom - middleOffset, z), innerColor).setUv(middleOffset / textureScale, (height - middleOffset) / textureScale);
+	//- 	withColor(buffer.addVertex(left, bottom, z), outerColor).setUv(0F, height / textureScale);
+	//- 	withColor(buffer.addVertex(left, top, z), outerColor).setUv(0F, 0F);
+	//- 	BufferUploader.drawWithShader(buffer.buildOrThrow());
+	//- 	//# else
+	//- 	BufferBuilder buffer = tesselator.getBuilder();
+	//- 	//# if MC_VERSION_NUMBER >= 11700
+	//- 	buffer.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
+	//- 	//# else
+	//- 	buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR_TEX);
+	//- 	//# end
+
+	//- 	withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
+	//- 	withColor(buffer.vertex(left + middleOffset, top + middleOffset, z), innerColor).uv(middleOffset / textureScale, middleOffset / textureScale).endVertex();
+	//- 	withColor(buffer.vertex(right, top, z), outerColor).uv(width / textureScale, 0F).endVertex();
+	//- 	withColor(buffer.vertex(right - middleOffset, top + middleOffset, z), innerColor).uv((width - middleOffset) / textureScale, middleOffset / textureScale).endVertex();
+	//- 	withColor(buffer.vertex(right, bottom, z), outerColor).uv(width / textureScale, height / textureScale).endVertex();
+	//- 	withColor(buffer.vertex(left + middleOffset, bottom - middleOffset, z), innerColor).uv(middleOffset / textureScale, (height - middleOffset) / textureScale).endVertex();
+	//- 	withColor(buffer.vertex(left, bottom, z), outerColor).uv(0F, height / textureScale).endVertex();
+	//- 	withColor(buffer.vertex(left, top, z), outerColor).uv(0F, 0F).endVertex();
+	//- 	tesselator.end();
+	//- 	//# end
+	//- }
+	//# end
+
+	//# if MC_VERSION_NUMBER >= 12108
+	private static void submitIndividuallyColoredBlitRectable(
+			GuiGraphics graphics,
+			TextureSetup textureSetup,
+			ScreenRectangle rect,
+			float textureScale,
+			CoatColor topLeftColor,
+			CoatColor topRightColor,
+			CoatColor bottomRightColor,
+			CoatColor bottomLeftColor
+	) {
+		CoatGuiGraphics coatGraphics = (CoatGuiGraphics) graphics;
+		coatGraphics.coat_submitGuiRenderState(new IndividuallyColoredBlitRenderState(
+				RenderPipelines.GUI_TEXTURED,
+				textureSetup,
+				new Matrix3x2f(graphics.pose()),
+				rect,
+				asVector4f(rect).div(textureScale),
+				topLeftColor.getArgb(),
+				topRightColor.getArgb(),
+				bottomRightColor.getArgb(),
+				bottomLeftColor.getArgb(),
+				coatGraphics.coat_currentScissorArea()
+		));
 	}
 
-	public static void setShaderTexture(ResourceLocation texture) {
-		//# if MC_VERSION_NUMBER >= 11700
-		RenderSystem.setShaderTexture(0, texture);
-		//# else
-		//- Minecraft.getInstance().getTextureManager().bind(texture);
-		//# end
+	private static Vector4f asVector4f(ScreenRectangle rect) {
+		return new Vector4f(rect.left(), rect.top(), rect.right(), rect.bottom());
 	}
+	//# else
+	//- private static <V extends VertexConsumer> V withColor(V vertexConsumer, CoatColor color) {
+	//- 	//# if MC_VERSION_NUMBER >= 12100
+	//- 	vertexConsumer.setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+	//- 	//# else
+	//- 	vertexConsumer.color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+	//- 	//# end
+	//- 	return vertexConsumer;
+	//- }
+	//# end
 
-	public static void setShaderColor(CoatColor color) {
-		//# if MC_VERSION_NUMBER >= 11700
-		RenderSystem.setShaderColor(color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF());
-		//# else
-		//- RenderSystem.color4f(color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF());
-		//# end
-	}
+	//# if MC_VERSION_NUMBER < 12100
+	//- public static void setShaderTexture(ResourceLocation texture) {
+	//- 	//# if MC_VERSION_NUMBER >= 11700
+	//- 	RenderSystem.setShaderTexture(0, texture);
+	//- 	//# else
+	//- 	Minecraft.getInstance().getTextureManager().bind(texture);
+	//- 	//# end
+	//- }
 
-	public static void resetShaderColor() {
-		//# if MC_VERSION_NUMBER >= 11700
-		RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-		//# else
-		//- RenderSystem.color4f(1F, 1F, 1F, 1F);
-		//# end
-	}
+	//- public static void setShaderColor(CoatColor color) {
+	//- 	//# if MC_VERSION_NUMBER >= 11700
+	//- 	RenderSystem.setShaderColor(color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF());
+	//- 	//# else
+	//- 	RenderSystem.color4f(color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF());
+	//- 	//# end
+	//- }
+
+	//- public static void resetShaderColor() {
+	//- 	//# if MC_VERSION_NUMBER >= 11700
+	//- 	RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+	//- 	//# else
+	//- 	RenderSystem.color4f(1F, 1F, 1F, 1F);
+	//- 	//# end
+	//- }
+	//# end
 
 	public static void playClickSound() {
 		SoundManager soundManager = Minecraft.getInstance().getSoundManager();

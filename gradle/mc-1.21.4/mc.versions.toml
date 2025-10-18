@@ -1,7 +1,7 @@
 [versions]
-amecs-api = "1.6.0"
+amecs-api = "1.6.2"
 fabric-api = "0.119.4+1.21.4"
-java = "17"
+java = "21"
 minecraft = "1.21.4"
 
 [libraries]

@@ -46,7 +46,7 @@ public abstract class ConfigContainerCompoundEntry extends ConfigContainerEntry 
 		if (this.focused instanceof ContainerEventHandler) {
 			((ContainerEventHandler) this.focused).setFocused(null);
 		} else if (this.focused instanceof ConfigInput) {
-			((ConfigInput<?>) this.focused).setFocused(false);
+			this.focused.setFocused(false);
 		}
 		this.focused = focused;
 	}

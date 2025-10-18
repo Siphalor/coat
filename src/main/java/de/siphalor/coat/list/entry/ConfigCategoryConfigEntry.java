@@ -8,7 +8,6 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
 import de.siphalor.coat.input.InputChangeListener;
 import de.siphalor.coat.util.CoatUtil;
-import de.siphalor.coat.util.CustomTooltip;
 import de.siphalor.coat.util.TextButtonWidget;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,16 +16,19 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-//- import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
+//- import net.minecraft.network.chat.TranslatableComponent;
 
-import java.util.ArrayList;
+//- import java.util.ArrayList;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
-import java.util.Collections;
+//- import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +47,8 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	//- private static final Component DEFAULT_TEXT = new TranslatableComponent(DEFAULT_TEXT_KEY);
 	//- private static final Component DEFAULT_HOVER_TEXT = new TranslatableComponent(DEFAULT_HOVER_TEXT_KEY);
 	//# end
+	//# if MC_VERSION_NUMBER >= 12005
+	private static final Duration DURATION_QUASI_INDEFINITE = Duration.of(14, ChronoUnit.DAYS);
 	private static final int TEXT_INDENT = 8;
 	private final Font font;
 	private final TextButtonWidget nameWidget;
@@ -84,20 +88,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		Minecraft minecraft = Minecraft.getInstance();
 		font = minecraft.font;
 		//# if MC_VERSION_NUMBER >= 11903
-		defaultButton = Button.builder(DEFAULT_TEXT, button ->
-				input.setValue(entryHandler.getDefault())
-		).size(10, 20).tooltip(
-				new CustomTooltip(() -> {
-					if (!getDefaultButton().active) {
-						return Collections.emptyList();
-					}
-					List<FormattedCharSequence> wrappedLines = CoatUtil.wrapTooltip(font, minecraft, entryHandler.asText(entryHandler.getDefault()));
-					ArrayList<FormattedCharSequence> list = new ArrayList<>(wrappedLines.size() + 1);
-					list.addAll(wrappedLines);
-					list.add(0, Component.translatable(Coat.MOD_ID + ".default.hover").getVisualOrderText());
-					return list;
-				}, null)
-		).build();
+		MutableComponent tooltipText = DEFAULT_HOVER_TEXT.plainCopy();
+		tooltipText.append("\n").append(entryHandler.asText(entryHandler.getDefault()));
+		defaultButton = Button.builder(DEFAULT_TEXT, button -> input.setValue(entryHandler.getDefault()))
+				.size(10, 20).tooltip(Tooltip.create(tooltipText)).build();
 		//# else
 		//- defaultButton = new Button(
 		//- 		0, 0, 10, 20, DEFAULT_TEXT, button -> input.setValue(entryHandler.getDefault()),
@@ -264,37 +258,33 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		int msgWidth = entryWidth - TEXT_INDENT;
 		for (Message message : messages) {
 			if (message.getLevel().getSeverity() >= Message.Level.DISPLAY_THRESHOLD) {
-				List<FormattedCharSequence> lines = font.split(message.getText(), msgWidth);
-				for (FormattedCharSequence line : lines) {
-					//# if RENDERING == "GUI_GRAPHICS"
-					graphics.drawString(font, line, msgX, curY, 0xffffff, false);
-					//# else
-					//- font.draw(graphics, line, msgX, curY, 0xffffff);
-					//# end
-					curY += 9;
-				}
-				curY += CoatUtil.MARGIN;
+				curY = drawMessageParagraph(graphics, msgX, curY, msgWidth, message);
 			}
 		}
 
 		if (isExpanded()) {
 			for (Message message : messages) {
 				if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
-					List<FormattedCharSequence> lines = font.split(message.getText(), msgWidth);
-					for (FormattedCharSequence line : lines) {
-						//# if RENDERING == "GUI_GRAPHICS"
-						graphics.drawString(font, line, msgX, curY, 0xffffff, false);
-						//# else
-						//- font.draw(graphics, line, msgX, curY, 0xffffff);
-						//# end
-						curY += 9;
-					}
-					curY += CoatUtil.MARGIN;
+					curY = drawMessageParagraph(graphics, msgX, curY, msgWidth, message);
 				}
 			}
 
 			descriptionMultiline.renderLeftAlignedNoShadow(graphics, x + TEXT_INDENT, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 		}
+	}
+
+	private int drawMessageParagraph(GuiGraphics graphics, int x, int y, int width, Message message) {
+		List<FormattedCharSequence> lines = font.split(message.getText(), width);
+		for (FormattedCharSequence line : lines) {
+			//# if RENDERING == "GUI_GRAPHICS"
+			graphics.drawString(font, line, x, y, 0xffffffff, false);
+			//# else
+			//- font.draw(graphics, line, msgX, curY, 0xffffffff);
+			//# end
+			y += 9;
+		}
+		y += CoatUtil.MARGIN;
+		return y;
 	}
 
 	/**
@@ -377,6 +367,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	public void inputChanged(V newValue) {
 		if (!Objects.equals(newValue, entryHandler.getDefault())) {
 			defaultButton.active = true;
+			//# if MC_VERSION_NUMBER >= 12005
+			defaultButton.setTooltipDelay(Duration.ZERO);
+			//# elif MC_VERSION_NUMBER >= 11903
+			//- defaultButton.setTooltipDelay(0);
+			//# end
 		} else {
 			if (defaultButton.isFocused()) {
 				//# if MC_VERSION_NUMBER >= 11904
@@ -386,6 +381,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 				//# end
 			}
 			defaultButton.active = false;
+			//# if MC_VERSION_NUMBER >= 12005
+			defaultButton.setTooltipDelay(DURATION_QUASI_INDEFINITE);
+			//# elif MC_VERSION_NUMBER >= 11903
+			//- defaultButton.setTooltipDelay(Integer.MAX_VALUE);
+			//# end
 		}
 		setMessages(entryHandler.getMessages(newValue));
 	}

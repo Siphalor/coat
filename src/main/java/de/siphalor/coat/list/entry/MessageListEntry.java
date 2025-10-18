@@ -13,7 +13,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TranslatableComponent;
@@ -34,8 +36,12 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	//# end
 
 	private final Message message;
-	private Component text;
 	private final Button jumpButton;
+	//# if MC_VERSION_NUMBER >= 12108
+	private final WidgetTooltipHolder tooltipHolder = new WidgetTooltipHolder();
+	//# else
+	//- private Component text;
+	//# end
 
 	/**
 	 * Constructs a new message list entry.
@@ -86,17 +92,19 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void widthChanged(int newWidth) {
-		super.widthChanged(newWidth);
-		text = CoatUtil.intelliTrim(
-				Minecraft.getInstance().font, message.getText(),
-				newWidth - CoatUtil.MARGIN - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN
-		);
-	}
+	//# if MC_VERSION_NUMBER < 12108
+	//- /**
+	//-  * {@inheritDoc}
+	//-  */
+	//- @Override
+	//- public void widthChanged(int newWidth) {
+	//- 	super.widthChanged(newWidth);
+	//- 	text = CoatUtil.intelliTrim(
+	//- 			Minecraft.getInstance().font, message.getText(),
+	//- 			newWidth - CoatUtil.MARGIN - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN
+	//- 	);
+	//- }
+	//# end
 
 	/**
 	 * {@inheritDoc}
@@ -108,8 +116,16 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		Font font = Minecraft.getInstance().font;
-		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.drawString(font, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb(), false);
+		//# if MC_VERSION_NUMBER >= 12108
+		ScreenRectangle nameRect = new ScreenRectangle(
+				x + CoatUtil.MARGIN,
+				y + 6,
+				entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN - CoatUtil.MARGIN,
+				entryHeight - 12
+		);
+		CoatUtil.drawLeftAlignedText(graphics, font, message.getText(), nameRect, CoatUtil.TEXT_COLOR);
+		//# elif RENDERING == "GUI_GRAPHICS"
+		//- graphics.drawString(font, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb(), false);
 		//# elif RENDERING == "POSE_STACK"
 		//- font.draw(graphics, text, x + CoatUtil.MARGIN, y + 6, CoatUtil.TEXT_COLOR.getArgb());
 		//# end
@@ -118,13 +134,17 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 		CoatUtil.setButtonPosition(jumpButton, jumpButtonX, y);
 		jumpButton.render(graphics, mouseX, mouseY, tickDelta);
 
-		if (hovered && mouseX < jumpButtonX) {
-			//# if RENDERING == "GUI_GRAPHICS"
-			graphics.renderTooltip(font, message.getText(), mouseX, mouseY);
-			//# elif RENDERING == "POSE_STACK"
-			//- CoatUtil.renderTooltip(graphics, mouseX, mouseY, message.getText());
-			//# end
-		}
+		//# if MC_VERSION_NUMBER >= 12108
+		tooltipHolder.refreshTooltipForNextRenderPass(graphics, mouseX, mouseY, hovered, isFocused(), nameRect);
+		//# else
+		//- if (hovered && mouseX < jumpButtonX) {
+		//- 	//# if RENDERING == "GUI_GRAPHICS"
+		//- 	graphics.renderTooltip(font, message.getText(), mouseX, mouseY);
+		//- 	//# elif RENDERING == "POSE_STACK"
+		//- 	CoatUtil.renderTooltip(graphics, mouseX, mouseY, message.getText());
+		//- 	//# end
+		//- }
+		//# end
 	}
 
 	/**

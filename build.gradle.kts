@@ -8,14 +8,16 @@ plugins {
 	alias(libs.plugins.jcyo)
 }
 
-//archivesBaseName = project.archives_base_name
-group = "de.siphalor.coat"
-version = properties["version"]!!
-
+val minecraftVersionDescriptor = project.properties["minecraft.version.descriptor"] as String
 val mcProps = Properties().apply {
-	val propFile = project.layout.settingsDirectory.file("gradle/mc-${project.properties["minecraft_version_descriptor"]}/gradle.properties")
+	val propFile = project.layout.settingsDirectory.file("gradle/mc-${minecraftVersionDescriptor}/gradle.properties")
 	load(propFile.asFile.inputStream())
 }
+
+group = "de.siphalor.${project.name}"
+val archivesBaseName = "${project.name}-mc${minecraftVersionDescriptor}"
+val shortVersion = "${properties["version"]}"
+version = "${shortVersion}+mc${mcLibs.versions.minecraft.get()}"
 
 val extraSources = mcProps["extra_sources"]?.toString()?.split(",")?.map { file("src/${it.trim()}") } ?: listOf()
 val mergedAccessWidenerDir = project.layout.buildDirectory.dir("merged-accesswidener")
@@ -26,6 +28,7 @@ sourceSets {
 	main {
 		extraSources.forEach {
 			java.srcDir(it.resolve("java"))
+			resources.srcDir(it.resolve("resources"))
 		}
 		resources.srcDir(mergedAccessWidenerDir)
 	}
@@ -87,10 +90,17 @@ dependencies {
 
 tasks.processResources {
 	inputs.property("version", project.version)
+	val mixins = sourceSets.main.get().resources.srcDirs
+		.flatMap { it.listFiles { f -> f.name.endsWith("mixins.json") }.orEmpty().toList() }
+		.joinToString(",") { "\"${it.name}\"" }
+	inputs.property("extraMixins", mixins)
 
 	from(sourceSets.main.get().resources.srcDirs) {
 		include("fabric.mod.json")
-		expand("version" to project.version)
+		expand(
+			"version" to project.version,
+			"mixins" to mixins
+		)
 		duplicatesStrategy = DuplicatesStrategy.INCLUDE
 	}
 }
@@ -123,3 +133,29 @@ tasks.named("compileTestmodJava") {
 tasks.jar {
 	from(file("LICENSE"))
 }
+
+
+publishing {
+	publications {
+		create<MavenPublication>("mavenJava") {
+			artifactId = archivesBaseName
+			version = shortVersion
+
+			from(components["java"])
+		}
+	}
+
+	repositories {
+		if (project.hasProperty("siphalor.maven.user")) {
+			maven {
+				name = "Siphalor"
+				url = uri("https://maven.siphalor.de/upload.php")
+				credentials {
+					username = project.property("siphalor.maven.user") as String
+					password = project.property("siphalor.maven.password") as String
+				}
+			}
+		}
+	}
+}
+

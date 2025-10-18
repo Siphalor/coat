@@ -1,6 +1,6 @@
 package de.siphalor.coat.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+//- import com.mojang.blaze3d.systems.RenderSystem;
 //- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screens.Screen;
 //- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TranslatableComponent;
-import org.lwjgl.opengl.GL32;
+//- import org.lwjgl.opengl.GL32;
 
 import java.util.Collection;
 import java.util.Deque;
@@ -290,19 +290,26 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void resize(Minecraft minecraft, int width, int height) {
-		this.width = width;
-		this.height = height;
+	public void resize(Minecraft minecraft, int windowWidth, int windowHeight) {
+		this.width = windowWidth;
+		this.height = windowHeight;
 
-		panelWidth = Math.max(100, (int) (width * 0.2));
-		treeWidget.resize(panelWidth, height - 20);
+		panelWidth = Math.max(100, (int) (windowWidth * 0.2));
 		contentWidget.setPosition(panelWidth, 20);
-		contentWidget.resize(width - panelWidth, height - 20);
+		contentWidget.resize(windowWidth - panelWidth, windowHeight - 20);
 
-		CoatUtil.setButtonY(saveButton, height - 20 - CoatUtil.MARGIN);
-		CoatUtil.setButtonY(abortButton, height - 40 - CoatUtil.DOUBLE_MARGIN);
+		int saveButtonY = windowHeight - 20 - CoatUtil.MARGIN;
+		int abortButtonY = saveButtonY - 20 - CoatUtil.MARGIN;
+		CoatUtil.setButtonY(saveButton, saveButtonY);
+		CoatUtil.setButtonY(abortButton, abortButtonY);
 		saveButton.setWidth(panelWidth - CoatUtil.DOUBLE_MARGIN);
 		abortButton.setWidth(saveButton.getWidth());
+
+		//# if TRANSPARENT_MENUS
+		treeWidget.resize(panelWidth, abortButtonY - 20 - CoatUtil.MARGIN);
+		//# else
+		//- treeWidget.resize(panelWidth, windowHeight - 20);
+		//# end
 	}
 
 	/**
@@ -325,37 +332,50 @@ public class ConfigScreen extends Screen {
 	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 
-		//# if MC_VERSION_NUMBER < 11700
+		//# if RENDERING == "GUI_GRAPHICS"
+		graphics.enableScissor(0, 20, width, height);
+		super.render(graphics, mouseX, mouseY, delta);
+		graphics.disableScissor();
+
+		CoatUtil.drawHorizontalGradient(graphics, panelWidth, 20, panelWidth + 8, height, CoatColor.BLACK.withAlpha(0x77), CoatColor.TRANSPARENT);
+
+		CoatUtil.drawTintedTiledTexture(
+				graphics,
+				contentWidget.getBackground(),
+				0,
+				0,
+				width,
+				20,
+				32,
+				0,
+				BACKGROUND_TEXTURE_TINT_COLOR
+		);
+		graphics.drawCenteredString(this.font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
+
+		graphics.fillGradient(0, abortButton.getY() - CoatUtil.MARGIN - 8, panelWidth, abortButton.getY() - CoatUtil.MARGIN, CoatColor.TRANSPARENT.getArgb(), CoatColor.BLACK.withAlpha(0x77).getArgb());
+
+		//# elif RENDERING == "POSE_STACK"
+
+		//- //# if MC_VERSION_NUMBER < 11700
 		//- treeWidget.render(graphics, mouseX, mouseY, delta);
 		//- contentWidget.renderWidget(graphics, mouseX, mouseY, delta);
-		//# end
+		//- //# end
+		//- super.render(graphics, mouseX, mouseY, delta);
 
-		super.render(graphics, mouseX, mouseY, delta);
+		//- CoatUtil.drawHorizontalGradient(panelWidth, 20, panelWidth + 8, height, CoatColor.BLACK.withAlpha(0x77), CoatColor.TRANSPARENT);
 
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL32.GL_LEQUAL);
-
-		CoatUtil.drawHorizontalGradient(panelWidth, 20, panelWidth + 8, height, CoatColor.BLACK.withAlpha(0x77), CoatColor.TRANSPARENT);
-
-		RenderSystem.disableDepthTest();
-
-		RenderSystem.enableBlend();
-		//# if MC_VERSION_NUMBER >= 12100
-		CoatUtil.drawTintedTexture(graphics, 0, 0, width, 20, contentWidget.getBackground(), 32, 0, BACKGROUND_TEXTURE_TINT_COLOR);
-		//# else
-		//- CoatUtil.drawTintedTexture(0, 0, width, 20, 0, contentWidget.getBackground(), 32F, 0, BACKGROUND_TEXTURE_TINT_COLOR);
-		//# end
-		RenderSystem.disableBlend();
-		RenderSystem.disableDepthTest();
-
-		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.pose().translate(0, 0, 10);
-		graphics.drawCenteredString(this.font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
-		graphics.pose().translate(0, 0, -10);
-		//# elif RENDERING == "POSE_STACK"
-		//- graphics.translate(0, 0, 10);
+		//- CoatUtil.drawTintedTiledTexture(
+		//- 		contentWidget.getBackground(),
+		//- 		0,
+		//- 		0,
+		//- 		width,
+		//- 		20,
+		//- 		0,
+		//- 		32F,
+		//- 		0,
+		//- 		BACKGROUND_TEXTURE_TINT_COLOR
+		//- );
 		//- drawCenteredString(graphics, font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
-		//- graphics.translate(0, 0, -10);
 		//# end
 	}
 }

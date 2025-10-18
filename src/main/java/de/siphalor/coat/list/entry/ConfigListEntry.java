@@ -13,7 +13,7 @@ import net.minecraft.client.gui.GuiGraphics;
 //- import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.renderer.RenderType;
+//- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -70,11 +70,9 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 
 		//# if RENDERING == "GUI_GRAPHICS"
 		//# if MC_VERSION_NUMBER < 12002
-		//- graphics.blit(HANDLE_TEXTURE, x, y + 2, 232, 0, 12, 15);
-		//# elif MC_VERSION_NUMBER < 12100
-		//- graphics.blitSprite(HANDLE_TEXTURE, x, y + 2, 12, 15);
+		//- CoatUtil.drawTexture(graphics, HANDLE_TEXTURE, x, y + 2, 232, 0, 12, 15);
 		//# else
-		graphics.blitSprite(RenderType::guiTextured, HANDLE_TEXTURE, x, y + 2, 12, 15);
+		CoatUtil.drawTexture(graphics, HANDLE_TEXTURE, x, y + 2, 12, 15);
 		//# end
 		//# elif RENDERING == "POSE_STACK"
 		//- CoatUtil.setShaderTexture(HANDLE_TEXTURE);

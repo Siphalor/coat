@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "de.siphalor.coat.mixin.renderstate",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [],
+	"client": ["GuiGraphicsMixin"],
+	"server": [],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

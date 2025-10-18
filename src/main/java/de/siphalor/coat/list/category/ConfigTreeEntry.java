@@ -14,6 +14,7 @@ import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.Nullable;
@@ -42,11 +43,18 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 
 	private final TextButtonWidget collapseButton;
 	private final TextButtonWidget nameButton;
+	@Getter
 	private final List<ConfigTreeEntry> subTrees;
+	/**
+	 *  The content widget that this tree entry is linked to.
+	 */
+	@Getter
 	private final ConfigContentWidget contentWidget;
 	@Getter
 	private final boolean temporary;
+	@Getter
 	private int x;
+	@Getter
 	private int y;
 	/**
 	 *  Whether this config category is currently opened.
@@ -176,6 +184,18 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		}
 	}
 
+	//# if MC_VERSION_NUMBER >= 12108
+	@Override
+	public boolean isMouseOver(double mouseX, double mouseY) {
+		return mouseX >= x && mouseY >= y && mouseX <= x + getEntryWidth() && mouseY <= y + getHeight();
+	}
+
+	@Override
+	public ScreenRectangle getRectangle() {
+		return new ScreenRectangle(x, y, getEntryWidth(), getHeight());
+	}
+	//# end
+
 	/**
 	 * Gets the height of the unexpanded part of the entry.
 	 *
@@ -202,6 +222,13 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int getEntryWidth() {
+		return parent.getEntryWidth() - 8 - CoatUtil.MARGIN;
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Collection<Message> getMessages() {
 		List<Message> messages = subTrees.stream().flatMap(entry -> entry.getMessages().stream()).collect(Collectors.toList());
 		messages.addAll(contentWidget.getMessages());
@@ -220,10 +247,6 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		children.add(nameButton);
 		children.addAll(subTrees);
 		return children;
-	}
-
-	public List<ConfigTreeEntry> getSubTrees() {
-		return subTrees;
 	}
 
 	public void addTemporaryTree(ConfigTreeEntry temporaryTreeEntry) {
@@ -255,29 +278,11 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		}
 	}
 
-	// TODO: Fix javadoc
-	/**
-	 * Gets the list widget that this tree entry is linked to.
-	 *
-	 * @return The linked list widget.
-	 */
-	public ConfigContentWidget getContentWidget() {
-		return contentWidget;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void focusLost() {
 		setFocused(null);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getEntryWidth() {
-		return parent.getEntryWidth() - 8 - CoatUtil.MARGIN;
 	}
 }

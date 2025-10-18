@@ -10,8 +10,12 @@ import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TranslatableComponent;
 
@@ -34,7 +38,12 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 
 	private final ConfigContentWidget configWidget;
 	private final Button button;
-	private Component nameText;
+	//# if MC_VERSION_NUMBER >= 12108
+	private final WidgetTooltipHolder tooltipHolder = new WidgetTooltipHolder();
+	private int nameWidth;
+	//# else
+	//- private Component nameText;
+	//# end
 
 	/**
 	 * Constructs a new link entry.
@@ -47,6 +56,9 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 		button = Button.builder(OPEN_TEXT, button -> this.clicked()).size(50, 20).build();
 		//# else
 		//- button = new Button(0, 0, 50, 20, OPEN_TEXT, button -> this.clicked());
+		//# end
+		//# if MC_VERSION_NUMBER >= 12108
+		tooltipHolder.set(Tooltip.create(configWidget.getName()));
 		//# end
 	}
 
@@ -66,10 +78,14 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	@Override
 	public void widthChanged(int newWidth) {
 		super.widthChanged(newWidth);
-		nameText = CoatUtil.intelliTrim(
-				Minecraft.getInstance().font, configWidget.getName(),
-				newWidth - button.getWidth() - CoatUtil.DOUBLE_MARGIN - CoatUtil.DOUBLE_MARGIN - CoatUtil.MARGIN
-		);
+		//# if MC_VERSION_NUMBER >= 12108
+		nameWidth = newWidth - button.getWidth() - CoatUtil.DOUBLE_MARGIN - CoatUtil.DOUBLE_MARGIN - CoatUtil.MARGIN;
+		//# else
+		//- nameText = CoatUtil.intelliTrim(
+		//- 		Minecraft.getInstance().font, configWidget.getName(),
+		//- 		newWidth - button.getWidth() - CoatUtil.DOUBLE_MARGIN - CoatUtil.DOUBLE_MARGIN - CoatUtil.MARGIN
+		//- );
+		//# end
 	}
 
 	/**
@@ -82,20 +98,44 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 
-		CoatUtil.drawInsetGradientTexture(x, y, x + entryWidth, y + entryHeight, 0, configWidget.getBackground(), 32F, BACKGROUND_OUTER_COLOR, BACKGROUND_INNER_COLOR);
+		//# if MC_VERSION_NUMBER >= 12100
+		CoatUtil.drawInsetGradientTexture(
+				graphics,
+				configWidget.getBackground(),
+				x, y, x + entryWidth, y + entryHeight, 32,
+				BACKGROUND_OUTER_COLOR, BACKGROUND_INNER_COLOR
+		);
+		//# else
+		//- CoatUtil.drawInsetGradientTexture(
+		//- 		configWidget.getBackground(),
+		//- 		x, y, x + entryWidth, y + entryHeight, 0,
+		//- 		32F, BACKGROUND_OUTER_COLOR, BACKGROUND_INNER_COLOR);
+		//# end
 
 		CoatUtil.setButtonPosition(button, x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN, y + CoatUtil.MARGIN);
-
-		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.drawString(Minecraft.getInstance().font, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2, CoatUtil.TEXT_COLOR.getArgb(), true);
-		//# elif RENDERING == "POSE_STACK"
-		//- Minecraft.getInstance().font.drawShadow(graphics, nameText, x + CoatUtil.DOUBLE_MARGIN, y + (entryHeight - 7) / 2, CoatUtil.TEXT_COLOR.getArgb());
-		//# end
 		button.render(graphics, mouseX, mouseY, tickDelta);
 
-		if (hovered && nameText != configWidget.getName() && !button.isMouseOver(mouseX, mouseY)) {
-			CoatUtil.renderTooltip(graphics, mouseX, mouseY, configWidget.getName());
-		}
+		int nameX = x + CoatUtil.DOUBLE_MARGIN;
+		int nameY = y + (entryHeight - 7) / 2;
+		//# if MC_VERSION_NUMBER >= 12108
+		CoatUtil.drawLeftAlignedText(
+				graphics,
+				Minecraft.getInstance().font,
+				configWidget.getName(),
+				new ScreenRectangle(nameX, nameY, nameWidth, 10),
+				CoatUtil.TEXT_COLOR
+		);
+		//# else
+		//- //# if RENDERING == "GUI_GRAPHICS"
+		//- graphics.drawString(Minecraft.getInstance().font, nameText, nameX, nameY, CoatUtil.TEXT_COLOR.getArgb(), true);
+		//- //# elif RENDERING == "POSE_STACK"
+		//- Minecraft.getInstance().font.drawShadow(graphics, nameText, nameX, nameY, CoatUtil.TEXT_COLOR.getArgb());
+		//- //# end
+
+		//- if (hovered && nameText != configWidget.getName() && !button.isMouseOver(mouseX, mouseY)) {
+		//- 	CoatUtil.renderTooltip(graphics, mouseX, mouseY, configWidget.getName());
+		//- }
+		//# end
 	}
 
 	/**

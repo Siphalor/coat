@@ -1,14 +1,15 @@
 package de.siphalor.coat.list;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+//- import com.mojang.blaze3d.systems.RenderSystem;
+//- import com.mojang.blaze3d.vertex.BufferBuilder;
+//- import com.mojang.blaze3d.vertex.BufferUploader;
+//- import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 //- import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import de.siphalor.coat.util.CoatColor;
+//- import com.mojang.blaze3d.vertex.Tesselator;
+//- import com.mojang.blaze3d.vertex.VertexFormat;
+//- import de.siphalor.coat.util.CoatColor;
+//- import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TickableElement;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -20,8 +21,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 //- import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Renderable;
 //- import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
@@ -31,12 +32,12 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 //- import net.minecraft.client.renderer.GameRenderer;
 //- import net.minecraft.client.renderer.ShaderManager;
 //- import net.minecraft.client.renderer.ShaderProgram;
-import net.minecraft.client.renderer.RenderType;
+//- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
+//- import org.lwjgl.opengl.GL11;
 
 import java.util.AbstractList;
 import java.util.Collection;
@@ -54,9 +55,18 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 {
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
-	private static final CoatColor SCROLLBAR_BACKGROUND_COLOR = CoatColor.rgb(0x000000);
-	private static final CoatColor SCROLLBAR_HANDLE_SHADOW_COLOR = CoatColor.rgb(0x808080);
-	private static final CoatColor SCROLLBAR_HANDLE_COLOR = CoatColor.rgb(0xC0C0C0);
+	private static final int SCROLLBAR_WIDTH = 6;
+	//# if MC_VERSION_NUMBER >= 12005
+	private static final ResourceLocation SCROLLBAR_BACKGROUND_TEXTURE = AbstractSelectionList.SCROLLER_BACKGROUND_SPRITE;
+	//# else
+	//- private static final CoatColor SCROLLBAR_BACKGROUND_COLOR = CoatColor.rgb(0x000000);
+	//# end
+	//# if MC_VERSION_NUMBER >= 12004
+	private static final ResourceLocation SCROLLBAR_HANDLE_TEXTURE = AbstractSelectionList.SCROLLER_SPRITE;
+	//# else
+	//- private static final CoatColor SCROLLBAR_HANDLE_SHADOW_COLOR = CoatColor.rgb(0x808080);
+	//- private static final CoatColor SCROLLBAR_HANDLE_COLOR = CoatColor.rgb(0xC0C0C0);
+	//# end
 
 	protected final Minecraft minecraft;
 	private final Entries entries = new Entries();
@@ -71,7 +81,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * The current scroll position - aka the vertical offset.
 	 */
 	@Getter
-	private double scrollAmount;
+	private double scrollYOffset;
 	//# if !TRANSPARENT_MENUS
 	//- /**
 	//-  * The brightness with which to render the background.
@@ -357,6 +367,42 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		return getMaxEntryPosition() + BOTTOM_PADDING;
 	}
 
+	@Override
+	//# if RENDERING == "GUI_GRAPHICS"
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+		//# elif RENDERING == "POSE_STACK"
+		//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
+		//# end
+		renderWidget(graphics, mouseX, mouseY, delta);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	//# if RENDERING == "GUI_GRAPHICS"
+	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "POSE_STACK"
+	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# end
+
+		//# if RENDERING == "GUI_GRAPHICS"
+		renderBackground(graphics);
+		renderScrollbar(graphics);
+		//# else
+		//- renderBackground();
+		//- renderScrollbar();
+		//# end
+
+		this.renderList(graphics, mouseX, mouseY, delta);
+
+		// render top shadow
+		//# if RENDERING == "GUI_GRAPHICS"
+		graphics.fillGradient(left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
+		//# elif RENDERING == "POSE_STACK"
+		//- fillGradient(graphics, left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
+		//# end
+	}
+
 	/**
 	 * Renders the background of this widget.
 	 */
@@ -365,27 +411,58 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	//# else
 	//- protected void renderBackground() {
 	//# end
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_LEQUAL);
+		//# if !TRANSPARENT_MENUS
+		//- int colorPart = (int) (backgroundBrightness * 255F);
+		//- CoatColor backgroundTint = CoatColor.rgb(colorPart, colorPart, colorPart);
+		//# end
+
 		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.pose().translate(0, 0, -100D);
-		graphics.blit(
-				/*# if MC_VERSION_NUMBER >= 12100 */RenderType::guiTextured,/*# end */
+		// FIXME
+		//# if MC_VERSION_NUMBER < 12108
+		//- graphics.pose().translate(0, 0, -100D);
+		//# end
+		//# if TRANSPARENT_MENUS
+		CoatUtil.drawTiledTexture(
+				graphics,
 				getListBackground(),
 				left,
 				top,
 				right,
-				bottom + (int) getScrollAmount(),
-				width,
-				height,
+				bottom,
 				32,
-				32
+				(int) getScrollYOffset()
 		);
-		graphics.pose().translate(0, 0, 100D);
 		//# else
-		//- int colorPart = (int) (backgroundBrightness * 255F);
-		//- CoatColor color = CoatColor.rgb(colorPart, colorPart, colorPart);
-		//- CoatUtil.drawTintedTexture(left, top, right, bottom, -100, getListBackground(), 32F, (int) getScrollAmount(), color);
+		//- CoatUtil.drawTintedTiledTexture(
+		//- 		graphics,
+		//- 		getListBackground(),
+		//- 		left,
+		//- 		top,
+		//- 		right,
+		//- 		bottom,
+		//- 		32,
+		//- 		(int) getScrollYOffset(),
+		//- 		backgroundTint
+		//- );
+		//# end
+		//# if MC_VERSION_NUMBER < 12108
+		//- graphics.pose().translate(0, 0, 100D);
+		//# end
+		//# else
+		//- RenderSystem.enableDepthTest();
+		//- RenderSystem.depthFunc(GL11.GL_LEQUAL);
+
+		//- CoatUtil.drawTintedTiledTexture(
+				//- getListBackground(),
+				//- left,
+				//- top,
+				//- right,
+				//- bottom,
+				//- -100,
+				//- 32F,
+				//- (int) getScrollYOffset(),
+				//- backgroundTint
+		//- );
 		//# end
 	}
 
@@ -399,75 +476,117 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//# end
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	//# if RENDERING == "GUI_GRAPHICS"
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "POSE_STACK"
-	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	private void renderScrollbar(GuiGraphics graphics) {
+	//# else
+	//- private void renderScrollbar() {
 	//# end
-		int scrollbarXBegin = this.getScrollbarPositionX();
-		int scrollbarXEnd = scrollbarXBegin + 6;
-
-		//# if RENDERING == "GUI_GRAPHICS"
-		renderBackground(graphics);
-		//# else
-		//- renderBackground();
-		//# end
 
 		int maxScroll = this.getMaxScroll();
-		if (maxScroll > 0) {
-			//# if MC_VERSION_NUMBER >= 11700
-			//# if MC_VERSION_NUMBER < 12100
-			//- RenderSystem.setShader(GameRenderer::getPositionColorShader);
-			//# end
-			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-			//# end
-			int p = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getMaxPosition());
-			p = Mth.clamp(p, 32, this.bottom - this.top - 8);
-			int q = (int) this.getScrollAmount() * (this.bottom - this.top - p) / maxScroll + this.top;
-			if (q < this.top) {
-				q = this.top;
-			}
-
-			Tesselator tesselator = Tesselator.getInstance();
-			//# if MC_VERSION_NUMBER >= 12100
-			BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-			//# elif MC_VERSION_NUMBER >= 11700
-			//- BufferBuilder bufferBuilder = tesselator.getBuilder();
-			//- bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-			//# else
-			//- BufferBuilder bufferBuilder = tesselator.getBuilder();
-			//- bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
-			//# end
-			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, top, scrollbarXEnd, bottom, SCROLLBAR_BACKGROUND_COLOR);
-			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd, q + p, SCROLLBAR_HANDLE_SHADOW_COLOR);
-			CoatUtil.addRect(bufferBuilder, scrollbarXBegin, q, scrollbarXEnd - 1, q + p - 1, SCROLLBAR_HANDLE_COLOR);
-			//# if MC_VERSION_NUMBER < 12100
-			//- tesselator.end();
-			//# else
-			BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
-			//# end
+		if (maxScroll <= 0) {
+			return;
 		}
 
-		this.renderList(graphics, mouseX, mouseY, delta);
+		int scrollbarLeft = this.getScrollbarPositionX();
+		int scrollbarRight = scrollbarLeft + SCROLLBAR_WIDTH;
 
-		// render top shadow
-		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.fillGradient(left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
-		//# elif RENDERING == "POSE_STACK"
-		//- fillGradient(graphics, left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
+		int handleHeight = (int) ((float) (this.height * this.height) / (float) this.getMaxPosition());
+		handleHeight = Mth.clamp(handleHeight, 32, this.height - 8);
+		int scrollableRange = this.height - handleHeight;
+		int handleTop = (int) this.getScrollYOffset() * scrollableRange / maxScroll + this.top;
+		if (handleTop < this.top) {
+			handleTop = this.top;
+		}
+
+		//# if MC_VERSION_NUMBER >= 12004
+		//# if MC_VERSION_NUMBER >= 12005
+		CoatUtil.drawTexture(
+				graphics,
+				SCROLLBAR_BACKGROUND_TEXTURE,
+				scrollbarLeft,
+				this.top,
+				SCROLLBAR_WIDTH,
+				this.bottom
+		);
+		//# else
+		//- graphics.fill(scrollbarLeft, this.top, scrollbarRight, this.bottom, SCROLLBAR_BACKGROUND_COLOR.getArgb());
+		//# end
+		CoatUtil.drawTexture(graphics, SCROLLBAR_HANDLE_TEXTURE, scrollbarLeft, handleTop, SCROLLBAR_WIDTH, handleHeight);
+
+		//# elif RENDERING == "GUI_GRAPHICS"
+		//- graphics.fill(scrollbarLeft, top, scrollbarRight, bottom, SCROLLBAR_BACKGROUND_COLOR.getArgb());
+		//- graphics.fill(scrollbarLeft, handleTop, scrollbarRight, handleTop + handleHeight, SCROLLBAR_HANDLE_SHADOW_COLOR.getArgb());
+		//- graphics.fill(scrollbarLeft, handleTop, scrollbarRight - 1, handleTop + handleHeight - 1, SCROLLBAR_HANDLE_COLOR.getArgb());
+		//# else
+		//- //# if MC_VERSION_NUMBER >= 11700
+		//- RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		//- //# end
+		//- RenderSystem.disableTexture();
+		//- CoatUtil.resetShaderColor();
+		//- Tesselator tesselator = Tesselator.getInstance();
+		//- //# if MC_VERSION_NUMBER >= 11700
+		//- BufferBuilder bufferBuilder = tesselator.getBuilder();
+		//- bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//- //# else
+		//- BufferBuilder bufferBuilder = tesselator.getBuilder();
+		//- bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+		//- //# end
+		//- CoatUtil.addRect(bufferBuilder, scrollbarLeft, top, scrollbarRight, bottom, SCROLLBAR_BACKGROUND_COLOR);
+		//- CoatUtil.addRect(bufferBuilder, scrollbarLeft, handleTop, scrollbarRight, handleTop + handleHeight, SCROLLBAR_HANDLE_SHADOW_COLOR);
+		//- CoatUtil.addRect(bufferBuilder, scrollbarLeft, handleTop, scrollbarRight - 1, handleTop + handleHeight - 1, SCROLLBAR_HANDLE_COLOR);
+		//- tesselator.end();
 		//# end
 	}
 
-	@Override
+	/**
+	 * Renders all visible entries.
+	 *
+	 * @param graphics The matrix stack to use for rendering
+	 * @param mouseX   The current mouse x position
+	 * @param mouseY   The current mouse y position
+	 * @param delta    The tick delta
+	 */
 	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "POSE_STACK"
-	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
-	//# end
-		renderWidget(graphics, mouseX, mouseY, delta);
+	public void renderList(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+		//# elif RENDERING == "POSE_STACK"
+		//- protected void renderList(PoseStack graphics, int mouseX, int mouseY, float delta) {
+		//# end
+		IntListIterator bottomIter = entries.bottoms.iterator();
+		Iterator<E> entryIter = entries.iterator();
+		int relBottom = 0, relTop = 0;
+		final int entryAreaTop = getEntryAreaTop();
+		E entry = null;
+
+		while (bottomIter.hasNext()) {
+			relTop = relBottom;
+			relBottom = bottomIter.nextInt();
+			entry = entryIter.next();
+			if (entryAreaTop + relBottom > top) {
+				break;
+			}
+		}
+
+		E hoveredEntry = getEntryAtPosition(mouseX, mouseY);
+
+		int rowWidth = getEntryWidth();
+		int rowLeft = getEntryLeft();
+		while (true) {
+			if (entry == null) {
+				break;
+			}
+
+			int rowTop = relTop + entryAreaTop;
+
+			entry.render(graphics, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
+
+			if (bottomIter.hasNext()) {
+				relTop = relBottom;
+				relBottom = bottomIter.nextInt();
+				entry = entryIter.next();
+			} else {
+				break;
+			}
+		}
 	}
 
 	/**
@@ -477,7 +596,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	public void centerScrollOn(E entry) {
 		int index = entries.indexOf(entry);
-		setScrollAmount(entries.bottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
+		setScrollYOffset(entries.bottoms.getInt(index) - entry.getHeight() / 2D - (bottom - top) / 2D);
 	}
 
 	/**
@@ -490,13 +609,13 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		int index = entries.indexOf(entry);
 		int entryBottom = entries.bottoms.getInt(index);
 		if (getEntryAreaTop() + entryBottom > bottom) {
-			setScrollAmount(entryBottom - height);
+			setScrollYOffset(entryBottom - height);
 		}
 
 		int entryTop = index == 0 ? 0 : entries.bottoms.getInt(index - 1);
 
 		if (getEntryAreaTop() + entryTop < top) {
-			setScrollAmount(entryTop);
+			setScrollYOffset(entryTop);
 		}
 	}
 
@@ -506,7 +625,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @param amount The amount to scroll by
 	 */
 	private void scroll(int amount) {
-		this.setScrollAmount(this.getScrollAmount() + amount);
+		this.setScrollYOffset(this.getScrollYOffset() + amount);
 	}
 
 	/**
@@ -514,8 +633,8 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 *
 	 * @param amount The new scroll position
 	 */
-	public void setScrollAmount(double amount) {
-		this.scrollAmount = Mth.clamp(amount, 0.0D, this.getMaxScroll());
+	public void setScrollYOffset(double amount) {
+		this.scrollYOffset = Mth.clamp(amount, 0.0D, this.getMaxScroll());
 	}
 
 	/**
@@ -577,15 +696,15 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			return true;
 		} else if (button == 0 && this.scrolling) {
 			if (mouseY < (double) this.top) {
-				this.setScrollAmount(0.0D);
+				this.setScrollYOffset(0.0D);
 			} else if (mouseY > (double) this.bottom) {
-				this.setScrollAmount(this.getMaxScroll());
+				this.setScrollYOffset(this.getMaxScroll());
 			} else {
 				double d = Math.max(1, this.getMaxScroll());
 				int i = this.bottom - this.top;
 				int j = Mth.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
 				double e = Math.max(1.0D, d / (double) (i - j));
-				this.setScrollAmount(this.getScrollAmount() + deltaY * e);
+				this.setScrollYOffset(this.getScrollYOffset() + deltaY * e);
 			}
 
 			return true;
@@ -608,9 +727,9 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//# end
 			return true;
 		}
-		double prevScroll = getScrollAmount();
-		this.setScrollAmount(this.getScrollAmount() - verticalAmount * 10.0D);
-		return getScrollAmount() != prevScroll;
+		double prevScroll = getScrollYOffset();
+		this.setScrollYOffset(this.getScrollYOffset() - verticalAmount * 10.0D);
+		return getScrollYOffset() != prevScroll;
 	}
 
 	/**
@@ -618,57 +737,6 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	public boolean isMouseOver(double mouseX, double mouseY) {
 		return mouseY >= (double) this.top && mouseY <= (double) this.bottom && mouseX >= (double) this.left && mouseX <= (double) this.right;
-	}
-
-	/**
-	 * Renders all visible entries.
-	 *
-	 * @param graphics The matrix stack to use for rendering
-	 * @param mouseX   The current mouse x position
-	 * @param mouseY   The current mouse y position
-	 * @param delta    The tick delta
-	 */
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void renderList(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "POSE_STACK"
-	//- protected void renderList(PoseStack graphics, int mouseX, int mouseY, float delta) {
-	//# end
-		IntListIterator bottomIter = entries.bottoms.iterator();
-		Iterator<E> entryIter = entries.iterator();
-		int relBottom = 0, relTop = 0;
-		final int entryAreaTop = getEntryAreaTop();
-		E entry = null;
-
-		while (bottomIter.hasNext()) {
-			relTop = relBottom;
-			relBottom = bottomIter.nextInt();
-			entry = entryIter.next();
-			if (entryAreaTop + relBottom > top) {
-				break;
-			}
-		}
-
-		E hoveredEntry = getEntryAtPosition(mouseX, mouseY);
-
-		int rowWidth = getEntryWidth();
-		int rowLeft = getEntryLeft();
-		while (true) {
-			if (entry == null) {
-				break;
-			}
-
-			int rowTop = relTop + entryAreaTop;
-
-			entry.render(graphics, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
-
-			if (bottomIter.hasNext()) {
-				relTop = relBottom;
-				relBottom = bottomIter.nextInt();
-				entry = entryIter.next();
-			} else {
-				break;
-			}
-		}
 	}
 
 	/**
@@ -695,7 +763,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @return The top position of the first entry
 	 */
 	protected int getEntryAreaTop() {
-		return top + TOP_PADDING - (int) scrollAmount;
+		return top + TOP_PADDING - (int) scrollYOffset;
 	}
 
 	/**
@@ -888,25 +956,9 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		/**
 		 * The parent element.
 		 */
+		@Getter
+		@Setter
 		protected EntryContainer parent;
-
-		/**
-		 * Gets the parent element of this entry.
-		 *
-		 * @return The current parent element
-		 */
-		public EntryContainer getParent() {
-			return parent;
-		}
-
-		/**
-		 * Sets the parent of this entry.
-		 *
-		 * @param parent The new parent element
-		 */
-		protected void setParent(EntryContainer parent) {
-			this.parent = parent;
-		}
 
 		/**
 		 * Renders an entry in a list.

@@ -51,7 +51,7 @@ public class CoatTestmod implements ClientModInitializer {
 				text("A boolean with a pretty long name to demonstrate the spacing improvements"),
 				text("The checkbox needs less space, so more space for the name :)"),
 				new GenericEntryHandler<>(true, s -> Collections.emptyList()),
-				new CheckBoxConfigInput(null, true, false)
+				new CheckBoxConfigInput(true)
 		));
 		list.add(new ConfigCategoryConfigEntry<>(
 				text("Blub"),

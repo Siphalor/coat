@@ -1,12 +1,13 @@
 package de.siphalor.coat.util;
 
 //- import com.mojang.blaze3d.vertex.PoseStack;
-import lombok.Getter;
+//- import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -16,8 +17,10 @@ public class TextButtonWidget extends Button {
 	/**
 	 *  The original, untrimmed button text
 	 */
-	@Getter
-	private Component originalMessage;
+	//# if MC_VERSION_NUMBER < 12108
+	//- @Getter
+	//- private Component originalMessage;
+	//# end
 	@Setter
 	private boolean hoverEffect = true;
 
@@ -63,13 +66,26 @@ public class TextButtonWidget extends Button {
 		int textY = y + (height - 7) / 2;
 		Font font = Minecraft.getInstance().font;
 		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.drawString(font, getMessage(), x, textY, color.getArgb());
-		//# elif RENDERING == "POSE_STACK"
-		//- font.draw(graphics, getMessage(), x, textY, color.getArgb());
+		//# if MC_VERSION_NUMBER >= 12108
+		CoatUtil.drawLeftAlignedText(
+				graphics,
+				font,
+				getMessage(),
+				new ScreenRectangle(x, textY, width, 9),
+				color
+		);
+		//# else
+		//- graphics.drawString(font, getMessage(), x, textY, color.getArgb());
 		//# end
 		if (isFocused()) {
-			CoatUtil.drawStrokeRect(x - 2, y - 2, x + width + 2, y + height + 2, 1, color);
+			CoatUtil.drawOutline(graphics, x - 2, y - 2, x + width + 2, y + height + 2, color);
 		}
+		//# elif RENDERING == "POSE_STACK"
+		//- font.draw(graphics, getMessage(), x, textY, color.getArgb());
+		//- if (isFocused()) {
+		//- 	CoatUtil.drawOutline(x - 2, y - 2, x + width + 2, y + height + 2, color);
+		//- }
+		//# end
 		if (isHovered) {
 			if (hoverEffect) {
 				//# if RENDERING == "GUI_GRAPHICS"
@@ -78,31 +94,39 @@ public class TextButtonWidget extends Button {
 				//- fill(graphics, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
 				//# end
 			}
-			if (originalMessage != getMessage()) {
-				CoatUtil.renderTooltip(graphics, mouseX, mouseY, originalMessage);
-			}
+			//# if MC_VERSION_NUMBER < 12108
+			//- if (originalMessage != getMessage()) {
+			//- 	CoatUtil.renderTooltip(graphics, mouseX, mouseY, originalMessage);
+			//- }
+			//# end
 		}
 	}
 
-	/**
-	 * Sets a new text for this button and trims it appropriately. #intellitrim
-	 *
-	 * @param text The new button text
-	 */
-	@Override
-	public void setMessage(Component text) {
-		originalMessage = text;
-		super.setMessage(CoatUtil.intelliTrim(Minecraft.getInstance().font, originalMessage, width));
+	//# if MC_VERSION_NUMBER >= 12108
+	public Component getOriginalMessage() {
+		return getMessage();
 	}
+	//# else
+	//- /**
+	//-  * Sets a new text for this button and trims it appropriately. #intellitrim
+	//-  *
+	//-  * @param text The new button text
+	//-  */
+	//- @Override
+	//- public void setMessage(Component text) {
+	//- 	originalMessage = text;
+	//- 	super.setMessage(CoatUtil.intelliTrim(Minecraft.getInstance().font, originalMessage, width));
+	//- }
 
-	/**
-	 * Updates the button's width and the trim work on the text.
-	 *
-	 * @param value The new width
-	 */
-	@Override
-	public void setWidth(int value) {
-		super.setWidth(value);
-		super.setMessage(CoatUtil.intelliTrim(Minecraft.getInstance().font, originalMessage, width));
-	}
+	//- /**
+	//-  * Updates the button's width and the trim work on the text.
+	//-  *
+	//-  * @param value The new width
+	//-  */
+	//- @Override
+	//- public void setWidth(int value) {
+	//- 	super.setWidth(value);
+	//- 	super.setMessage(CoatUtil.intelliTrim(Minecraft.getInstance().font, originalMessage, width));
+	//- }
+	//# end
 }

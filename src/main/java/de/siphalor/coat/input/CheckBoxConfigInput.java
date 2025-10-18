@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A boolean {@link ConfigInput} which displays as a checkbox.
@@ -12,12 +13,27 @@ import net.minecraft.network.chat.Component;
 public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean> {
 	private InputChangeListener<Boolean> changeListener;
 
+	public CheckBoxConfigInput(boolean checked) {
+		this(null, checked, false);
+	}
+
+	/**
+	 * Constructs a new checkbox input.
+	 * @param message     A message to be shown behind the checkbox
+	 * @param checked     Whether this checkbox should initially be checked
+	 */
+	public CheckBoxConfigInput(boolean checked, @NotNull Component message) {
+		this(message, checked, true);
+	}
+
 	/**
 	 * Constructs a new checkbox input.
 	 * @param message     A message to be shown behind the checkbox
 	 * @param checked     Whether this checkbox should initially be checked
 	 * @param showMessage Whether the message should be displayed
+	 * @deprecated use {@link #CheckBoxConfigInput(boolean)} or {@link #CheckBoxConfigInput(boolean, Component)}
 	 */
+	@Deprecated
 	public CheckBoxConfigInput(Component message, boolean checked, boolean showMessage) {
 		super(
 				0,
