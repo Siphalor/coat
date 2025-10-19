@@ -337,7 +337,9 @@ public class ConfigScreen extends Screen {
 		super.render(graphics, mouseX, mouseY, delta);
 		graphics.disableScissor();
 
+		//# if TRANSPARENT_MENUS
 		CoatUtil.drawHorizontalGradient(graphics, panelWidth, 20, panelWidth + 8, height, CoatColor.BLACK.withAlpha(0x77), CoatColor.TRANSPARENT);
+		//# end
 
 		CoatUtil.drawTintedTiledTexture(
 				graphics,

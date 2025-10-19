@@ -50,6 +50,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	//# end
 	//# if MC_VERSION_NUMBER >= 12005
 	private static final Duration DURATION_QUASI_INDEFINITE = Duration.of(14, ChronoUnit.DAYS);
+	//# end
 	private static final int TEXT_INDENT = 8;
 	private final Font font;
 	private final TextButtonWidget nameWidget;
