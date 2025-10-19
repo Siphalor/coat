@@ -136,7 +136,11 @@ public class MessagesScreen extends Screen {
 
 		super.render(graphics, mouseX, mouseY, delta);
 
-		titleLines.renderLeftAligned(graphics, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
+		//# if MC_VERSION_NUMBER >= 12110
+		titleLines.render(graphics, MultiLineLabel.Align.LEFT, left, CoatUtil.DOUBLE_MARGIN, 10, true, CoatUtil.TEXT_COLOR.getArgb());
+		//# else
+		//- titleLines.renderLeftAligned(graphics, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
+		//# end
 
 		//# if MC_VERSION_NUMBER < 11700
 		//- messagesList.render(graphics, mouseX, mouseY, delta);

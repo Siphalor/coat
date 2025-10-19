@@ -46,11 +46,21 @@ public record IndividuallyColoredRectangleRenderState(
 		);
 	}
 
+	//# if MC_VERSION_NUMBER >= 12110
 	@Override
-	public void buildVertices(VertexConsumer vertexConsumer, float z) {
-		vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.top(), z).setColor(topLeftColor);
-		vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.bottom(), z).setColor(bottomLeftColor);
-		vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.bottom(), z).setColor(bottomRightColor);
-		vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.top(), z).setColor(topRightColor);
+	public void buildVertices(VertexConsumer vertexConsumer) {
+		vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.top()).setColor(topLeftColor);
+		vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.bottom()).setColor(bottomLeftColor);
+		vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.bottom()).setColor(bottomRightColor);
+		vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.top()).setColor(topRightColor);
 	}
+	//# else
+	//- @Override
+	//- public void buildVertices(VertexConsumer vertexConsumer, float z) {
+	//- 	vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.top(), z).setColor(topLeftColor);
+	//- 	vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.bottom(), z).setColor(bottomLeftColor);
+	//- 	vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.bottom(), z).setColor(bottomRightColor);
+	//- 	vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.top(), z).setColor(topRightColor);
+	//- }
+	//# end
 }

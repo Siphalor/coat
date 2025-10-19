@@ -171,7 +171,11 @@ public class CoatUtil {
 	 */
 	//# if RENDERING == "GUI_GRAPHICS"
 	public static void drawOutline(GuiGraphics graphics, int x1, int y1, int x2, int y2, CoatColor color) {
-		graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
+		//# if MC_VERSION_NUMBER >= 12110
+		graphics.submitOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
+		//# else
+		//- graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
+		//# end
 	}
 	//# else
 	//- public static void drawOutline(int x1, int y1, int x2, int y2, CoatColor color) {

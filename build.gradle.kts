@@ -1,5 +1,6 @@
 import de.siphalor.jcyo.gradle.JcyoTask
 import java.util.*
+import kotlin.reflect.KProperty
 
 plugins {
 	alias(libs.plugins.loom)
@@ -114,17 +115,19 @@ val jcyoVars = mcProps.stringPropertyNames()
 	.filter { it.startsWith("preprocessor.") }
 	.map { it to mcProps[it] }
 	.associate { (key, value) -> key.substring("preprocessor.".length) to value }
-val jcyo = tasks.register<JcyoTask>("jcyo") {
-	inputDirectory = file("src/main/java")
-	variables = jcyoVars
-}
-val testmodJcyo = tasks.register<JcyoTask>("testmodJcyo") {
-	inputDirectory = file("src/testmod/java")
-	variables = jcyoVars
+
+val jcyo = registerJcyoTask("jcyo", "src/main/java")
+val renderStateHelpersJcyo = registerJcyoTask("renderStateHelpersJcyo", "src/render-state-helpers/java")
+val testmodJcyo = registerJcyoTask("testmodJcyo", "src/testmod/java")
+fun registerJcyoTask(name: String, input: String): TaskProvider<JcyoTask> {
+	return tasks.register<JcyoTask>(name) {
+		inputDirectory = file(input)
+		variables = jcyoVars
+	}
 }
 
 tasks.compileJava {
-	dependsOn(jcyo)
+	dependsOn(jcyo, renderStateHelpersJcyo)
 }
 tasks.named("compileTestmodJava") {
 	dependsOn(testmodJcyo)

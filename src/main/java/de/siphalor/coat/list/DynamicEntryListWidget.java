@@ -33,6 +33,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 //- import net.minecraft.client.renderer.ShaderManager;
 //- import net.minecraft.client.renderer.ShaderProgram;
 //- import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
@@ -654,17 +655,26 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		return getEntryRight() + CoatUtil.MARGIN;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	//# if MC_VERSION_NUMBER >= 12110
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
+		//# else
+	//- public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	//# end
 		this.updateScrollingState(mouseX, mouseY, button);
 		if (!isMouseOver(mouseX, mouseY)) {
 			return false;
 		} else {
 			Entry entry = getEntryAtPosition(mouseX, mouseY);
 			if (entry != null) {
-				if (entry.mouseClicked(mouseX, mouseY, button) && entry.getParent() == this) {
+				//# if MC_VERSION_NUMBER >= 12110
+				boolean handled = entry.mouseClicked(event, doubleClick);
+				//# else
+				//- boolean handled = entry.mouseClicked(mouseX, mouseY, button);
+				//# end
+				if (handled && entry.getParent() == this) {
 					setFocused(entry);
 					setDragging(true);
 					return true;
@@ -677,23 +687,34 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	//# if MC_VERSION_NUMBER >= 12110
+	public boolean mouseReleased(MouseButtonEvent event) {
 		if (this.getFocused() != null) {
-			this.getFocused().mouseReleased(mouseX, mouseY, button);
+			this.getFocused().mouseReleased(event);
 		}
-
 		return false;
 	}
+	//# else
+	//- public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	//- 	if (this.getFocused() != null) {
+	//- 		this.getFocused().mouseReleased(mouseX, mouseY, button);
+	//- 	}
+	//- 	return false;
+	//- }
+	//# end
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+	//# if MC_VERSION_NUMBER >= 12110
+	public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
+		if (super.mouseDragged(event, deltaX, deltaY)) {
 			return true;
+	//# else
+	//- public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	//- 	if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+	//- 		return true;
+	//# end
 		} else if (button == 0 && this.scrolling) {
 			if (mouseY < (double) this.top) {
 				this.setScrollYOffset(0.0D);

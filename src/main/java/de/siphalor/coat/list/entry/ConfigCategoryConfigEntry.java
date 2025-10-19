@@ -18,6 +18,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -269,7 +270,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 				}
 			}
 
-			descriptionMultiline.renderLeftAlignedNoShadow(graphics, x + TEXT_INDENT, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+			//# if MC_VERSION_NUMBER >= 12110
+			descriptionMultiline.render(graphics, MultiLineLabel.Align.LEFT, msgX, curY, 9, true, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+			//# else
+			//- descriptionMultiline.renderLeftAlignedNoShadow(graphics, msgX, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+			//# end
 		}
 	}
 
@@ -447,8 +452,13 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (!super.mouseClicked(mouseX, mouseY, button)) {
+	//# if MC_VERSION_NUMBER >= 12110
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (!super.mouseClicked(event, doubleClick)) {
+	//# else
+	//- public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	//- 	if (!super.mouseClicked(mouseX, mouseY, button)) {
+	//# end
 			if (hovered && !isExpansionEmpty()) {
 				CoatUtil.playClickSound();
 				setExpanded(!isExpanded());

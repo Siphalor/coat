@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 //- import net.minecraft.network.chat.TranslatableComponent;
@@ -58,8 +59,15 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		boolean result = super.mouseClicked(mouseX, mouseY, button);
+	//# if MC_VERSION_NUMBER >= 12110
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		boolean result = super.mouseClicked(event, doubleClick);
+	//# else
+	//- public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	//- 	boolean result = super.mouseClicked(mouseX, mouseY, button);
+	//# end
 		if (mouseX < left + 20) {
 			dragEntry = getEntryAtPosition(mouseX, mouseY);
 			if (dragEntry != null) {
@@ -69,7 +77,11 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 			}
 		}
 		if (!result) {
-			return appendButton.mouseClicked(mouseX, mouseY, button);
+			//# if MC_VERSION_NUMBER >= 12110
+			return appendButton.mouseClicked(event, doubleClick);
+			//# else
+			//- return appendButton.mouseClicked(mouseX, mouseY, button);
+			//# end
 		}
 		return result;
 	}
@@ -80,8 +92,14 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	}
 
 	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		boolean result = super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+	//# if MC_VERSION_NUMBER >= 12110
+	public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
+		boolean result = super.mouseDragged(event, deltaX, deltaY);
+		double mouseY = event.y();
+	//# else
+	//- public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	//- 	boolean result = super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+	//# end
 
 		if (dragEntry != null && dragEntry.isDragFollow()) {
 			int oldPos = entries().indexOf(dragEntry);
@@ -100,13 +118,21 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	}
 
 	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	//# if MC_VERSION_NUMBER >= 12110
+	public boolean mouseReleased(MouseButtonEvent event) {
+	//# else
+	//- public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	//# end
 		setDragging(false);
 		if (dragEntry != null) {
 			dragEntry.setDragFollow(false);
 		}
 		dragEntry = null;
-		return super.mouseReleased(mouseX, mouseY, button);
+		//# if MC_VERSION_NUMBER >= 12110
+		return super.mouseReleased(event);
+		//# else
+		//- return super.mouseReleased(mouseX, mouseY, button);
+		//# end
 	}
 
 	@Override

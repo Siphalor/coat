@@ -38,7 +38,12 @@ public class CoatTestmod implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		KeyBindingHelper.registerKeyBinding(new ScreenBinding(MOD_ID, 84, MOD_ID));
+		//# if MC_VERSION_NUMBER >= 12110
+		var category = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "main"));
+		KeyBindingHelper.registerKeyBinding(new ScreenBinding(MOD_ID, 84, category));
+		//# else
+		//- KeyBindingHelper.registerKeyBinding(new ScreenBinding(MOD_ID, 84, MOD_ID));
+		//# end
 	}
 
 	public static ConfigScreen createScreen() {
@@ -136,7 +141,15 @@ public class CoatTestmod implements ClientModInitializer {
 	}
 
 	public static class ScreenBinding extends KeyMapping implements PriorityKeyBinding {
-		public ScreenBinding(String translationKey, int code, String category) {
+		public ScreenBinding(
+				String translationKey,
+				int code,
+				//# if MC_VERSION_NUMBER >= 12110
+				Category category
+				//# else
+				//- String category
+				//# end
+		) {
 			super(translationKey, code, category);
 		}
 

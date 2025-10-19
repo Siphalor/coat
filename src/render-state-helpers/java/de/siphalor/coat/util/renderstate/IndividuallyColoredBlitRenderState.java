@@ -50,11 +50,21 @@ public record IndividuallyColoredBlitRenderState(
 		);
 	}
 
+	//# if MC_VERSION_NUMBER >= 12110
 	@Override
-	public void buildVertices(VertexConsumer vertexConsumer, float z) {
-		vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.top(), z).setUv(uv.x, uv.y).setColor(topLeftColor);
-		vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.bottom(), z).setUv(uv.x, uv.w).setColor(bottomLeftColor);
-		vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.bottom(), z).setUv(uv.z, uv.w).setColor(bottomRightColor);
-		vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.top(), z).setUv(uv.z, uv.y).setColor(topRightColor);
+	public void buildVertices(VertexConsumer vertexConsumer) {
+		vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.top()).setUv(uv.x, uv.y).setColor(topLeftColor);
+		vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.bottom()).setUv(uv.x, uv.w).setColor(bottomLeftColor);
+		vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.bottom()).setUv(uv.z, uv.w).setColor(bottomRightColor);
+		vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.top()).setUv(uv.z, uv.y).setColor(topRightColor);
 	}
+	//# else
+	//- @Override
+	//- public void buildVertices(VertexConsumer vertexConsumer, float z) {
+	//- 	vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.top(), z).setUv(uv.x, uv.y).setColor(topLeftColor);
+	//- 	vertexConsumer.addVertexWith2DPose(pose, rect.left(), rect.bottom(), z).setUv(uv.x, uv.w).setColor(bottomLeftColor);
+	//- 	vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.bottom(), z).setUv(uv.z, uv.w).setColor(bottomRightColor);
+	//- 	vertexConsumer.addVertexWith2DPose(pose, rect.right(), rect.top(), z).setUv(uv.z, uv.y).setColor(topRightColor);
+	//- }
+	//# end
 }

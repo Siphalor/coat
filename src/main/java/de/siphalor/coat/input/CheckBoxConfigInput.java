@@ -4,6 +4,7 @@ package de.siphalor.coat.input;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,25 +63,16 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 		return getWidth();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public Boolean getValue() {
 		return selected();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void setFocused(boolean focused) {
 		super.setFocused(focused);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	//# if RENDERING == "GUI_GRAPHICS"
 	public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
@@ -98,28 +90,27 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 	//- }
 	//# end
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void setValue(Boolean value) {
 		if (selected() != value) {
-			onPress();
+			onPress(/*# if MC_VERSION_NUMBER >= 12110 */null/*# end */);
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	//# if MC_VERSION_NUMBER >= 12110
 	@Override
-	public void onPress() {
-		super.onPress();
+	public void onPress(InputWithModifiers inputWithModifiers) {
+		super.onPress(inputWithModifiers);
 		changeListener.inputChanged(selected());
 	}
+	//# else
+	//- @Override
+	//- public void onPress() {
+	//- 	super.onPress();
+	//- 	changeListener.inputChanged(selected());
+	//- }
+	//# end
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void setChangeListener(InputChangeListener<Boolean> changeListener) {
 		this.changeListener = changeListener;
