@@ -98,8 +98,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	@Getter
 	@Setter
 	private ResourceLocation background =
-			//# if MC_VERSION_NUMBER >= 12100
-			ResourceLocation.parse("textures/block/tuff_bricks.png");
+			//# if MC_VERSION_NUMBER >= 12109
+			ResourceLocation.parse("textures/block/dark_oak_planks.png");
+			//# elif MC_VERSION_NUMBER >= 12100
+			//- ResourceLocation.parse("textures/block/tuff_bricks.png");
 			//# elif MC_VERSION_NUMBER >= 12000
 			//- new ResourceLocation("textures/block/cherry_log.png");
 			//# elif MC_VERSION_NUMBER >= 11900
