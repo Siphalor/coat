@@ -250,10 +250,10 @@ public class CoatUtil {
 
 		//- //# if MC_VERSION_NUMBER >= 12100
 		//- BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		//- withColor(bufferBuilder.addVertex(left, bottom, 0), leftColor);
-		//- withColor(bufferBuilder.addVertex(right, bottom, 0), rightColor);
-		//- withColor(bufferBuilder.addVertex(right, top, 0), rightColor);
-		//- withColor(bufferBuilder.addVertex(left, top, 0), leftColor);
+		//- bufferBuilder.addVertex(left, bottom, 0).setColor(leftColor.getArgb());
+		//- bufferBuilder.addVertex(right, bottom, 0).setColor(rightColor.getArgb());
+		//- bufferBuilder.addVertex(right, top, 0).setColor(rightColor.getArgb());
+		//- bufferBuilder.addVertex(left, top, 0).setColor(leftColor.getArgb());
 		//- BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 		//- //# else
 		//- BufferBuilder bufferBuilder = tesselator.getBuilder();
@@ -425,96 +425,44 @@ public class CoatUtil {
 		int height = bottom - top;
 		int middleOffset = height / 2;
 
+		ScreenRectangle topLeft = new ScreenRectangle(left, top, middleOffset, middleOffset);
+		ScreenRectangle topMiddle = new ScreenRectangle(left + middleOffset, top, width - 2 * middleOffset, middleOffset);
+		ScreenRectangle topRight = new ScreenRectangle(right - middleOffset, top, middleOffset, middleOffset);
+		ScreenRectangle bottomLeft = new ScreenRectangle(left, top + middleOffset, middleOffset, middleOffset);
+		ScreenRectangle bottomMiddle = new ScreenRectangle(left + middleOffset, top + middleOffset, width - 2 * middleOffset, middleOffset);
+		ScreenRectangle bottomRight = new ScreenRectangle(right - middleOffset, top + middleOffset, middleOffset, middleOffset);
+
 		//# if MC_VERSION_NUMBER >= 12108
 		TextureSetup textureSetup = TextureSetup.singleTexture(
 				Minecraft.getInstance().getTextureManager().getTexture(texture).getTextureView()
 		);
 		submitIndividuallyColoredBlitRectable(
-				graphics,
-				textureSetup,
-				new ScreenRectangle(left, top, middleOffset, middleOffset),
-				textureScale,
-				outerColor,
-				outerColor,
-				innerColor,
-				outerColor
+				graphics, textureSetup, topLeft, textureScale, outerColor, outerColor, innerColor, outerColor
 		);
 		submitIndividuallyColoredBlitRectable(
-				graphics,
-				textureSetup,
-				new ScreenRectangle(left + middleOffset, top, width - 2 * middleOffset, middleOffset),
-				textureScale,
-				outerColor,
-				outerColor,
-				innerColor,
-				innerColor
+				graphics, textureSetup, topMiddle, textureScale, outerColor, outerColor, innerColor, innerColor
 		);
 		submitIndividuallyColoredBlitRectable(
-				graphics,
-				textureSetup,
-				new ScreenRectangle(right - middleOffset, top, middleOffset, middleOffset),
-				textureScale,
-				outerColor,
-				outerColor,
-				outerColor,
-				innerColor
+				graphics, textureSetup, topRight, textureScale, outerColor, outerColor, outerColor, innerColor
 		);
 		submitIndividuallyColoredBlitRectable(
-				graphics,
-				textureSetup,
-				new ScreenRectangle(left, top + middleOffset, middleOffset, middleOffset),
-				textureScale,
-				outerColor,
-				innerColor,
-				outerColor,
-				outerColor
+				graphics, textureSetup, bottomLeft, textureScale, outerColor, innerColor, outerColor, outerColor
 		);
 		submitIndividuallyColoredBlitRectable(
-				graphics,
-				textureSetup,
-				new ScreenRectangle(left + middleOffset, top + middleOffset, width - 2 * middleOffset, middleOffset),
-				textureScale,
-				innerColor,
-				innerColor,
-				outerColor,
-				outerColor
+				graphics, textureSetup, bottomMiddle, textureScale, innerColor, innerColor, outerColor, outerColor
 		);
 		submitIndividuallyColoredBlitRectable(
-				graphics,
-				textureSetup,
-				new ScreenRectangle(right - middleOffset, top + middleOffset, middleOffset, middleOffset),
-				textureScale,
-				innerColor,
-				outerColor,
-				outerColor,
-				outerColor
+				graphics, textureSetup, bottomRight, textureScale, innerColor, outerColor, outerColor, outerColor
 		);
 		//# else
 		//- graphics.drawSpecial(bufferSource -> {
-		//- 	bufferSource.getBuffer(RenderType.guiTextured(texture))
-		//- 			.addVertex(left, top, 0)
-		//- 			.setUv(0, 0)
-		//- 			.setColor(outerColor.getArgb())
-		//- 			.addVertex(middleOffset, top, 0)
-		//- 			.setUv(middleOffset / textureScale, 0)
-		//- 			.setColor(outerColor.getArgb())
-		//- 			.addVertex(middleOffset, middleOffset, 0)
-		//- 			.setUv(middleOffset / textureScale, middleOffset / textureScale)
-		//- 			.setColor(innerColor.getArgb())
-		//- 			.addVertex(left, middleOffset, 0)
-		//- 			.setUv(0, middleOffset / textureScale)
-		//- 			.setColor(outerColor.getArgb())
-		//- 			.addVertex(middleOffset, 0, 0)
-		//- 			.setUv(middleOffset / textureScale, 0)
-		//- 			.setColor(outerColor.getArgb())
-		//- 			.addVertex(width - middleOffset, 0, 0)
-		//- 			.setUv((width - middleOffset) / textureScale, 0)
-		//- 			.setColor(outerColor.getArgb())
-		//- 			.addVertex(width - middleOffset, middleOffset, 0)
-		//- 			.setUv((width - middleOffset) / textureScale, middleOffset / textureScale)
-		//- 			.setColor(innerColor.getArgb())
-		//- 			.addVertex(left, middleOffset, 0)
-		//- 			;
+		//- 	VertexConsumer consumer = bufferSource.getBuffer(RenderType.guiTextured(texture));
+		//- 	appendTintedTexturedRect(consumer, topLeft, textureScale, outerColor, outerColor, innerColor, outerColor);
+		//- 	appendTintedTexturedRect(consumer, topMiddle, textureScale, outerColor, outerColor, innerColor, innerColor);
+		//- 	appendTintedTexturedRect(consumer, topRight, textureScale, outerColor, outerColor, outerColor, innerColor);
+		//- 	appendTintedTexturedRect(consumer, bottomLeft, textureScale, outerColor, innerColor, outerColor, outerColor);
+		//- 	appendTintedTexturedRect(consumer, bottomMiddle, textureScale, innerColor, innerColor, outerColor, outerColor);
+		//- 	appendTintedTexturedRect(consumer, bottomRight, textureScale, innerColor, outerColor, outerColor, outerColor);
 		//- });
 		//# end
 	}
@@ -611,6 +559,21 @@ public class CoatUtil {
 	private static Vector4f asVector4f(ScreenRectangle rect) {
 		return new Vector4f(rect.left(), rect.top(), rect.right(), rect.bottom());
 	}
+	//# elif MC_VERSION_NUMBER >= 12100
+	//- private static void appendTintedTexturedRect(
+	//- 		VertexConsumer vc,
+	//- 		ScreenRectangle rect,
+	//- 		float textureScale,
+	//- 		CoatColor topLeftColor,
+	//- 		CoatColor topRightColor,
+	//- 		CoatColor bottomRightColor,
+	//- 		CoatColor bottomLeftColor
+	//- ) {
+	//- 	vc.addVertex(rect.left(), rect.top(), 0).setUv(rect.left() / textureScale, rect.top() / textureScale).setColor(topLeftColor.getArgb());
+	//- 	vc.addVertex(rect.left(), rect.bottom(), 0).setUv(rect.left() / textureScale, rect.bottom() / textureScale).setColor(bottomLeftColor.getArgb());
+	//- 	vc.addVertex(rect.right(), rect.bottom(), 0).setUv(rect.right() / textureScale, rect.bottom() / textureScale).setColor(bottomRightColor.getArgb());
+	//- 	vc.addVertex(rect.right(), rect.top(), 0).setUv(rect.right() / textureScale, rect.top() / textureScale).setColor(topRightColor.getArgb());
+	//- }
 	//# else
 	//- private static <V extends VertexConsumer> V withColor(V vertexConsumer, CoatColor color) {
 	//- 	//# if MC_VERSION_NUMBER >= 12100
