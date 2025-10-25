@@ -10,6 +10,7 @@
 	"coat.default": "Default",
 	"coat.default.hover": "Reset to:",
 
+	"coat.input.enumerated.null": "Unset",
 	"coat.list.append": "Create new entry",
 
 	"coat.message.jump": "Go to issue",

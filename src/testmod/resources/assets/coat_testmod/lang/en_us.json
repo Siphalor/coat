@@ -1,0 +1,4 @@
+{
+	"coat.testmod.envtype.client": "Client",
+	"coat.testmod.envtype.server": "Server"
+}

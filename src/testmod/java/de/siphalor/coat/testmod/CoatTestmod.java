@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import de.siphalor.amecs.api.PriorityKeyBinding;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
+import de.siphalor.coat.input.CycleButtonConfigInput;
 import de.siphalor.coat.input.SliderConfigInput;
 import de.siphalor.coat.input.TextConfigInput;
 import de.siphalor.coat.list.complex.ConfigCategoryWidget;
@@ -11,6 +12,7 @@ import de.siphalor.coat.list.complex.ConfigListWidget;
 import de.siphalor.coat.list.entry.*;
 import de.siphalor.coat.screen.ConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -96,6 +98,12 @@ public class CoatTestmod implements ClientModInitializer {
 				text(""),
 				new GenericEntryHandler<>(3.14D, v -> Collections.emptyList()),
 				new SliderConfigInput<>(0D, -10D, 90D)
+		));
+		list.add(new ConfigCategoryConfigEntry<>(
+				text("Enum selector"),
+				text(""),
+				new GenericEntryHandler<>(EnvType.CLIENT, v -> Collections.emptyList()),
+				new CycleButtonConfigInput<>(new EnumMaterial<>(EnvType.class), true, null)
 		));
 
 		ConfigCategoryWidget widget = new ConfigCategoryWidget(Minecraft.getInstance(), text("Hi, my name is Fry"), list, null);
