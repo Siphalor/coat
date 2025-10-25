@@ -18,7 +18,7 @@ jobs:
           distribution: 'temurin'
           java-version: '24'
       - name: Set Gradle execution rights
-        run: chmod +x ./gradlew
+        run: chmod +x ./gradlew ./helpers/run-each-mc.sh
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Run tests on all versions
