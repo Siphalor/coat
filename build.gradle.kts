@@ -118,10 +118,10 @@ java {
 	targetCompatibility = JavaVersion.toVersion(mcLibs.versions.java.get())
 }
 
-val jcyoVars = mcProps.stringPropertyNames()
+val jcyoVars: Map<String, String> = mcProps.stringPropertyNames()
 	.filter { it.startsWith("preprocessor.") }
 	.map { it to mcProps[it] }
-	.associate { (key, value) -> key.substring("preprocessor.".length) to value }
+	.associate { (key, value) -> key.substring("preprocessor.".length) to value.toString() }
 
 val jcyo = registerJcyoTask("jcyo", "src/main/java")
 val renderStateHelpersJcyo = registerJcyoTask("renderStateHelpersJcyo", "src/render-state-helpers/java")
