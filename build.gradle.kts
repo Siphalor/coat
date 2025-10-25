@@ -40,6 +40,7 @@ sourceSets {
 }
 
 val wideners = extraSources.flatMap { it.listFiles { _, name -> name.endsWith(".accesswidener") }.orEmpty().toList() }
+mergedAccessWidenerDir.get().asFile.mkdirs()
 val merged = mergedAccessWidenerDir.get().file(mergedAccessWidenerName).asFile
 merged.createNewFile()
 val writer = merged.writer()
