@@ -6,6 +6,17 @@ pluginManagement {
 		maven {
 			name = "Fabric"
 			url = uri("https://maven.fabricmc.net/")
+			mavenContent {
+				includeGroupAndSubgroups("net.fabricmc")
+				includeGroup("fabric-loom")
+			}
+		}
+		maven {
+			name = "Siphalor"
+			url = uri("https://maven.siphalor.de")
+			mavenContent {
+				includeGroupAndSubgroups("de.siphalor")
+			}
 		}
 		gradlePluginPortal()
 	}

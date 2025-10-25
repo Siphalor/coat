@@ -66,7 +66,13 @@ loom {
 }
 
 repositories {
-	maven { url = uri("https://maven.siphalor.de") }
+	maven {
+		name = "Siphalor"
+		url = uri("https://maven.siphalor.de")
+		mavenContent {
+			includeGroupAndSubgroups("de.siphalor")
+		}
+	}
 	mavenLocal()
 }
 
