@@ -279,13 +279,23 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		}
 	}
 
-	private int drawMessageParagraph(GuiGraphics graphics, int x, int y, int width, Message message) {
+	private int drawMessageParagraph(
+			//# if RENDERING == "GUI_GRAPHICS"
+			GuiGraphics context,
+			//# else
+			//- PoseStack context,
+			//# end
+			int x,
+			int y,
+			int width,
+			Message message
+	) {
 		List<FormattedCharSequence> lines = font.split(message.getText(), width);
 		for (FormattedCharSequence line : lines) {
 			//# if RENDERING == "GUI_GRAPHICS"
-			graphics.drawString(font, line, x, y, 0xffffffff, false);
+			context.drawString(font, line, x, y, 0xffffffff, false);
 			//# else
-			//- font.draw(graphics, line, msgX, curY, 0xffffffff);
+			//- font.draw(context, line, x, y, 0xffffffff);
 			//# end
 			y += 9;
 		}

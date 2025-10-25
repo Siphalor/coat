@@ -524,7 +524,9 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//- //# if MC_VERSION_NUMBER >= 11700
 		//- RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		//- //# end
+		//- //# if MC_VERSION_NUMBER <= 11903
 		//- RenderSystem.disableTexture();
+		//- //# end
 		//- CoatUtil.resetShaderColor();
 		//- Tesselator tesselator = Tesselator.getInstance();
 		//- //# if MC_VERSION_NUMBER >= 11700
