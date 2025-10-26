@@ -1,6 +1,5 @@
 import de.siphalor.jcyo.gradle.JcyoTask
 import java.util.*
-import kotlin.reflect.KProperty
 
 plugins {
 	alias(libs.plugins.loom)
@@ -75,6 +74,15 @@ repositories {
 		}
 	}
 	mavenLocal()
+}
+
+configurations {
+	apiElements {
+		outgoing.capability("de.siphalor:coat-${mcProps["minecraft.version.major"]}:${shortVersion}")
+	}
+	runtimeElements {
+		outgoing.capability("de.siphalor:coat-${mcProps["minecraft.version.major"]}:${shortVersion}")
+	}
 }
 
 dependencies {
