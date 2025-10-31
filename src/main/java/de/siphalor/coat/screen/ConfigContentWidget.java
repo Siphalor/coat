@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface ConfigContentWidget
 		extends GuiEventListener,
@@ -21,6 +22,7 @@ public interface ConfigContentWidget
 	Component getName();
 	ResourceLocation getBackground();
 	ConfigTreeEntry getTreeEntry();
+	List<ConfigContentWidget> getSubTrees();
 	Collection<Message> getMessages();
 	void save();
 	void setPosition(int left, int top);

@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 			//- return appendButton.mouseClicked(mouseX, mouseY, button);
 			//# end
 		}
-		return result;
+		return true;
 	}
 
 	@Override
@@ -138,6 +139,11 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	@Override
 	public ConfigTreeEntry getTreeEntry() {
 		return new ConfigTreeEntry(name.withStyle(style -> style.withUnderlined(true)), this, true);
+	}
+
+	@Override
+	public List<ConfigContentWidget> getSubTrees() {
+		return Collections.emptyList();
 	}
 
 	@Override

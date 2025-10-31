@@ -7,7 +7,6 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.list.DynamicEntryListWidget;
 import de.siphalor.coat.list.EntryContainer;
 import de.siphalor.coat.list.category.ConfigTreeEntry;
-import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
@@ -55,7 +54,7 @@ public class ConfigScreen extends Screen {
 	private static final CoatColor BACKGROUND_TEXTURE_TINT_COLOR = CoatColor.rgb(0x777777);
 
 	private final Screen parent;
-	private final Collection<ConfigCategoryWidget> widgets;
+	private final Collection<ConfigContentWidget> widgets;
 	private ConfigTreeEntry openCategory;
 	/**
 	 * A {@link Runnable} that runs after all {@link de.siphalor.coat.handler.ConfigEntryHandler#save(Object)}
@@ -85,7 +84,7 @@ public class ConfigScreen extends Screen {
 	 * @param title   The title of this config screen. Typically contains the name of the mod
 	 * @param widgets The categories/lists that this screen will be displaying
 	 */
-	public ConfigScreen(Screen parent, Component title, Collection<ConfigCategoryWidget> widgets) {
+	public ConfigScreen(Screen parent, Component title, Collection<ConfigContentWidget> widgets) {
 		super(title);
 		this.visualTitle = title.copy().append(" - ").append("missingno");
 		this.parent = parent;
@@ -121,7 +120,7 @@ public class ConfigScreen extends Screen {
 		//- children.add(treeWidget);
 		//# end
 
-		for (ConfigCategoryWidget widget : widgets) {
+		for (ConfigContentWidget widget : widgets) {
 			treeWidget.addEntry(widget.getTreeEntry());
 		}
 
@@ -151,7 +150,7 @@ public class ConfigScreen extends Screen {
 	 * Triggers the save listeners
 	 */
 	protected void onSave() {
-		for (ConfigCategoryWidget widget : widgets) {
+		for (ConfigContentWidget widget : widgets) {
 			widget.save();
 		}
 		onSave.run();

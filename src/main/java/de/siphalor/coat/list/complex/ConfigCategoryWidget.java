@@ -25,7 +25,7 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 	@Getter
 	private final Component name;
 	@Getter
-	private final List<ConfigCategoryWidget> subTrees;
+	private final List<ConfigContentWidget> subTrees;
 	private final List<ConfigContainerLinkEntry> subTreeLinks;
 	private ConfigTreeEntry treeEntry;
 
@@ -49,7 +49,7 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 	 *
 	 * @param subWidget The sub list to link
 	 */
-	public void addSubTree(ConfigCategoryWidget subWidget) {
+	public void addSubTree(ConfigContentWidget subWidget) {
 		if (subTrees.isEmpty()) {
 			entries().add(0, new ConfigListHorizontalBreak());
 		}
@@ -90,7 +90,7 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 	 */
 	@Override
 	public void save() {
-		for (ConfigCategoryWidget subTree : subTrees) {
+		for (ConfigContentWidget subTree : subTrees) {
 			subTree.save();
 		}
 		for (ConfigContainerEntry entry : entries()) {

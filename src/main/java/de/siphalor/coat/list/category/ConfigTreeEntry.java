@@ -3,7 +3,7 @@ package de.siphalor.coat.list.category;
 //- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.Coat;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.list.complex.ConfigCategoryWidget;
+//- import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.list.entry.ConfigContainerCompoundEntry;
 import de.siphalor.coat.screen.ConfigContentWidget;
 import de.siphalor.coat.screen.ConfigScreen;
@@ -85,12 +85,10 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> ((ConfigScreen) Minecraft.getInstance().screen).openCategory(this));
 
 		List<ConfigTreeEntry> list = new ArrayList<>();
-		if (contentWidget instanceof ConfigCategoryWidget) {
-			for (ConfigCategoryWidget configCategoryWidget : ((ConfigCategoryWidget) contentWidget).getSubTrees()) {
-				ConfigTreeEntry treeEntry = configCategoryWidget.getTreeEntry();
-				treeEntry.setParent(this);
-				list.add(treeEntry);
-			}
+		for (ConfigContentWidget subWidget : contentWidget.getSubTrees()) {
+			ConfigTreeEntry treeEntry = subWidget.getTreeEntry();
+			treeEntry.setParent(this);
+			list.add(treeEntry);
 		}
 		subTrees = list;
 	}
