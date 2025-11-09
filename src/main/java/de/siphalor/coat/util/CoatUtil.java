@@ -289,7 +289,7 @@ public class CoatUtil {
 	) {
 		//# if MC_VERSION_NUMBER >= 12108
 		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, left, top, width, height);
-		//# elif MC_VERSION_NUMBER >= 12100
+		//# elif MC_VERSION_NUMBER >= 12103
 		//- graphics.blitSprite(RenderType::guiTextured, texture, left, top, width, height);
 		//# elif MC_VERSION_NUMBER >= 12002
 		//- graphics.blitSprite(texture, left, top, width, height);
@@ -324,13 +324,13 @@ public class CoatUtil {
 			int textureYOffset,
 			CoatColor color
 	) {
-		//# if MC_VERSION_NUMBER >= 12100
+		//# if MC_VERSION_NUMBER >= 12103
 		int width = right - left;
 		int height = bottom - top;
 		graphics.blit(
 				//# if MC_VERSION_NUMBER >= 12108
 				RenderPipelines.GUI_TEXTURED,
-				//# elif MC_VERSION_NUMBER >=12100
+				//# elif MC_VERSION_NUMBER >= 12103
 				//- RenderType::guiTextured,
 				//# end
 				texture,
@@ -366,7 +366,7 @@ public class CoatUtil {
 		graphics.blit(
 				//# if MC_VERSION_NUMBER >= 12108
 				RenderPipelines.GUI_TEXTURED,
-				//#elif MC_VERSION_NUMBER >=12100
+				//#elif MC_VERSION_NUMBER >=12103
 				//- RenderType::guiTextured,
 				//# end
 				texture,
@@ -413,7 +413,7 @@ public class CoatUtil {
 	//- }
 	//# end
 
-	//# if MC_VERSION_NUMBER >= 12100
+	//# if MC_VERSION_NUMBER >= 12103
 	public static void drawInsetGradientTexture(
 			GuiGraphics graphics,
 			ResourceLocation texture,
@@ -485,7 +485,7 @@ public class CoatUtil {
 	//- 	RenderSystem.enableDepthTest();
 	//- 	RenderSystem.depthFunc(GL11.GL_LEQUAL);
 	//- 	//# if MC_VERSION_NUMBER >= 12100
-	//- 	RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
+	//- 	RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 	//- 	//# elif MC_VERSION_NUMBER >= 11700
 	//- 	RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 	//- 	//# else
@@ -563,7 +563,7 @@ public class CoatUtil {
 	private static Vector4f asVector4f(ScreenRectangle rect) {
 		return new Vector4f(rect.left(), rect.top(), rect.right(), rect.bottom());
 	}
-	//# elif MC_VERSION_NUMBER >= 12100
+	//# elif MC_VERSION_NUMBER >= 12103
 	//- private static void appendTintedTexturedRect(
 	//- 		VertexConsumer vc,
 	//- 		ScreenRectangle rect,
@@ -589,7 +589,7 @@ public class CoatUtil {
 	//- }
 	//# end
 
-	//# if MC_VERSION_NUMBER < 12100
+	//# if MC_VERSION_NUMBER < 12103
 	//- public static void setShaderTexture(ResourceLocation texture) {
 	//- 	//# if MC_VERSION_NUMBER >= 11700
 	//- 	RenderSystem.setShaderTexture(0, texture);

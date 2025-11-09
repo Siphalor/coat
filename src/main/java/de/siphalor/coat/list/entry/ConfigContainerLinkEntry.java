@@ -98,7 +98,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 
-		//# if MC_VERSION_NUMBER >= 12100
+		//# if MC_VERSION_NUMBER >= 12103
 		CoatUtil.drawInsetGradientTexture(
 				graphics,
 				configWidget.getBackground(),
