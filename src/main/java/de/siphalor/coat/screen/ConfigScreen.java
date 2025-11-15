@@ -111,13 +111,13 @@ public class ConfigScreen extends Screen {
 		//# end
 
 		//# if MC_VERSION_NUMBER >= 11700
+		addRenderableWidget(treeWidget);
 		addRenderableWidget(abortButton);
 		addRenderableWidget(saveButton);
-		addRenderableWidget(treeWidget);
 		//# else
+		//- children.add(treeWidget);
 		//- addButton(abortButton);
 		//- addButton(saveButton);
-		//- children.add(treeWidget);
 		//# end
 
 		for (ConfigContentWidget widget : widgets) {

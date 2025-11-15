@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 //- import com.mojang.blaze3d.vertex.VertexFormat;
 //- import de.siphalor.coat.util.CoatColor;
 //- import de.siphalor.coat.util.CoatColor;
+//- import com.mojang.blaze3d.systems.RenderSystem;
 import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TickableElement;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -420,9 +421,8 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//# end
 
 		//# if RENDERING == "GUI_GRAPHICS"
-		// FIXME
 		//# if MC_VERSION_NUMBER < 12108
-		//- graphics.pose().translate(0, 0, -100D);
+		//- RenderSystem.enableBlend();
 		//# end
 		//# if TRANSPARENT_MENUS
 		CoatUtil.drawTiledTexture(
@@ -449,7 +449,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//- );
 		//# end
 		//# if MC_VERSION_NUMBER < 12108
-		//- graphics.pose().translate(0, 0, 100D);
+		//- RenderSystem.disableBlend();
 		//# end
 		//# else
 		//- RenderSystem.enableDepthTest();
