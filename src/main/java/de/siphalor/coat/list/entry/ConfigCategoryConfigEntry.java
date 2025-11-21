@@ -68,6 +68,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 */
 	@Getter
 	private boolean expanded;
+	/**
+	 * Whether there is any description or messages to display.
+	 */
+	@Getter
+	private boolean isExpansionEmpty;
 	private boolean hovered;
 	private int leftInputOffset;
 	private int inputWidth;
@@ -82,8 +87,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 */
 	public ConfigCategoryConfigEntry(MutableComponent name, MutableComponent description, ConfigEntryHandler<V> entryHandler, ConfigInput<V> input) {
 		super();
-		nameWidget = new TextButtonWidget(0, 0, 100, 12, name, button -> setExpanded(!isExpanded()));
+		nameWidget = new TextButtonWidget(0, 0, 100, 12, name, button -> userToggleExpansion());
 		nameWidget.setHoverEffect(false);
+		//# if MC_VERSION_NUMBER >= 12110
+		nameWidget.setActionCursorType(CoatCursorTypes.helpCursor());
+		//# end
 		setName(name.copy());
 		this.description = description;
 		this.entryHandler = entryHandler;
@@ -116,23 +124,6 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		//# end
 
 		inputChanged(input.getValue());
-	}
-
-	/**
-	 * Gets whether there is any description or messages to display.
-	 *
-	 * @return Whether the expansion is empty
-	 */
-	public boolean isExpansionEmpty() {
-		if (description != null) {
-			return false;
-		}
-		for (Message message : messages) {
-			if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -247,7 +238,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 			//# end
 
 			//# if MC_VERSION_NUMBER >= 12110
-			if (!expanded) {
+			if (!isExpansionEmpty) {
 				graphics.requestCursor(CoatCursorTypes.helpCursor());
 			}
 			//# end
@@ -468,23 +459,45 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		}
 		// shallow copy is required because the OrderedText in MutableText is cached, so the style needs to be force updated
 		setName(nameWidget.getOriginalMessage().plainCopy());
+
+		isExpansionEmpty = !calcHasExpansionContent();
+		nameWidget.active = !isExpansionEmpty;
+		if (isExpansionEmpty) {
+			setExpanded(false);
+		}
+	}
+
+	private boolean calcHasExpansionContent() {
+		if (description != null && !description.getString().isEmpty()) {
+			return true;
+		}
+		for (Message message : messages) {
+			if (message.getLevel().getSeverity() < Message.Level.DISPLAY_THRESHOLD) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	//# if MC_VERSION_NUMBER >= 12110
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (!super.mouseClicked(event, doubleClick)) {
+		if (!super.mouseClicked(event, doubleClick) && hovered) {
 	//# else
 	//- public boolean mouseClicked(double mouseX, double mouseY, int button) {
-	//- 	if (!super.mouseClicked(mouseX, mouseY, button)) {
+	//- 	if (!super.mouseClicked(mouseX, mouseY, button) && hovered) {
 	//# end
-			if (hovered && !isExpansionEmpty()) {
-				CoatUtil.playClickSound();
-				setExpanded(!isExpanded());
-				return true;
-			}
-			return false;
+			return userToggleExpansion();
 		}
 		return true;
+	}
+
+	private boolean userToggleExpansion() {
+		if (!isExpansionEmpty()) {
+			CoatUtil.playClickSound();
+			setExpanded(!isExpanded());
+			return true;
+		}
+		return false;
 	}
 }

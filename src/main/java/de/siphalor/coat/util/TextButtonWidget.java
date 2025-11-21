@@ -2,6 +2,8 @@ package de.siphalor.coat.util;
 
 //- import com.mojang.blaze3d.vertex.PoseStack;
 //- import lombok.Getter;
+import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -23,6 +25,11 @@ public class TextButtonWidget extends Button {
 	//# end
 	@Setter
 	private boolean hoverEffect = true;
+
+	//#if MC_VERSION_NUMBER >= 12110
+	@Setter
+	private CursorType actionCursorType = CursorTypes.POINTING_HAND;
+	//# end
 
 	/**
 	 * Constructs a new instance.
@@ -94,9 +101,14 @@ public class TextButtonWidget extends Button {
 				//- fill(graphics, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
 				//# end
 			}
+			//# if MC_VERSION_NUMBER >= 12110
+			if (active) {
+				graphics.requestCursor(actionCursorType);
+			}
+			//# end
 			//# if MC_VERSION_NUMBER < 12108
 			//- if (originalMessage != getMessage()) {
-			//- 	CoatUtil.renderTooltip(graphics, mouseX, mouseY, originalMessage);
+				//- CoatUtil.renderTooltip(graphics, mouseX, mouseY, originalMessage);
 			//- }
 			//# end
 		}
