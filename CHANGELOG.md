@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implemented proper cursors for checkboxes for Minecraft 1.21.10.
 - Added translations for Portuguese (Brazil), Finnish and Italian languages, thanks to Pho573, Max and RiginDev.
 
 ## [1.1.0] - 2025-11-21

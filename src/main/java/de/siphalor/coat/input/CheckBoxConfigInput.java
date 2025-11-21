@@ -1,6 +1,7 @@
 package de.siphalor.coat.input;
 
 //- import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Checkbox;
@@ -81,6 +82,15 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 	//# end
 		setPosition(x + width - getWidth(), y);
 		render(graphics, mouseX, mouseY, tickDelta);
+		//# if MC_VERSION_NUMBER >= 12110
+		if (visible && isHovered) {
+			if (active) {
+				graphics.requestCursor(CursorTypes.POINTING_HAND);
+			} else {
+				graphics.requestCursor(CursorTypes.NOT_ALLOWED);
+			}
+		}
+		//# end
 	}
 
 	//# if MC_VERSION_NUMBER < 11903
