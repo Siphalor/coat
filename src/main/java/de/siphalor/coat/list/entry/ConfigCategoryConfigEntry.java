@@ -238,8 +238,8 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		int right = x + entryWidth;
 		int bottom = y + entryHeight;
 
-		this.hovered = hovered;
-		if (hovered) {
+		this.hovered = hovered && mouseY >= y + CoatUtil.MARGIN;
+		if (this.hovered) {
 			//# if RENDERING == "GUI_GRAPHICS"
 			graphics.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
 			//# elif RENDERING == "POSE_STACK"
