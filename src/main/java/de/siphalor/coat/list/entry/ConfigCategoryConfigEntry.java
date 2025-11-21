@@ -2,7 +2,9 @@ package de.siphalor.coat.list.entry;
 
 import com.google.common.collect.ImmutableList;
 //- import com.mojang.blaze3d.vertex.PoseStack;
+//- import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import de.siphalor.coat.Coat;
+import de.siphalor.coat.cursor.CoatCursorTypes;
 import de.siphalor.coat.handler.ConfigEntryHandler;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.ConfigInput;
@@ -242,6 +244,12 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 			graphics.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
 			//# elif RENDERING == "POSE_STACK"
 			//- fill(graphics, x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
+			//# end
+
+			//# if MC_VERSION_NUMBER >= 12110
+			if (!expanded) {
+				graphics.requestCursor(CoatCursorTypes.helpCursor());
+			}
 			//# end
 		}
 
