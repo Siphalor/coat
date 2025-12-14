@@ -15,7 +15,7 @@ import de.siphalor.coat.util.renderstate.IndividuallyColoredRectangleRenderState
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
+//- import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 //- import net.minecraft.client.renderer.GameRenderer;
 //- import net.minecraft.client.renderer.CoreShaders;
@@ -23,11 +23,13 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
 //- import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+//- import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import org.joml.Matrix3x2f;
 import org.joml.Vector4f;
@@ -81,16 +83,29 @@ public class CoatUtil {
 		if (textWidth <= rect.width()) {
 			graphics.drawString(font, text, rect.left(), rect.top(), color.getArgb());
 		} else {
-			AbstractWidget.renderScrollingString(
-					graphics,
-					font,
-					text,
+			//# if MC_VERSION_NUMBER >= 12111
+			graphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE).acceptScrolling(
+					// This is pretty hacky, but probably the simplest way to keep the method signature relatively stable
+					text.plainCopy().withColor(color.getArgb()),
 					rect.left(),
-					rect.top(),
+					rect.left(),
 					rect.right(),
-					rect.bottom(),
-					color.getArgb()
+					// Scrolling rendering for some reason renders two pixels lower
+					rect.top() - 2,
+					rect.bottom() - 2
 			);
+			//# else
+			//- AbstractWidget.renderScrollingString(
+			//- 		graphics,
+			//- 		font,
+			//- 		text,
+			//- 		rect.left(),
+			//- 		rect.top(),
+			//- 		rect.right(),
+			//- 		rect.bottom(),
+			//- 		color.getArgb()
+			//- );
+			//# end
 		}
 	}
 	//# else
@@ -171,8 +186,10 @@ public class CoatUtil {
 	 */
 	//# if RENDERING == "GUI_GRAPHICS"
 	public static void drawOutline(GuiGraphics graphics, int x1, int y1, int x2, int y2, CoatColor color) {
-		//# if MC_VERSION_NUMBER >= 12110
-		graphics.submitOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
+		//# if MC_VERSION_NUMBER >= 12111
+		graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
+		//# elif MC_VERSION_NUMBER >= 12110
+		//- graphics.submitOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
 		//# else
 		//- graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
 		//# end
@@ -281,7 +298,11 @@ public class CoatUtil {
 	//# if RENDERING == "GUI_GRAPHICS"
 	public static void drawTexture(
 			GuiGraphics graphics,
-			ResourceLocation texture,
+			//# if MC_VERSION_NUMBER >= 12111
+			Identifier texture,
+			//# else
+			//- ResourceLocation texture,
+			//# end
 			int left,
 			int top,
 			int width,
@@ -315,7 +336,11 @@ public class CoatUtil {
 
 	public static void drawTintedTiledTexture(
 			GuiGraphics graphics,
-			ResourceLocation texture,
+			//# if MC_VERSION_NUMBER >= 12111
+			Identifier texture,
+			//# else
+			//- ResourceLocation texture,
+			//# end
 			int left,
 			int top,
 			int right,
@@ -353,7 +378,11 @@ public class CoatUtil {
 
 	public static void drawTiledTexture(
 			GuiGraphics graphics,
-			ResourceLocation texture,
+			//# if MC_VERSION_NUMBER >= 12111
+			Identifier texture,
+			//# else
+			//- ResourceLocation texture,
+			//# end
 			int left,
 			int top,
 			int right,
@@ -416,7 +445,11 @@ public class CoatUtil {
 	//# if MC_VERSION_NUMBER >= 12103
 	public static void drawInsetGradientTexture(
 			GuiGraphics graphics,
-			ResourceLocation texture,
+			//# if MC_VERSION_NUMBER >= 12111
+			Identifier texture,
+			//# else
+			//- ResourceLocation texture,
+			//# end
 			int left,
 			int top,
 			int right,
@@ -437,8 +470,10 @@ public class CoatUtil {
 		ScreenRectangle bottomRight = new ScreenRectangle(right - middleOffset, top + middleOffset, middleOffset, middleOffset);
 
 		//# if MC_VERSION_NUMBER >= 12108
+		AbstractTexture loadedTexture = Minecraft.getInstance().getTextureManager().getTexture(texture);
 		TextureSetup textureSetup = TextureSetup.singleTexture(
-				Minecraft.getInstance().getTextureManager().getTexture(texture).getTextureView()
+				loadedTexture.getTextureView()
+				/*# if MC_VERSION_NUMBER >= 12111 */, loadedTexture.getSampler()/*# end */
 		);
 		submitIndividuallyColoredBlitRectable(
 				graphics, textureSetup, topLeft, textureScale, outerColor, outerColor, innerColor, outerColor

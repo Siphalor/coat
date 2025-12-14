@@ -10,7 +10,8 @@ import de.siphalor.coat.screen.ConfigContentWidget;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+//- import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -37,7 +38,16 @@ public class ConfigCategoryWidget extends DynamicEntryListWidget<ConfigContainer
 	 * @param entries    A collection of entries to directly add to the widget
 	 * @param background An identifier referring to a background texture
 	 */
-	public ConfigCategoryWidget(Minecraft minecraft, Component name, Collection<ConfigContainerEntry> entries, @Nullable ResourceLocation background) {
+	public ConfigCategoryWidget(
+			Minecraft minecraft,
+			Component name,
+			Collection<ConfigContainerEntry> entries,
+			//# if MC_VERSION_NUMBER >= 12111
+			@Nullable Identifier background
+			//# else
+			//- @Nullable ResourceLocation background
+			//# end
+	) {
 		super(minecraft, entries, background);
 		this.name = name;
 		subTrees = new LinkedList<>();

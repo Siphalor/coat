@@ -274,7 +274,7 @@ public class ConfigScreen extends Screen {
 			visualTitle = title.copy().append(" - ").append(contentWidget.getName());
 		}
 
-		resize(minecraft, width, height);
+		resize(/*# if MC_VERSION_NUMBER < 12111 *//*- minecraft, *//*# end */ width, height);
 	}
 
 	public void openTemporary(ConfigTreeEntry temporaryTreeEntry) {
@@ -289,7 +289,11 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void resize(Minecraft minecraft, int windowWidth, int windowHeight) {
+	public void resize(
+			/*# if MC_VERSION_NUMBER < 12111 *//*- Minecraft minecraft, *//*# end */
+			int windowWidth,
+			int windowHeight
+	) {
 		this.width = windowWidth;
 		this.height = windowHeight;
 

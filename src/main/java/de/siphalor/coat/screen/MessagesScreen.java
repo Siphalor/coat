@@ -9,6 +9,7 @@ import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
@@ -90,7 +91,7 @@ public class MessagesScreen extends Screen {
 		//- addWidget(messagesList);
 		//# end
 
-		resize(Minecraft.getInstance(), width, height);
+		resize(/*# if MC_VERSION_NUMBER < 12111 *//*- Minecraft.getInstance(),  *//*# end */width, height);
 	}
 
 	private void abortClicked() {
@@ -105,7 +106,11 @@ public class MessagesScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void resize(Minecraft minecraft, int width, int height) {
+	public void resize(
+			/*# if MC_VERSION_NUMBER < 12111 *//*- Minecraft minecraft, *//*# end */
+			int width,
+			int height
+	) {
 		this.width = width;
 		this.height = height;
 
@@ -136,8 +141,10 @@ public class MessagesScreen extends Screen {
 
 		super.render(graphics, mouseX, mouseY, delta);
 
-		//# if MC_VERSION_NUMBER >= 12110
-		titleLines.render(graphics, MultiLineLabel.Align.LEFT, left, CoatUtil.DOUBLE_MARGIN, 10, true, CoatUtil.TEXT_COLOR.getArgb());
+		//# if MC_VERSION_NUMBER >= 12111
+		titleLines.visitLines(TextAlignment.LEFT, left, CoatUtil.DOUBLE_MARGIN, 10, graphics.textRenderer());
+		//# elif MC_VERSION_NUMBER >= 12110
+		//- titleLines.render(graphics, MultiLineLabel.Align.LEFT, left, CoatUtil.DOUBLE_MARGIN, 10, true, CoatUtil.TEXT_COLOR.getArgb());
 		//# else
 		//- titleLines.renderLeftAligned(graphics, left, CoatUtil.DOUBLE_MARGIN, 10, CoatUtil.TEXT_COLOR.getArgb());
 		//# end

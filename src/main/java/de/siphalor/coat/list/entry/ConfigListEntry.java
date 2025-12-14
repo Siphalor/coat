@@ -16,19 +16,22 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 //- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+//- import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
-	//# if MC_VERSION_NUMBER < 12002
-	//- private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
-	//# elif MC_VERSION_NUMBER < 12100
+	//# if MC_VERSION_NUMBER >= 12111
+	private static final Identifier HANDLE_TEXTURE = Identifier.parse("container/creative_inventory/scroller");
+	//# elif MC_VERSION_NUMBER >= 12100
+	//- private static final ResourceLocation HANDLE_TEXTURE = ResourceLocation.parse("container/creative_inventory/scroller");
+	//# elif MC_VERSION_NUMBER >= 12002
 	//- private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("container/creative_inventory/scroller");
-	//#else
-	private static final ResourceLocation HANDLE_TEXTURE = ResourceLocation.parse("container/creative_inventory/scroller");
+	//# else
+	//- private static final ResourceLocation HANDLE_TEXTURE = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 	//# end
 	//# if MC_VERSION_NUMBER >= 11900
 	private static final Component DELETE_BUTTON_TEXT = Component.literal("x");

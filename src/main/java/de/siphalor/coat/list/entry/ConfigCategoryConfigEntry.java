@@ -16,6 +16,7 @@ import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.Tooltip;
@@ -147,7 +148,12 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 *
 	 * @param width The new width of this entry
 	 */
+	@Deprecated
 	protected void updateExpanded(int width) {
+		//# if MC_VERSION_NUMBER >= 12111
+		MutableComponent description = this.description.copy();
+		description.withColor(CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+		//# end
 		descriptionMultiline = MultiLineLabel.create(Minecraft.getInstance().font, description, width - TEXT_INDENT);
 	}
 
@@ -178,9 +184,13 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		this.leftInputOffset = namePart + CoatUtil.HALF_MARGIN;
 		defaultButton.setWidth(controlsPart - CoatUtil.HALF_MARGIN);
 
-		if (isExpanded()) {
-			updateExpanded(newWidth);
-		}
+		//# if MC_VERSION_NUMBER >= 12111
+		updateExpanded(newWidth);
+		//# else
+		//- if (isExpanded()) {
+		//- 	updateExpanded(newWidth);
+		//- }
+		//# end
 	}
 
 	/**
@@ -270,8 +280,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 				}
 			}
 
-			//# if MC_VERSION_NUMBER >= 12110
-			descriptionMultiline.render(graphics, MultiLineLabel.Align.LEFT, msgX, curY, 9, true, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+			//# if MC_VERSION_NUMBER >= 12111
+			descriptionMultiline.visitLines(TextAlignment.LEFT, msgX, curY, 9, graphics.textRenderer());
+			//# elif MC_VERSION_NUMBER >= 12110
+			//- descriptionMultiline.render(graphics, MultiLineLabel.Align.LEFT, msgX, curY, 9, true, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 			//# else
 			//- descriptionMultiline.renderLeftAlignedNoShadow(graphics, msgX, curY, 9, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 			//# end

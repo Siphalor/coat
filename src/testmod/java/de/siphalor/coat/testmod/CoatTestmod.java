@@ -20,7 +20,8 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 //- import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+//- import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -41,7 +42,13 @@ public class CoatTestmod implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		//# if MC_VERSION_NUMBER >= 12110
-		var category = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "main"));
+		var category = KeyMapping.Category.register(
+				//# if MC_VERSION_NUMBER >= 12111
+				Identifier.fromNamespaceAndPath(MOD_ID, "main")
+				//# else
+				//- ResourceLocation.fromNamespaceAndPath(MOD_ID, "main")
+				//# end
+		);
 		KeyBindingHelper.registerKeyBinding(new ScreenBinding(MOD_ID, 84, category));
 		//# else
 		//- KeyBindingHelper.registerKeyBinding(new ScreenBinding(MOD_ID, 84, MOD_ID));
@@ -112,26 +119,41 @@ public class CoatTestmod implements ClientModInitializer {
 		list1.add(new ConfigListTextEntry(text("You know the rules and so do I")));
 		list1.add(new ConfigListTextEntry(text("A full commitment's what I'm thinking of")));
 
-		ResourceLocation achachaPlanks = createIdentifier("textures/block/acacia_planks.png");
-		widget.addSubTree(new ConfigCategoryWidget(Minecraft.getInstance(), text("Abc Def"), list1, achachaPlanks));
+		widget.addSubTree(new ConfigCategoryWidget(
+				Minecraft.getInstance(),
+				text("Abc Def"),
+				list1,
+				createIdentifier("textures/block/acacia_planks.png")
+		));
 
 
 		LinkedList<ConfigContainerEntry> list2 = new LinkedList<>();
 		list2.add(new ConfigListTextEntry(text("Heyho")));
 
-		ResourceLocation endStone = createIdentifier("textures/block/end_stone.png");
-		widget.addSubTree(new ConfigCategoryWidget(Minecraft.getInstance(), text("This is a kinda long category name"), list2, endStone));
+		widget.addSubTree(new ConfigCategoryWidget(
+				Minecraft.getInstance(),
+				text("This is a kinda long category name"),
+				list2,
+				createIdentifier("textures/block/end_stone.png")
+		));
 
 		ConfigCategoryWidget widget2 = new ConfigCategoryWidget(Minecraft.getInstance(), text("Ho, this is a no go"), Collections.emptyList(), null);
 
 
-		ResourceLocation cobblestone = createIdentifier("textures/block/cobblestone.png");
-		ConfigListWidget<String> listWidget = new ConfigListWidget<>(Minecraft.getInstance(), Arrays.asList(
-				new ConfigListEntry<>(new TextConfigInput("a")),
-				new ConfigListEntry<>(new TextConfigInput("bcdef"))
-		), cobblestone, widget2, text("A list"), new GenericEntryHandler<>(
-				Arrays.asList("Hello", "World"), v -> Collections.emptyList()
-		), () -> new ConfigListEntry<>(new TextConfigInput("")));
+		ConfigListWidget<String> listWidget = new ConfigListWidget<>(
+				Minecraft.getInstance(),
+				Arrays.asList(
+						new ConfigListEntry<>(new TextConfigInput("a")),
+						new ConfigListEntry<>(new TextConfigInput("bcdef"))
+				),
+				createIdentifier("textures/block/cobblestone.png"),
+				widget2,
+				text("A list"),
+				new GenericEntryHandler<>(
+						Arrays.asList("Hello", "World"), v -> Collections.emptyList()
+				),
+				() -> new ConfigListEntry<>(new TextConfigInput(""))
+		);
 
 		widget2.addEntry(new ConfigContainerLinkEntry(listWidget));
 
@@ -140,13 +162,19 @@ public class CoatTestmod implements ClientModInitializer {
 		return screen;
 	}
 
-	private static ResourceLocation createIdentifier(String text) {
-		//# if MC_VERSION_NUMBER < 12100
-		//- return new ResourceLocation(text);
-		//# else
-		return ResourceLocation.parse(text);
-		//# end
+	//# if MC_VERSION_NUMBER >= 12111
+	private static Identifier createIdentifier(String text) {
+		return Identifier.parse(text);
 	}
+	//# else
+	//- private static ResourceLocation createIdentifier(String text) {
+	//- 	//# if MC_VERSION_NUMBER < 12100
+	//- 	return new ResourceLocation(text);
+	//- 	//# else
+	//- 	return ResourceLocation.parse(text);
+	//- 	//# end
+	//- }
+	//# end
 
 	public static class ScreenBinding extends KeyMapping implements PriorityKeyBinding {
 		public ScreenBinding(

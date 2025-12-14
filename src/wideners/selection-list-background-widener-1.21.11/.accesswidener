@@ -1,0 +1,3 @@
+accessWidener	v1	named
+accessible field net/minecraft/client/gui/components/AbstractSelectionList MENU_LIST_BACKGROUND Lnet/minecraft/resources/Identifier;
+accessible field net/minecraft/client/gui/components/AbstractSelectionList INWORLD_MENU_LIST_BACKGROUND Lnet/minecraft/resources/Identifier;

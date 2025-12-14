@@ -1,8 +1,8 @@
 [versions]
-fabric-loader = "0.17.2"
+fabric-loader = "0.18.2"
 jcyo = "0.5.0"
 lombok = "1.18.38"
-loom = "1.11-SNAPSHOT"
+loom = "1.13-SNAPSHOT"
 
 [plugins]
 jcyo = { id = "de.siphalor.jcyo", version.ref = "jcyo" }

@@ -35,7 +35,8 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 //- import net.minecraft.client.renderer.ShaderProgram;
 //- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+//- import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,13 +59,17 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	private static final int TOP_PADDING = 8;
 	private static final int BOTTOM_PADDING = 6;
 	private static final int SCROLLBAR_WIDTH = 6;
-	//# if MC_VERSION_NUMBER >= 12005
-	private static final ResourceLocation SCROLLBAR_BACKGROUND_TEXTURE = AbstractSelectionList.SCROLLER_BACKGROUND_SPRITE;
+	//# if MC_VERSION_NUMBER >= 12111
+	private static final Identifier SCROLLBAR_BACKGROUND_TEXTURE = AbstractSelectionList.SCROLLER_BACKGROUND_SPRITE;
+	//# elif MC_VERSION_NUMBER >= 12005
+	//- private static final ResourceLocation SCROLLBAR_BACKGROUND_TEXTURE = AbstractSelectionList.SCROLLER_BACKGROUND_SPRITE;
 	//# else
 	//- private static final CoatColor SCROLLBAR_BACKGROUND_COLOR = CoatColor.rgb(0x000000);
 	//# end
-	//# if MC_VERSION_NUMBER >= 12004
-	private static final ResourceLocation SCROLLBAR_HANDLE_TEXTURE = AbstractSelectionList.SCROLLER_SPRITE;
+	//# if MC_VERSION_NUMBER >= 12111
+	private static final Identifier SCROLLBAR_HANDLE_TEXTURE = AbstractSelectionList.SCROLLER_SPRITE;
+	//# elif MC_VERSION_NUMBER >= 12004
+	//- private static final ResourceLocation SCROLLBAR_HANDLE_TEXTURE = AbstractSelectionList.SCROLLER_SPRITE;
 	//# else
 	//- private static final CoatColor SCROLLBAR_HANDLE_SHADOW_COLOR = CoatColor.rgb(0x808080);
 	//- private static final CoatColor SCROLLBAR_HANDLE_COLOR = CoatColor.rgb(0xC0C0C0);
@@ -98,9 +103,15 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	@Getter
 	@Setter
-	private ResourceLocation background =
-			//# if MC_VERSION_NUMBER >= 12109
-			ResourceLocation.parse("textures/block/dark_oak_planks.png");
+	//# if MC_VERSION_NUMBER >= 12111
+	private Identifier background =
+	//# else
+	//- private ResourceLocation background =
+	//# end
+			//# if MC_VERSION_NUMBER >= 12111
+			Identifier.parse("textures/block/dark_oak_planks.png");
+			//# elif MC_VERSION_NUMBER >= 12109
+			//- ResourceLocation.parse("textures/block/dark_oak_planks.png");
 			//# elif MC_VERSION_NUMBER >= 12100
 			//- ResourceLocation.parse("textures/block/tuff_bricks.png");
 			//# elif MC_VERSION_NUMBER >= 12000
@@ -143,7 +154,15 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @param entries    A collection of entries to be immediately added to this widget
 	 * @param background An identifier referring to a background texture for this widget
 	 */
-	public DynamicEntryListWidget(Minecraft minecraft, Collection<E> entries, @Nullable ResourceLocation background) {
+	public DynamicEntryListWidget(
+			Minecraft minecraft,
+			Collection<E> entries,
+			//# if MC_VERSION_NUMBER >= 12111
+			@Nullable Identifier background
+			//# else
+			//- @Nullable ResourceLocation background
+			//# end
+	) {
 		this.minecraft = minecraft;
 		top = 20;
 		addEntries(entries);
@@ -469,7 +488,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//# end
 	}
 
-	protected ResourceLocation getListBackground() {
+	//# if MC_VERSION_NUMBER >= 12111
+	protected Identifier getListBackground() {
+	//# else
+	//- protected ResourceLocation getListBackground() {
+	//# end
 		//# if TRANSPARENT_MENUS
 		return this.minecraft.level == null
 				? AbstractSelectionList.MENU_LIST_BACKGROUND

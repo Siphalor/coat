@@ -58,8 +58,10 @@ public class TextButtonWidget extends Button {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# if MC_VERSION_NUMBER >= 12111
+	public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "POSE_STACK" && MC_VERSION_NUMBER >= 11904
 	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "POSE_STACK"
@@ -78,7 +80,7 @@ public class TextButtonWidget extends Button {
 				graphics,
 				font,
 				getMessage(),
-				new ScreenRectangle(x, textY, width, 9),
+				new ScreenRectangle(x, textY, width, 11),
 				color
 		);
 		//# else
@@ -101,10 +103,10 @@ public class TextButtonWidget extends Button {
 				//- fill(graphics, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
 				//# end
 			}
-			//# if MC_VERSION_NUMBER >= 12110
-			if (active) {
-				graphics.requestCursor(actionCursorType);
-			}
+			//# if MC_VERSION_NUMBER == 12110
+			//- if (active) {
+			//- 	graphics.requestCursor(actionCursorType);
+			//- }
 			//# end
 			//# if MC_VERSION_NUMBER < 12108
 			//- if (originalMessage != getMessage()) {
@@ -113,6 +115,20 @@ public class TextButtonWidget extends Button {
 			//# end
 		}
 	}
+
+	//# if MC_VERSION_NUMBER >= 12111
+	@Override
+	protected void handleCursor(GuiGraphics graphics) {
+		if (isHovered && active) {
+			graphics.requestCursor(actionCursorType);
+		}
+	}
+
+	@Override
+	public Component getMessage() {
+		return message;
+	}
+	//# end
 
 	//# if MC_VERSION_NUMBER >= 12108
 	public Component getOriginalMessage() {

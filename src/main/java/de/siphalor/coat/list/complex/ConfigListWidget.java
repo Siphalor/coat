@@ -17,7 +17,8 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 //- import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+//- import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -52,7 +53,19 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 		this.entryFactory = entryFactory;
 	}
 
-	public ConfigListWidget(Minecraft client, Collection<ConfigListEntry<V>> entries, ResourceLocation background, ConfigContentWidget parent, MutableComponent name, ConfigEntryHandler<List<V>> entryHandler, ConfigListEntryFactory<V> entryFactory) {
+	public ConfigListWidget(
+			Minecraft client,
+			Collection<ConfigListEntry<V>> entries,
+			//# if MC_VERSION_NUMBER >= 12111
+			Identifier background,
+			//# else
+			//- ResourceLocation background,
+			//# end
+			ConfigContentWidget parent,
+			MutableComponent name,
+			ConfigEntryHandler<List<V>> entryHandler,
+			ConfigListEntryFactory<V> entryFactory
+	) {
 		super(client, entries, background);
 		this.name = name;
 		this.entryHandler = entryHandler;

@@ -9,7 +9,8 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+//- import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +21,11 @@ public interface ConfigContentWidget
 		/*# if MC_VERSION_NUMBER >= 11903 */Renderable/*# else *//*- Widget *//*# end */
 {
 	Component getName();
-	ResourceLocation getBackground();
+	//# if MC_VERSION_NUMBER >= 12111
+	Identifier getBackground();
+	//# else
+	//- ResourceLocation getBackground();
+	//# end
 	ConfigTreeEntry getTreeEntry();
 	List<ConfigContentWidget> getSubTrees();
 	Collection<Message> getMessages();
