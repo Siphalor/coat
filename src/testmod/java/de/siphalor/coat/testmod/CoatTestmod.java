@@ -1,7 +1,7 @@
 package de.siphalor.coat.testmod;
 
 import com.google.common.collect.ImmutableList;
-import de.siphalor.amecs.api.PriorityKeyBinding;
+import de.siphalor.amecs.priority_key_mappings.api.AmecsPriorityKeyMapping;
 import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.input.CheckBoxConfigInput;
 import de.siphalor.coat.input.CycleButtonConfigInput;
@@ -176,7 +176,7 @@ public class CoatTestmod implements ClientModInitializer {
 	//- }
 	//# end
 
-	public static class ScreenBinding extends KeyMapping implements PriorityKeyBinding {
+	public static class ScreenBinding extends KeyMapping implements AmecsPriorityKeyMapping {
 		public ScreenBinding(
 				String translationKey,
 				int code,

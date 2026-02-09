@@ -63,6 +63,8 @@ loom {
 			source(sourceSets.getByName("testmod"))
 		}
 	}
+
+	createRemapConfigurations(sourceSets.getByName("testmod"))
 }
 
 repositories {
@@ -95,13 +97,10 @@ dependencies {
 	mappings(loom.officialMojangMappings())
 	modImplementation(libs.fabric.loader)
 
-	// testmod dependencies will not be remapped in the testmodImplementation configuration
-	"modImplementation"(mcLibs.amecs.api) {
-		exclude(module = "lazydfu")
-	}
-	"modImplementation"(fabricApi.module("fabric-api-base", mcLibs.versions.fabric.api.get()))
-	"modImplementation"(fabricApi.module("fabric-key-binding-api-v1", mcLibs.versions.fabric.api.get()))
-	"modImplementation"(fabricApi.module("fabric-resource-loader-v0", mcLibs.versions.fabric.api.get()))
+	"modTestmodImplementation"(mcLibs.amecs.priorityKeyMappings)
+	"modTestmodImplementation"(fabricApi.module("fabric-api-base", mcLibs.versions.fabric.api.get()))
+	"modTestmodImplementation"(fabricApi.module("fabric-key-binding-api-v1", mcLibs.versions.fabric.api.get()))
+	"modTestmodImplementation"(fabricApi.module("fabric-resource-loader-v0", mcLibs.versions.fabric.api.get()))
 
 	"testmodImplementation"(sourceSets.main.map { it.output })
 }
