@@ -1,5 +1,3 @@
-import java.util.*
-
 pluginManagement {
 	repositories {
 		mavenLocal()
@@ -22,15 +20,12 @@ pluginManagement {
 	}
 }
 
-val properties = Properties()
-properties.load(file("gradle.properties").inputStream())
+plugins {
+	id("de.siphalor.minecraft-modding-toolkit.settings-plugin") version("0.1.0")
+}
 
-dependencyResolutionManagement {
-	versionCatalogs {
-		create("mcLibs") {
-			from(files("gradle/mc-${properties["minecraft.version.descriptor"]}/mc.versions.toml"))
-		}
-	}
+smcmtk {
+	fabricLoomVersion = "1.15-SNAPSHOT"
 }
 
 rootProject.name = "coat"

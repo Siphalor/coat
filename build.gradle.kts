@@ -1,25 +1,21 @@
 import de.siphalor.jcyo.gradle.JcyoTask
-import java.util.*
 
 plugins {
-	alias(libs.plugins.loom)
 	java
 	`maven-publish`
 	alias(libs.plugins.jcyo)
+	alias(mcLibs.plugins.smcmtk)
+	alias(mcLibs.plugins.fabric.loom)
 }
 
 val minecraftVersionDescriptor = project.properties["minecraft.version.descriptor"] as String
-val mcProps = Properties().apply {
-	val propFile = project.layout.settingsDirectory.file("gradle/mc-${minecraftVersionDescriptor}/gradle.properties")
-	load(propFile.asFile.inputStream())
-}
 
 group = "de.siphalor.${project.name}"
 val archivesBaseName = "${project.name}-mc${minecraftVersionDescriptor}"
 val shortVersion = "${properties["version"]}"
 version = "${shortVersion}+mc${mcLibs.versions.minecraft.get()}"
 
-val extraSources = mcProps["extra_sources"]?.toString()?.split(",")?.map { file("src/${it.trim()}") } ?: listOf()
+val extraSources = smcmtk.mcProps.getting("extra_sources").orNull?.split(",")?.map { file("src/${it.trim()}") } ?: listOf()
 val mergedAccessWidenerDir = project.layout.buildDirectory.dir("merged-accesswidener")
 val mergedAccessWidenerName = "coat.accesswidener"
 val mergedAccessWidenerFile = mergedAccessWidenerDir.map { it.file(mergedAccessWidenerName) }
@@ -53,9 +49,13 @@ wideners.forEach {
 }
 writer.close()
 
-loom {
-	accessWidenerPath.set(mergedAccessWidenerFile)
+smcmtk {
+	useMojangMappings()
+	useAccessWidener(mergedAccessWidenerFile.get())
+	createModConfigurations(listOf(sourceSets.getByName("testmod")))
+}
 
+loom {
 	runs {
 		create("testmodClient") {
 			client()
@@ -63,8 +63,6 @@ loom {
 			source(sourceSets.getByName("testmod"))
 		}
 	}
-
-	createRemapConfigurations(sourceSets.getByName("testmod"))
 }
 
 repositories {
@@ -79,13 +77,14 @@ repositories {
 }
 
 configurations {
+	val mcMajorVersion = smcmtk.mcProps.getting("minecraft.version.major").get()
 	apiElements {
 		outgoing.capability("${project.group}:$archivesBaseName:$shortVersion")
-		outgoing.capability("de.siphalor:coat-${mcProps["minecraft.version.major"]}:${shortVersion}")
+		outgoing.capability("de.siphalor:coat-$mcMajorVersion:$shortVersion")
 	}
 	runtimeElements {
 		outgoing.capability("${project.group}:$archivesBaseName:$shortVersion")
-		outgoing.capability("de.siphalor:coat-${mcProps["minecraft.version.major"]}:${shortVersion}")
+		outgoing.capability("de.siphalor:coat-$mcMajorVersion:$shortVersion")
 	}
 }
 
@@ -127,18 +126,17 @@ java {
 	targetCompatibility = JavaVersion.toVersion(mcLibs.versions.java.get())
 }
 
-val jcyoVars: Map<String, String> = mcProps.stringPropertyNames()
-	.filter { it.startsWith("preprocessor.") }
-	.map { it to mcProps[it] }
-	.associate { (key, value) -> key.substring("preprocessor.".length) to value.toString() }
-
 val jcyo = registerJcyoTask("jcyo", "src/main/java")
 val renderStateHelpersJcyo = registerJcyoTask("renderStateHelpersJcyo", "src/render-state-helpers/java")
 val testmodJcyo = registerJcyoTask("testmodJcyo", "src/testmod/java")
 fun registerJcyoTask(name: String, input: String): TaskProvider<JcyoTask> {
 	return tasks.register<JcyoTask>(name) {
 		inputDirectory = file(input)
-		variables = jcyoVars
+		variables = smcmtk.mcProps.map { props ->
+			props.filter { it.key.startsWith("preprocessor.") }
+				.map { it.key.substring("preprocessor.".length) to it.value}
+				.toMap()
+		}
 	}
 }
 

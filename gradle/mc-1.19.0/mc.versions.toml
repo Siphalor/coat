@@ -1,5 +1,5 @@
 [versions]
-amecs-priorityKeyMappings = "1.0.0"
+amecs-priorityKeyMappings = "1.0.1"
 fabric-api = "0.58.0+1.19"
 java = "17"
 minecraft = "1.19"
