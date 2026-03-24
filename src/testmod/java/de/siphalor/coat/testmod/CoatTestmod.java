@@ -13,7 +13,8 @@ import de.siphalor.coat.list.entry.*;
 import de.siphalor.coat.screen.ConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+//- import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -49,7 +50,11 @@ public class CoatTestmod implements ClientModInitializer {
 				//- ResourceLocation.fromNamespaceAndPath(MOD_ID, "main")
 				//# end
 		);
-		KeyBindingHelper.registerKeyBinding(new ScreenBinding(MOD_ID, 84, category));
+		//# if MC_VERSION_NUMBER >= 260100
+		KeyMappingHelper.registerKeyMapping(new ScreenBinding(MOD_ID, 84, category));
+		//# else
+		//- KeyBindingHelper.registerKeyBinding(new ScreenBinding(MOD_ID, 84, category));
+		//# end
 		//# else
 		//- KeyBindingHelper.registerKeyBinding(new ScreenBinding(MOD_ID, 84, MOD_ID));
 		//# end

@@ -10,7 +10,8 @@ import de.siphalor.coat.list.entry.ConfigListEntry;
 import de.siphalor.coat.screen.ConfigContentWidget;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -194,9 +195,11 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 	}
 
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# else
 	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 		super.renderWidget(graphics, mouseX, mouseY, delta);
@@ -205,7 +208,11 @@ public class ConfigListWidget<V> extends DynamicEntryListWidget<ConfigListEntry<
 				left + (width - appendButton.getWidth()) / 2,
 				super.getEntryAreaTop() + super.getMaxPosition()
 		);
-		appendButton.render(graphics, mouseX, mouseY, delta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		appendButton.extractRenderState(graphics, mouseX, mouseY, delta);
+		//# else
+		//- appendButton.render(graphics, mouseX, mouseY, delta);
+		//# end
 	}
 
 	@Override

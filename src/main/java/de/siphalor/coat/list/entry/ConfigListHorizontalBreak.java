@@ -3,8 +3,9 @@ package de.siphalor.coat.list.entry;
 //- import com.mojang.blaze3d.systems.RenderSystem;
 //- import com.mojang.blaze3d.vertex.PoseStack;
 import de.siphalor.coat.handler.Message;
-import de.siphalor.coat.util.CoatUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+//- import de.siphalor.coat.util.CoatUtil;
+//- import net.minecraft.client.gui.GuiGraphics;
 //- import org.lwjgl.opengl.GL32;
 
 import java.util.Collection;
@@ -20,9 +21,11 @@ public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# else
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		//# if MC_VERSION_NUMBER < 12108
@@ -30,7 +33,7 @@ public class ConfigListHorizontalBreak extends ConfigContainerEntry {
 		//- RenderSystem.depthFunc(GL32.GL_LESS);
 		//# end
 		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.fill(x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
+		//- graphics.fill(x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 		//# elif RENDERING == "POSE_STACK"
 		//- fill(graphics, x, y + PADDING, x + entryWidth, y + PADDING + 1, CoatUtil.SECONDARY_TEXT_COLOR.getArgb());
 		//# end

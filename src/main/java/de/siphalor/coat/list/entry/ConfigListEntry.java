@@ -9,8 +9,9 @@ import de.siphalor.coat.list.complex.ConfigListWidget;
 import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
 //- import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 //- import net.minecraft.client.renderer.RenderType;
@@ -62,9 +63,11 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 	}
 
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# else
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		if (isDragFollow()) {
@@ -72,11 +75,11 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		}
 
 		//# if RENDERING == "GUI_GRAPHICS"
-		//# if MC_VERSION_NUMBER < 12002
+		//- //# if MC_VERSION_NUMBER < 12002
 		//- CoatUtil.drawTexture(graphics, HANDLE_TEXTURE, x, y + 2, 232, 0, 12, 15);
-		//# else
-		CoatUtil.drawTexture(graphics, HANDLE_TEXTURE, x, y + 2, 12, 15);
-		//# end
+		//- //# else
+		//- CoatUtil.drawTexture(graphics, HANDLE_TEXTURE, x, y + 2, 12, 15);
+		//- //# end
 		//# elif RENDERING == "POSE_STACK"
 		//- CoatUtil.setShaderTexture(HANDLE_TEXTURE);
 		//- blit(graphics, x, y + 2, 232, 0, 12, 15);
@@ -88,7 +91,12 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		//- deleteWidget.x = x + entryWidth - 20;
 		//- deleteWidget.y = y;
 		//# end
-		deleteWidget.render(graphics, mouseX, mouseY, tickDelta);
+
+		//# if MC_VERSION_NUMBER >= 260100
+		deleteWidget.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# else
+		//- deleteWidget.render(graphics, mouseX, mouseY, tickDelta);
+		//# end
 	}
 
 	@Override

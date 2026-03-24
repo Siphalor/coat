@@ -11,7 +11,8 @@ import de.siphalor.coat.screen.MessagesScreen;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -110,9 +111,11 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# else
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		Font font = Minecraft.getInstance().font;
@@ -132,7 +135,12 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 
 		int jumpButtonX = x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN;
 		CoatUtil.setButtonPosition(jumpButton, jumpButtonX, y);
-		jumpButton.render(graphics, mouseX, mouseY, tickDelta);
+
+		//# if MC_VERSION_NUMBER >= 260100
+		jumpButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# else
+		//- jumpButton.render(graphics, mouseX, mouseY, tickDelta);
+		//# end
 
 		//# if MC_VERSION_NUMBER >= 12108
 		tooltipHolder.refreshTooltipForNextRenderPass(graphics, mouseX, mouseY, hovered, isFocused(), nameRect);

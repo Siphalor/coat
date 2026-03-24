@@ -3,7 +3,8 @@ package de.siphalor.coat.input;
 //- import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
@@ -75,13 +76,21 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 	}
 
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "POSE_STACK"
 	//- public void render(PoseStack graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		setPosition(x + width - getWidth(), y);
-		render(graphics, mouseX, mouseY, tickDelta);
+
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		extractContents(graphics, mouseX, mouseY, tickDelta);
+		//# else
+		//- render(graphics, mouseX, mouseY, tickDelta);
+		//# end
+
 		//# if MC_VERSION_NUMBER >= 12110
 		if (visible && isHovered) {
 			if (active) {

@@ -8,7 +8,8 @@ import de.siphalor.coat.list.entry.MessageListEntry;
 import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -122,9 +123,11 @@ public class MessagesScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# else
 	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 		int left = width / 2 - 130;
@@ -139,7 +142,11 @@ public class MessagesScreen extends Screen {
 		CoatUtil.setButtonX(abortButton, width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
 		CoatUtil.setButtonX(acceptButton, width / 2 + CoatUtil.MARGIN);
 
-		super.render(graphics, mouseX, mouseY, delta);
+		//# if MC_VERSION_NUMBER >= 260100
+		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		//# else
+		//- super.render(graphics, mouseX, mouseY, delta);
+		//# end
 
 		//# if MC_VERSION_NUMBER >= 12111
 		titleLines.visitLines(TextAlignment.LEFT, left, CoatUtil.DOUBLE_MARGIN, 10, graphics.textRenderer());

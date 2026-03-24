@@ -21,8 +21,9 @@ import lombok.Setter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
 //- import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Renderable;
 //- import net.minecraft.client.gui.components.Widget;
@@ -391,24 +392,28 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	}
 
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-		//# elif RENDERING == "POSE_STACK"
-		//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
-		//# end
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# else
+	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# end
 		renderWidget(graphics, mouseX, mouseY, delta);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# else
 	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 
-		//# if RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 		renderBackground(graphics);
 		renderScrollbar(graphics);
 		//# else
@@ -420,7 +425,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 		// render top shadow
 		//# if RENDERING == "GUI_GRAPHICS"
-		graphics.fillGradient(left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
+		//- graphics.fillGradient(left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
 		//# elif RENDERING == "POSE_STACK"
 		//- fillGradient(graphics, left, top, right, top + TOP_PADDING, 0x77000000, 0x00000000);
 		//# end
@@ -429,8 +434,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * Renders the background of this widget.
 	 */
-	//# if RENDERING == "GUI_GRAPHICS"
-	protected void renderBackground(GuiGraphics graphics) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	protected void renderBackground(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- protected void renderBackground(GuiGraphics graphics) {
 	//# else
 	//- protected void renderBackground() {
 	//# end
@@ -439,7 +446,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//- CoatColor backgroundTint = CoatColor.rgb(colorPart, colorPart, colorPart);
 		//# end
 
-		//# if RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 		//# if MC_VERSION_NUMBER < 12108
 		//- RenderSystem.enableBlend();
 		//# end
@@ -502,8 +509,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//# end
 	}
 
-	//# if RENDERING == "GUI_GRAPHICS"
-	private void renderScrollbar(GuiGraphics graphics) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	private void renderScrollbar(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- private void renderScrollbar(GuiGraphics graphics) {
 	//# else
 	//- private void renderScrollbar() {
 	//# end
@@ -574,11 +583,13 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @param mouseY   The current mouse y position
 	 * @param delta    The tick delta
 	 */
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void renderList(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-		//# elif RENDERING == "POSE_STACK"
-		//- protected void renderList(PoseStack graphics, int mouseX, int mouseY, float delta) {
-		//# end
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void renderList(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void renderList(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# else
+	//- protected void renderList(PoseStack graphics, int mouseX, int mouseY, float delta) {
+	//# end
 		IntListIterator bottomIter = entries.bottoms.iterator();
 		Iterator<E> entryIter = entries.iterator();
 		int relBottom = 0, relTop = 0;
@@ -997,7 +1008,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 */
 	@Environment(EnvType.CLIENT)
 	public abstract static class Entry
-			//# if RENDERING != "GUI_GRAPHICS"
+			//# if RENDERING == "POSE_STACK"
 			//- extends GuiComponent
 			//# end
 			implements GuiEventListener, TickableElement {
@@ -1021,8 +1032,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		 * @param mouseY      the Y coordinate of the mouse
 		 * @param hovered     whether the mouse is hovering over the entry
 		 */
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		public abstract void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 		//# if RENDERING == "GUI_GRAPHICS"
-		public abstract void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+		//- public abstract void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 		//# elif RENDERING == "POSE_STACK"
 		//- public abstract void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 		//# end

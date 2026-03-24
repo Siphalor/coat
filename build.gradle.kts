@@ -20,18 +20,16 @@ val mergedAccessWidenerDir = project.layout.buildDirectory.dir("merged-accesswid
 val mergedAccessWidenerName = "coat.accesswidener"
 val mergedAccessWidenerFile = mergedAccessWidenerDir.map { it.file(mergedAccessWidenerName) }
 
-sourceSets {
-	main {
-		extraSources.forEach {
-			java.srcDir(it.resolve("java"))
-			resources.srcDir(it.resolve("resources"))
-		}
-		resources.srcDir(mergedAccessWidenerDir)
+sourceSets.main {
+	extraSources.forEach {
+		java.srcDir(it.resolve("java"))
+		resources.srcDir(it.resolve("resources"))
 	}
-	create("testmod") {
-		compileClasspath += sourceSets.main.get().compileClasspath
-		runtimeClasspath += sourceSets.main.get().runtimeClasspath
-	}
+	resources.srcDir(mergedAccessWidenerDir)
+}
+val testmodSourceSet = sourceSets.register("testmod") {
+	compileClasspath += sourceSets.main.get().compileClasspath
+	runtimeClasspath += sourceSets.main.get().runtimeClasspath
 }
 
 val wideners = extraSources.flatMap { it.listFiles { _, name -> name.endsWith(".accesswidener") }.orEmpty().toList() }
@@ -52,7 +50,7 @@ writer.close()
 smcmtk {
 	useMojangMappings()
 	useAccessWidener(mergedAccessWidenerFile.get())
-	createModConfigurations(listOf(sourceSets.getByName("testmod")))
+	createModConfigurations(listOf(sourceSets.main.get(), testmodSourceSet.get()))
 }
 
 loom {
@@ -93,12 +91,13 @@ dependencies {
 	compileOnly(libs.lombok)
 
 	minecraft(mcLibs.minecraft)
-	mappings(loom.officialMojangMappings())
-	modImplementation(libs.fabric.loader)
+
+	"modImplementation"(libs.fabric.loader)
 
 	"modTestmodImplementation"(mcLibs.amecs.priorityKeyMappings)
+
 	"modTestmodImplementation"(fabricApi.module("fabric-api-base", mcLibs.versions.fabric.api.get()))
-	"modTestmodImplementation"(fabricApi.module("fabric-key-binding-api-v1", mcLibs.versions.fabric.api.get()))
+	"modTestmodImplementation"(fabricApi.module(smcmtk.mcProps.getting("fabric.api.key_mapping_module").get(), mcLibs.versions.fabric.api.get()))
 	"modTestmodImplementation"(fabricApi.module("fabric-resource-loader-v0", mcLibs.versions.fabric.api.get()))
 
 	"testmodImplementation"(sourceSets.main.map { it.output })

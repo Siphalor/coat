@@ -12,7 +12,8 @@ import de.siphalor.coat.util.TextButtonWidget;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
@@ -97,8 +98,10 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "POSE_STACK"
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
@@ -111,12 +114,20 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 
 		if (!subTrees.isEmpty()) {
 			CoatUtil.setButtonPosition(collapseButton, x, y);
-			collapseButton.render(graphics, mouseX, mouseY, tickDelta);
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			collapseButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+			//# else
+			//- collapseButton.render(graphics, mouseX, mouseY, tickDelta);
+			//# end
 		}
 
 		CoatUtil.setButtonPosition(nameButton, indent, y);
 		nameButton.setWidth(innerWidth);
-		nameButton.render(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		nameButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# else
+		//- nameButton.render(graphics, mouseX, mouseY, tickDelta);
+		//# end
 
 		if (expanded) {
 			int curY = y + getBaseHeight();

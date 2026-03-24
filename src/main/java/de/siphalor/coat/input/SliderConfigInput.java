@@ -2,7 +2,8 @@ package de.siphalor.coat.input;
 
 //- import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Setter;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TextComponent;
@@ -102,15 +103,21 @@ public class SliderConfigInput<N extends Number> extends AbstractSliderButton im
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "POSE_STACK"
 	//- public void render(PoseStack graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		setPosition(x, y);
 		setWidth(width);
 
-		render(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# else
+		//- render(graphics, mouseX, mouseY, tickDelta);
+		//# end
 	}
 
 	//# if MC_VERSION_NUMBER < 11903

@@ -12,7 +12,8 @@ import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -329,15 +330,21 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# else
 	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 
-		//# if RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 		graphics.enableScissor(0, 20, width, height);
-		super.render(graphics, mouseX, mouseY, delta);
+		//# if MC_VERSION_NUMBER >= 260100
+		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		//# else
+		//- super.render(graphics, mouseX, mouseY, delta);
+		//# end
 		graphics.disableScissor();
 
 		//# if TRANSPARENT_MENUS
@@ -355,7 +362,11 @@ public class ConfigScreen extends Screen {
 				0,
 				BACKGROUND_TEXTURE_TINT_COLOR
 		);
-		graphics.drawCenteredString(this.font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
+		//# if MC_VERSION_NUMBER >= 260100
+		graphics.centeredText(this.font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
+		//# else
+		//- graphics.drawCenteredString(this.font, this.visualTitle, this.width / 2, 8, CoatColor.WHITE.getArgb());
+		//# end
 
 		graphics.fillGradient(0, abortButton.getY() - CoatUtil.MARGIN - 8, panelWidth, abortButton.getY() - CoatUtil.MARGIN, CoatColor.TRANSPARENT.getArgb(), CoatColor.BLACK.withAlpha(0x77).getArgb());
 

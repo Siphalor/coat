@@ -14,8 +14,9 @@ import de.siphalor.coat.util.renderstate.IndividuallyColoredBlitRenderState;
 import de.siphalor.coat.util.renderstate.IndividuallyColoredRectangleRenderState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
 //- import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 //- import net.minecraft.client.renderer.GameRenderer;
 //- import net.minecraft.client.renderer.CoreShaders;
@@ -74,26 +75,40 @@ public class CoatUtil {
 	 * Renders a string either scrolling or left-aligned depending on the width.
 	 */
 	public static void drawLeftAlignedText(
-			GuiGraphics graphics, Font font,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor graphics,
+			//# else
+			//- GuiGraphics graphics,
+			//# end
+			Font font,
 			Component text,
 			ScreenRectangle rect,
 			CoatColor color
 	) {
 		int textWidth = font.width(text);
 		if (textWidth <= rect.width()) {
-			graphics.drawString(font, text, rect.left(), rect.top(), color.getArgb());
+			//# if MC_VERSION_NUMBER >= 260100
+			graphics.text(font, text, rect.left(), rect.top(), color.getArgb());
+			//# else
+			//- graphics.drawString(font, text, rect.left(), rect.top(), color.getArgb());
+			//# end
 		} else {
 			//# if MC_VERSION_NUMBER >= 12111
-			graphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE).acceptScrolling(
-					// This is pretty hacky, but probably the simplest way to keep the method signature relatively stable
-					text.plainCopy().withColor(color.getArgb()),
-					rect.left(),
-					rect.left(),
-					rect.right(),
-					// Scrolling rendering for some reason renders two pixels lower
-					rect.top() - 2,
-					rect.bottom() - 2
-			);
+			//# if MC_VERSION_NUMBER >= 260100
+			graphics.textRenderer(GuiGraphicsExtractor.HoveredTextEffects.NONE)
+			//# else
+			//- graphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE)
+			//# end
+					.acceptScrolling(
+							// This is pretty hacky, but probably the simplest way to keep the method signature relatively stable
+									text.plainCopy().withColor(color.getArgb()),
+									rect.left(),
+									rect.left(),
+									rect.right(),
+									// Scrolling rendering for some reason renders two pixels lower
+									rect.top() - 2,
+									rect.bottom() - 2
+							);
 			//# else
 			//- AbstractWidget.renderScrollingString(
 			//- 		graphics,
@@ -184,16 +199,20 @@ public class CoatUtil {
 	 * Draws the outline of a rectangle.
 	 * @param color  The color to draw with
 	 */
-	//# if RENDERING == "GUI_GRAPHICS"
-	public static void drawOutline(GuiGraphics graphics, int x1, int y1, int x2, int y2, CoatColor color) {
-		//# if MC_VERSION_NUMBER >= 12111
-		graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
-		//# elif MC_VERSION_NUMBER >= 12110
-		//- graphics.submitOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
-		//# else
-		//- graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
-		//# end
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public static void drawOutline(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, CoatColor color) {
+		graphics.outline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
 	}
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public static void drawOutline(GuiGraphics graphics, int x1, int y1, int x2, int y2, CoatColor color) {
+	//- 	//# if MC_VERSION_NUMBER >= 12111
+	//- 	graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
+	//- 	//# elif MC_VERSION_NUMBER >= 12110
+	//- 	graphics.submitOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
+	//- 	//# else
+	//- 	graphics.renderOutline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
+	//- 	//# end
+	//- }
 	//# else
 	//- public static void drawOutline(int x1, int y1, int x2, int y2, CoatColor color) {
 	//- 	final int stroke = 1;
@@ -222,7 +241,7 @@ public class CoatUtil {
 	//- }
 	//# end
 
-	//# if RENDERING != "GUI_GRAPHICS"
+	//# if RENDERING == "POSE_STACK"
 	//- /**
 	//-  * Adds a rectangle to the given buffer builder.
 	//-  * @param buffer The builder to append to
@@ -237,8 +256,10 @@ public class CoatUtil {
 	//# end
 
 	public static void drawHorizontalGradient(
-			//# if RENDERING == "GUI_GRAPHICS"
-			GuiGraphics graphics,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor graphics,
+			//# elif RENDERING == "GUI_GRAPHICS"
+			//- GuiGraphics graphics,
 			//# end
 			int left,
 			int top,
@@ -295,9 +316,13 @@ public class CoatUtil {
 		//# end
 	}
 
-	//# if RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 	public static void drawTexture(
-			GuiGraphics graphics,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor graphics,
+			//# else
+			//- GuiGraphics graphics,
+			//# end
 			//# if MC_VERSION_NUMBER >= 12111
 			Identifier texture,
 			//# else
@@ -335,7 +360,11 @@ public class CoatUtil {
 	//# end
 
 	public static void drawTintedTiledTexture(
-			GuiGraphics graphics,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor graphics,
+			//# else
+			//- GuiGraphics graphics,
+			//# end
 			//# if MC_VERSION_NUMBER >= 12111
 			Identifier texture,
 			//# else
@@ -377,7 +406,11 @@ public class CoatUtil {
 	}
 
 	public static void drawTiledTexture(
-			GuiGraphics graphics,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor graphics,
+			//# else
+			//- GuiGraphics graphics,
+			//# end
 			//# if MC_VERSION_NUMBER >= 12111
 			Identifier texture,
 			//# else
@@ -444,7 +477,11 @@ public class CoatUtil {
 
 	//# if MC_VERSION_NUMBER >= 12103
 	public static void drawInsetGradientTexture(
-			GuiGraphics graphics,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor graphics,
+			//# else
+			//- GuiGraphics graphics,
+			//# end
 			//# if MC_VERSION_NUMBER >= 12111
 			Identifier texture,
 			//# else
@@ -571,7 +608,11 @@ public class CoatUtil {
 
 	//# if MC_VERSION_NUMBER >= 12108
 	private static void submitIndividuallyColoredBlitRectable(
-			GuiGraphics graphics,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor graphics,
+			//# else
+			//- GuiGraphics graphics,
+			//# end
 			TextureSetup textureSetup,
 			ScreenRectangle rect,
 			float textureScale,

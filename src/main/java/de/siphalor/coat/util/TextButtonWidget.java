@@ -7,7 +7,8 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
@@ -58,8 +59,10 @@ public class TextButtonWidget extends Button {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if MC_VERSION_NUMBER >= 12111
-	public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	//# if MC_VERSION_NUMBER >= 260100
+	public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# elif MC_VERSION_NUMBER >= 12111
+	//- public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "POSE_STACK" && MC_VERSION_NUMBER >= 11904
@@ -74,7 +77,7 @@ public class TextButtonWidget extends Button {
 		final CoatColor color = CoatUtil.TEXT_COLOR.withAlpha((int) (alpha * 255F));
 		int textY = y + (height - 7) / 2;
 		Font font = Minecraft.getInstance().font;
-		//# if RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 		//# if MC_VERSION_NUMBER >= 12108
 		CoatUtil.drawLeftAlignedText(
 				graphics,
@@ -89,7 +92,7 @@ public class TextButtonWidget extends Button {
 		if (isFocused()) {
 			CoatUtil.drawOutline(graphics, x - 2, y - 2, x + width + 2, y + height + 2, color);
 		}
-		//# elif RENDERING == "POSE_STACK"
+		//# else
 		//- font.draw(graphics, getMessage(), x, textY, color.getArgb());
 		//- if (isFocused()) {
 		//- 	CoatUtil.drawOutline(x - 2, y - 2, x + width + 2, y + height + 2, color);
@@ -97,9 +100,9 @@ public class TextButtonWidget extends Button {
 		//# end
 		if (isHovered) {
 			if (hoverEffect) {
-				//# if RENDERING == "GUI_GRAPHICS"
+				//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 				graphics.fill(x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
-				//# elif RENDERING == "POSE_STACK"
+				//# else
 				//- fill(graphics, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
 				//# end
 			}
@@ -118,7 +121,11 @@ public class TextButtonWidget extends Button {
 
 	//# if MC_VERSION_NUMBER >= 12111
 	@Override
-	protected void handleCursor(GuiGraphics graphics) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	protected void handleCursor(GuiGraphicsExtractor graphics) {
+	//# else
+	//- protected void handleCursor(GuiGraphics graphics) {
+	//# end
 		if (isHovered && active) {
 			graphics.requestCursor(actionCursorType);
 		}

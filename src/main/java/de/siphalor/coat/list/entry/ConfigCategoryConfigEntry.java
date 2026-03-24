@@ -15,7 +15,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -228,9 +229,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# else
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		int inputHeight = input.getHeight();
@@ -242,7 +245,7 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		this.hovered = hovered && mouseY >= y + CoatUtil.MARGIN;
 		if (this.hovered) {
 			//# if RENDERING == "GUI_GRAPHICS"
-			graphics.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
+			//- graphics.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
 			//# elif RENDERING == "POSE_STACK"
 			//- fill(graphics, x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
 			//# end
@@ -261,8 +264,13 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		CoatUtil.setButtonPosition(defaultButton, x + entryWidth - defaultButton.getWidth() + CoatUtil.HALF_MARGIN, top);
 		CoatUtil.setButtonPosition(nameWidget, x, textY - 2);
 
-		defaultButton.render(graphics, mouseX, mouseY, tickDelta);
-		nameWidget.render(graphics, mouseX, mouseY, tickDelta);
+		//# if MC_VERSION_NUMBER >= 260100
+		defaultButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		nameWidget.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# else
+		//- defaultButton.render(graphics, mouseX, mouseY, tickDelta);
+		//- nameWidget.render(graphics, mouseX, mouseY, tickDelta);
+		//# end
 
 		int curY = top + messageHeight + CoatUtil.MARGIN;
 		int msgX = x + TEXT_INDENT;
@@ -291,8 +299,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	}
 
 	private int drawMessageParagraph(
-			//# if RENDERING == "GUI_GRAPHICS"
-			GuiGraphics context,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor context,
+			//# elif RENDERING == "GUI_GRAPHICS"
+			//- GuiGraphics context,
 			//# else
 			//- PoseStack context,
 			//# end
@@ -303,8 +313,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	) {
 		List<FormattedCharSequence> lines = font.split(message.getText(), width);
 		for (FormattedCharSequence line : lines) {
-			//# if RENDERING == "GUI_GRAPHICS"
-			context.drawString(font, line, x, y, 0xffffffff, false);
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			context.text(font, line, x, y, 0xffffffff, false);
+			//# elif RENDERING == "GUI_GRAPHICS"
+			//- context.drawString(font, line, x, y, 0xffffffff, false);
 			//# else
 			//- font.draw(context, line, x, y, 0xffffffff);
 			//# end

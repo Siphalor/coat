@@ -9,8 +9,9 @@ import de.siphalor.coat.screen.ConfigScreen;
 import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
 //- import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetTooltipHolder;
@@ -92,9 +93,11 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# else
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 
@@ -113,7 +116,12 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 		//# end
 
 		CoatUtil.setButtonPosition(button, x + getEntryWidth() - button.getWidth() - CoatUtil.MARGIN, y + CoatUtil.MARGIN);
-		button.render(graphics, mouseX, mouseY, tickDelta);
+
+		//# if MC_VERSION_NUMBER >= 260100
+		button.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# else
+		//- button.render(graphics, mouseX, mouseY, tickDelta);
+		//# end
 
 		int nameX = x + CoatUtil.DOUBLE_MARGIN;
 		int nameY = y + (entryHeight - 7) / 2;

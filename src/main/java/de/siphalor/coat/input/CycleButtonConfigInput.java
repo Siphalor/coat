@@ -6,7 +6,8 @@ import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.EnumeratedMaterial;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -154,8 +155,10 @@ public class CycleButtonConfigInput<T> extends AbstractContainerEventHandler imp
 
 	@Override
 	public void render(
-			//# if RENDERING == "GUI_GRAPHICS"
-			GuiGraphics context,
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor context,
+			//# elif RENDERING == "GUI_GRAPHICS"
+			//- GuiGraphics context,
 			//# else
 			//- PoseStack context,
 			//# end
@@ -170,20 +173,31 @@ public class CycleButtonConfigInput<T> extends AbstractContainerEventHandler imp
 	) {
 		CoatUtil.setButtonPosition(button, x, y);
 		button.setWidth(width);
-		render(context, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		extractRenderState(context, mouseX, mouseY, tickDelta);
+		//# else
+		//- render(context, mouseX, mouseY, tickDelta);
+		//# end
 	}
 
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 	@Override
-	public void render(
-			//# if RENDERING == "GUI_GRAPHICS"
-			GuiGraphics context,
-			//# else
-			//- PoseStack context,
-			//# end
-			int mouseX,
-			int mouseY,
-			float tickDelta
-	) {
-		button.render(context, mouseX, mouseY, tickDelta);
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float tickDelta) {
+		button.extractRenderState(graphics, mouseX, mouseY, tickDelta);
 	}
+	//# else
+	//- @Override
+	//- public void render(
+	//- 		//# if RENDERING == "GUI_GRAPHICS"
+	//- 		GuiGraphics context,
+	//- 		//# else
+	//- 		PoseStack context,
+	//- 		//# end
+	//- 		int mouseX,
+	//- 		int mouseY,
+	//- 		float tickDelta
+	//- ) {
+	//- 	button.render(context, mouseX, mouseY, tickDelta);
+	//- }
+	//# end
 }

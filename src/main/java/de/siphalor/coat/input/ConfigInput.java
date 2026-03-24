@@ -1,7 +1,9 @@
 package de.siphalor.coat.input;
 
 //- import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.GuiGraphics;
+//- import com.mojang.blaze3d.vertex.PoseStack;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 //- import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -93,5 +95,21 @@ public interface ConfigInput<V>
 	 * @param hovered     Whether this input is currently hovered by the mouse
 	 * @param tickDelta   The render tick delta
 	 */
-	void render(/*# if rendering == "GUI_GRAPHICS" */GuiGraphics/*# else *//*- PoseStack *//*# end */ context, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+	void render(
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			GuiGraphicsExtractor context,
+			//# elif RENDERING == "GUI_GRAPHICS"
+			//- GuiGraphics context,
+			//# else
+			//- PoseStack context,
+			//# end
+			int x,
+			int y,
+			int width,
+			int entryHeight,
+			int mouseX,
+			int mouseY,
+			boolean hovered,
+			float tickDelta
+	);
 }

@@ -5,7 +5,8 @@ import de.siphalor.coat.handler.Message;
 import de.siphalor.coat.util.CoatUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+//- import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -51,15 +52,19 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS"
-	public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# elif RENDERING == "POSE_STACK"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# elif RENDERING == "GUI_GRAPHICS"
+	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# else
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		for (int i = 0; i < multilineText.size(); i++) {
-			//# if RENDERING == "GUI_GRAPHICS"
-			graphics.drawString(font, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
-			//# elif RENDERING == "POSE_STACK"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			graphics.text(font, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
+			//# elif RENDERING == "GUI_GRAPHICS"
+			//- graphics.drawString(font, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
+			//# else
 			//- font.draw(graphics, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb());
 			//# end
 		}
