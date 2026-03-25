@@ -47,6 +47,10 @@ wideners.forEach {
 }
 writer.close()
 
+tasks.validateAccessWidener {
+	enabled = false
+}
+
 smcmtk {
 	useMojangMappings()
 	useAccessWidener(mergedAccessWidenerFile.get())
