@@ -1034,7 +1034,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		 */
 		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 		public abstract void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
-		//# if RENDERING == "GUI_GRAPHICS"
+		//# elif RENDERING == "GUI_GRAPHICS"
 		//- public abstract void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 		//# elif RENDERING == "POSE_STACK"
 		//- public abstract void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);

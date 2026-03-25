@@ -100,7 +100,7 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	@Override
 	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-	//# if RENDERING == "GUI_GRAPHICS"
+	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "POSE_STACK"
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
