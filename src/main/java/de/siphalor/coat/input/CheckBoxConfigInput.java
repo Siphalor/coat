@@ -92,11 +92,14 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 		//# end
 
 		//# if MC_VERSION_NUMBER >= 12110
-		if (visible && isHovered) {
-			if (active) {
-				graphics.requestCursor(CursorTypes.POINTING_HAND);
-			} else {
-				graphics.requestCursor(CursorTypes.NOT_ALLOWED);
+		if (visible) {
+			isHovered = graphics.containsPointInScissor(mouseX, mouseY) && getRectangle().containsPoint(mouseX, mouseY);
+			if (isHovered) {
+				if (active) {
+					graphics.requestCursor(CursorTypes.POINTING_HAND);
+				} else {
+					graphics.requestCursor(CursorTypes.NOT_ALLOWED);
+				}
 			}
 		}
 		//# end
