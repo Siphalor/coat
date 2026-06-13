@@ -22,6 +22,7 @@ import net.minecraft.client.gui.components.Button;
 //- import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 //- import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -69,6 +70,22 @@ public class CoatUtil {
 	 * Half the {@link CoatUtil#MARGIN}.
 	 */
 	public static final int HALF_MARGIN = MARGIN / 2;
+
+	public static <T extends Screen> T getOpenScreen() {
+		//# if MC_VERSION_NUMBER >= 260200
+		return (T) Minecraft.getInstance().gui.screen();
+		//# else
+		//- return (T) Minecraft.getInstance().screen;
+		//# end
+	}
+
+	public static void openScreen(Screen screen) {
+		//# if MC_VERSION_NUMBER >= 260200
+		Minecraft.getInstance().gui.setScreen(screen);
+		//# else
+		//- Minecraft.getInstance().setScreen(screen);
+		//# end
+	}
 
 	//# if MC_VERSION_NUMBER >= 12108
 	/**

@@ -96,7 +96,7 @@ public class MessagesScreen extends Screen {
 	}
 
 	private void abortClicked() {
-		Minecraft.getInstance().setScreen(parent);
+		CoatUtil.openScreen(parent);
 	}
 
 	private void acceptClicked() {

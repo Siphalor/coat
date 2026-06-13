@@ -11,6 +11,7 @@ import de.siphalor.coat.list.complex.ConfigCategoryWidget;
 import de.siphalor.coat.list.complex.ConfigListWidget;
 import de.siphalor.coat.list.entry.*;
 import de.siphalor.coat.screen.ConfigScreen;
+import de.siphalor.coat.util.CoatUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 //- import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -162,9 +163,7 @@ public class CoatTestmod implements ClientModInitializer {
 
 		widget2.addEntry(new ConfigContainerLinkEntry(listWidget));
 
-		ConfigScreen screen = new ConfigScreen(Minecraft.getInstance().screen, text("Coat Test Mod"), ImmutableList.of(widget, widget2));
-
-		return screen;
+		return new ConfigScreen(CoatUtil.getOpenScreen(), text("Coat Test Mod"), ImmutableList.of(widget, widget2));
 	}
 
 	//# if MC_VERSION_NUMBER >= 12111
@@ -196,9 +195,8 @@ public class CoatTestmod implements ClientModInitializer {
 
 		@Override
 		public boolean onPressedPriority() {
-			Minecraft client = Minecraft.getInstance();
-			if (client.screen instanceof TitleScreen || client.level != null) {
-				client.setScreen(createScreen());
+			if (CoatUtil.getOpenScreen() instanceof TitleScreen) {
+				CoatUtil.openScreen(createScreen());
 			}
 			return false;
 		}

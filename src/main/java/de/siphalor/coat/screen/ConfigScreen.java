@@ -11,9 +11,9 @@ import de.siphalor.coat.util.CoatColor;
 import de.siphalor.coat.util.CoatUtil;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.Minecraft;
 //- import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//- import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -135,12 +135,12 @@ public class ConfigScreen extends Screen {
 	 */
 	@Override
 	public void onClose() {
-		Minecraft.getInstance().setScreen(
+		CoatUtil.openScreen(
 				new ConfirmScreen(action -> {
 					if (action) {
-						Minecraft.getInstance().setScreen(parent);
+						CoatUtil.openScreen(parent);
 					} else {
-						Minecraft.getInstance().setScreen(this);
+						CoatUtil.openScreen(this);
 					}
 				},
 				ABORT_SCREEN_TITLE_TEXT,
@@ -180,20 +180,18 @@ public class ConfigScreen extends Screen {
 
 		Runnable saveRunnable = () -> {
 			onSave();
-			Minecraft.getInstance().setScreen(parent);
+			CoatUtil.openScreen(parent);
 		};
 
-		Runnable warningOpener = () -> {
-			Minecraft.getInstance().setScreen(new MessagesScreen(
-					SAVE_WARNINGS_TEXT,
-					this,
-					saveRunnable,
-					warnings
-			));
-		};
+		Runnable warningOpener = () -> CoatUtil.openScreen(new MessagesScreen(
+				SAVE_WARNINGS_TEXT,
+				this,
+				saveRunnable,
+				warnings
+		));
 
 		if (!errors.isEmpty()) {
-			Minecraft.getInstance().setScreen(new MessagesScreen(
+			CoatUtil.openScreen(new MessagesScreen(
 					SAVE_ERRORS_TEXT,
 					this,
 					warnings.isEmpty() ? saveRunnable : warningOpener,
@@ -293,7 +291,7 @@ public class ConfigScreen extends Screen {
 	public void resize(
 			/*# if MC_VERSION_NUMBER < 12111 *//*- Minecraft minecraft, *//*# end */
 			int windowWidth,
-			int windowHeight
+			                                   int windowHeight
 	) {
 		this.width = windowWidth;
 		this.height = windowHeight;

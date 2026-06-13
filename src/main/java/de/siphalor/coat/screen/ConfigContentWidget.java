@@ -40,6 +40,7 @@ public interface ConfigContentWidget
 	 * @deprecated Override and use {@link #renderWidget} instead.
 	 */
 	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	@Deprecated
 	default void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		renderWidget(graphics, mouseX, mouseY, delta);
 	}

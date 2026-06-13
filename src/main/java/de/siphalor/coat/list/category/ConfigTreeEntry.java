@@ -11,7 +11,6 @@ import de.siphalor.coat.util.CoatUtil;
 import de.siphalor.coat.util.TextButtonWidget;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.Minecraft;
 //- import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -83,7 +82,7 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		this.contentWidget = contentWidget;
 		this.temporary = temporary;
 		collapseButton = new TextButtonWidget(x, y, 7, 9, EXPAND_TEXT, button -> setExpanded(!isExpanded()));
-		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> ((ConfigScreen) Minecraft.getInstance().screen).openCategory(this));
+		nameButton = new TextButtonWidget(x, y, 100, 9, name, button -> (CoatUtil.<ConfigScreen>getOpenScreen()).openCategory(this));
 
 		List<ConfigTreeEntry> list = new ArrayList<>();
 		for (ConfigContentWidget subWidget : contentWidget.getSubTrees()) {

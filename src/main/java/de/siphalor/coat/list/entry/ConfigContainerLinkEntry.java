@@ -64,7 +64,7 @@ public class ConfigContainerLinkEntry extends ConfigContainerCompoundEntry {
 	}
 
 	private void clicked() {
-		ConfigScreen screen = ((ConfigScreen) Minecraft.getInstance().screen);
+		ConfigScreen screen = CoatUtil.getOpenScreen();
 		ConfigTreeEntry treeEntry = configWidget.getTreeEntry();
 		if (treeEntry.getParent() != null) {
 			screen.openCategory(treeEntry);

@@ -72,13 +72,13 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 				category.setFocused(last);
 			}
 
-			Screen currentScreen = Minecraft.getInstance().screen;
+			Screen currentScreen = CoatUtil.getOpenScreen();
 			ConfigScreen configScreen = null;
 			if (currentScreen instanceof MessagesScreen) {
 				configScreen = ((MessagesScreen) currentScreen).getParent();
-				Minecraft.getInstance().setScreen(configScreen);
+				CoatUtil.openScreen(configScreen);
 			} else if (currentScreen instanceof ConfigScreen) {
-				configScreen = (ConfigScreen) currentScreen;
+					configScreen = (ConfigScreen) currentScreen;
 			}
 
 			if (configScreen != null) {
