@@ -687,11 +687,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	}
 
 	protected void updateScrollingState(double mouseX, double mouseY, int button) {
-		//# if MC_VERSION_NUMBER >= 260300
 		int scrollbarX = this.getScrollbarPositionX();
+		//# if MC_VERSION_NUMBER >= 260300
 		this.scrolling = (button == InputConstants.MOUSE_BUTTON_LEFT || button == 0) && mouseX >= (double) (scrollbarX - 2) && mouseX < (double) (scrollbarX + 8);
 		//# else
-		//- this.scrolling = button == 0 && mouseX >= (double) this.getScrollbarPositionX() && mouseX < (double) (this.getScrollbarPositionX() + 6);
+		//- this.scrolling = button == 0 && mouseX >= (double) scrollbarX && mouseX < (double) (scrollbarX + 6);
 		//# end
 	}
 
