@@ -8,11 +8,11 @@ plugins {
 	alias(mcLibs.plugins.fabric.loom)
 }
 
-val minecraftVersionDescriptor = project.properties["minecraft.version.descriptor"] as String
+val minecraftVersionDescriptor = property("minecraft.version.descriptor")
 
 group = "de.siphalor.${project.name}"
 val archivesBaseName = "${project.name}-mc${minecraftVersionDescriptor}"
-val shortVersion = "${properties["version"]}"
+val shortVersion = "${property("version")}"
 version = "${shortVersion}+mc${mcLibs.versions.minecraft.get()}"
 
 val extraSources = smcmtk.mcProps.getting("extra_sources").orNull?.split(",")?.map { file("src/${it.trim()}") } ?: listOf()
