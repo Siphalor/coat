@@ -123,8 +123,10 @@ public class MessagesScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void extractRenderState(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# else
@@ -142,8 +144,10 @@ public class MessagesScreen extends Screen {
 		CoatUtil.setButtonX(abortButton, width / 2 - CoatUtil.MARGIN - abortButton.getWidth());
 		CoatUtil.setButtonX(acceptButton, width / 2 + CoatUtil.MARGIN);
 
-		//# if MC_VERSION_NUMBER >= 260100
-		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		super.extractRenderState(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- super.extractRenderState(graphics, mouseX, mouseY, delta);
 		//# else
 		//- super.render(graphics, mouseX, mouseY, delta);
 		//# end

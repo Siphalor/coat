@@ -96,20 +96,24 @@ public interface ConfigInput<V>
 	 * @param tickDelta   The render tick delta
 	 */
 	void render(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-			GuiGraphicsExtractor context,
-			//# elif RENDERING == "GUI_GRAPHICS"
-			//- GuiGraphics context,
-			//# else
-			//- PoseStack context,
-			//# end
-			int x,
-			int y,
-			int width,
-			int entryHeight,
-			int mouseX,
-			int mouseY,
-			boolean hovered,
-			float tickDelta
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		GuiGraphicsExtractor context,
+		//# elif RENDERING == "GUI_GRAPHICS"
+		//- GuiGraphics context,
+		//# else
+		//- PoseStack context,
+		//# end
+		int x,
+		int y,
+		int width,
+		int entryHeight,
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		boolean hovered
+		//# else
+		//- int mouseX,
+		//- int mouseY,
+		//- boolean hovered,
+		//- float tickDelta
+		//# end
 	);
 }

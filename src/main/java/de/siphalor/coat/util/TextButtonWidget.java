@@ -59,8 +59,10 @@ public class TextButtonWidget extends Button {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if MC_VERSION_NUMBER >= 260100
-	public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void extractContents(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 	//# elif MC_VERSION_NUMBER >= 12111
 	//- public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
@@ -77,7 +79,7 @@ public class TextButtonWidget extends Button {
 		final CoatColor color = CoatUtil.TEXT_COLOR.withAlpha((int) (alpha * 255F));
 		int textY = y + (height - 7) / 2;
 		Font font = Minecraft.getInstance().font;
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 		//# if MC_VERSION_NUMBER >= 12108
 		CoatUtil.drawLeftAlignedText(
 				graphics,
@@ -100,7 +102,7 @@ public class TextButtonWidget extends Button {
 		//# end
 		if (isHovered) {
 			if (hoverEffect) {
-				//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
+				//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 				graphics.fill(x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
 				//# else
 				//- fill(graphics, x - 1, y - 1, x + width + 1, y + height + 1, CoatUtil.HOVER_BG_COLOR.getArgb());
@@ -121,7 +123,7 @@ public class TextButtonWidget extends Button {
 
 	//# if MC_VERSION_NUMBER >= 12111
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 	protected void handleCursor(GuiGraphicsExtractor graphics) {
 	//# else
 	//- protected void handleCursor(GuiGraphics graphics) {

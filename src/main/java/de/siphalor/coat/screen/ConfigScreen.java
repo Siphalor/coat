@@ -328,18 +328,22 @@ public class ConfigScreen extends Screen {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void extractRenderState(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# else
 	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 		graphics.enableScissor(0, 20, width, height);
-		//# if MC_VERSION_NUMBER >= 260100
-		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		super.extractRenderState(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- super.extractRenderState(graphics, mouseX, mouseY, delta);
 		//# else
 		//- super.render(graphics, mouseX, mouseY, delta);
 		//# end

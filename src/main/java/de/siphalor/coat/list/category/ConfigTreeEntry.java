@@ -97,8 +97,10 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, boolean hovered) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "POSE_STACK"
@@ -113,8 +115,10 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 
 		if (!subTrees.isEmpty()) {
 			CoatUtil.setButtonPosition(collapseButton, x, y);
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-			collapseButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+			collapseButton.extractRenderState(graphics);
+			//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//- collapseButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
 			//# else
 			//- collapseButton.render(graphics, mouseX, mouseY, tickDelta);
 			//# end
@@ -122,8 +126,10 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 
 		CoatUtil.setButtonPosition(nameButton, indent, y);
 		nameButton.setWidth(innerWidth);
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-		nameButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		nameButton.extractRenderState(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- nameButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
 		//# else
 		//- nameButton.render(graphics, mouseX, mouseY, tickDelta);
 		//# end
@@ -131,12 +137,21 @@ public class ConfigTreeEntry extends ConfigContainerCompoundEntry {
 		if (expanded) {
 			int curY = y + getBaseHeight();
 			for (ConfigTreeEntry entry : subTrees) {
-				if (!hoverFound && mouseY > curY) {
+				//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+				if (!hoverFound && graphics.mouseY() > curY) {
 					hoverFound = true;
-					entry.render(graphics, indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
+					entry.render(graphics, indent, curY, innerWidth, entryHeight, true);
 				} else {
-					entry.render(graphics, indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
+					entry.render(graphics, indent, curY, innerWidth, entryHeight, false);
 				}
+				//# else
+				//- if (!hoverFound && mouseY > curY) {
+				//- 	hoverFound = true;
+				//- 	entry.render(graphics, indent, curY, innerWidth, entryHeight, mouseX, mouseY, true, tickDelta);
+				//- } else {
+				//- 	entry.render(graphics, indent, curY, innerWidth, entryHeight, mouseX, mouseY, false, tickDelta);
+				//- }
+				//# end
 				curY += entry.getHeight();
 			}
 		}

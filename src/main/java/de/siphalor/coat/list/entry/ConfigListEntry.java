@@ -63,16 +63,32 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 	}
 
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, boolean hovered) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# else
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
 		if (isDragFollow()) {
-			y = mouseY - entryHeight / 2;
+			y = graphics.mouseY() - entryHeight / 2;
 		}
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- if (isDragFollow()) {
+		//- 	y = mouseY - entryHeight / 2;
+		//- }
+		//# elif RENDERING == "GUI_GRAPHICS"
+		//- if (isDragFollow()) {
+		//- 	y = mouseY - entryHeight / 2;
+		//- }
+		//# else
+		//- if (isDragFollow()) {
+		//- 	y = mouseY - entryHeight / 2;
+		//- }
+		//# end
 
 		//# if RENDERING == "GUI_GRAPHICS"
 		//- //# if MC_VERSION_NUMBER < 12002
@@ -84,7 +100,11 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		//- CoatUtil.setShaderTexture(HANDLE_TEXTURE);
 		//- blit(graphics, x, y + 2, 232, 0, 12, 15);
 		//# end
-		input.render(graphics, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		input.render(graphics, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, hovered);
+		//# else
+		//- input.render(graphics, x + 12 + CoatUtil.MARGIN, y, entryWidth - 32 - CoatUtil.DOUBLE_MARGIN, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		//# end
 		//# if MC_VERSION_NUMBER >= 11903
 		deleteWidget.setPosition(x + entryWidth - 20, y);
 		//# else
@@ -92,8 +112,10 @@ public class ConfigListEntry<V> extends ConfigContainerCompoundEntry {
 		//- deleteWidget.y = y;
 		//# end
 
-		//# if MC_VERSION_NUMBER >= 260100
-		deleteWidget.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		deleteWidget.extractRenderState(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- deleteWidget.extractRenderState(graphics, mouseX, mouseY, tickDelta);
 		//# else
 		//- deleteWidget.render(graphics, mouseX, mouseY, tickDelta);
 		//# end

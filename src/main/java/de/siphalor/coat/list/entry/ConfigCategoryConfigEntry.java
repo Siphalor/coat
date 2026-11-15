@@ -229,8 +229,10 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, boolean hovered) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# else
@@ -242,7 +244,11 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 		int right = x + entryWidth;
 		int bottom = y + entryHeight;
 
-		this.hovered = hovered && mouseY >= y + CoatUtil.MARGIN;
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		this.hovered = hovered && graphics.mouseY() >= y + CoatUtil.MARGIN;
+		//# else
+		//- this.hovered = hovered && mouseY >= y + CoatUtil.MARGIN;
+		//# end
 		if (this.hovered) {
 			//# if RENDERING == "GUI_GRAPHICS"
 			//- graphics.fill(x, top, right, bottom, CoatUtil.HOVER_BG_COLOR.getArgb());
@@ -259,14 +265,21 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 
 		int textY = top + (int) ((messageHeight - 8) / 2F);
 
-		input.render(graphics, x + leftInputOffset, top + (messageHeight - inputHeight) / 2, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		input.render(graphics, x + leftInputOffset, top + (messageHeight - inputHeight) / 2, inputWidth, entryHeight, hovered);
+		//# else
+		//- input.render(graphics, x + leftInputOffset, top + (messageHeight - inputHeight) / 2, inputWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+		//# end
 
 		CoatUtil.setButtonPosition(defaultButton, x + entryWidth - defaultButton.getWidth() + CoatUtil.HALF_MARGIN, top);
 		CoatUtil.setButtonPosition(nameWidget, x, textY - 2);
 
-		//# if MC_VERSION_NUMBER >= 260100
-		defaultButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
-		nameWidget.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		defaultButton.extractRenderState(graphics);
+		nameWidget.extractRenderState(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- defaultButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//- nameWidget.extractRenderState(graphics, mouseX, mouseY, tickDelta);
 		//# else
 		//- defaultButton.render(graphics, mouseX, mouseY, tickDelta);
 		//- nameWidget.render(graphics, mouseX, mouseY, tickDelta);
@@ -299,21 +312,21 @@ public class ConfigCategoryConfigEntry<V> extends ConfigContainerCompoundEntry i
 	}
 
 	private int drawMessageParagraph(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-			GuiGraphicsExtractor context,
-			//# elif RENDERING == "GUI_GRAPHICS"
-			//- GuiGraphics context,
-			//# else
-			//- PoseStack context,
-			//# end
-			int x,
-			int y,
-			int width,
-			Message message
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		GuiGraphicsExtractor context,
+		//# elif RENDERING == "GUI_GRAPHICS"
+		//- GuiGraphics context,
+		//# else
+		//- PoseStack context,
+		//# end
+		int x,
+		int y,
+		int width,
+		Message message
 	) {
 		List<FormattedCharSequence> lines = font.split(message.getText(), width);
 		for (FormattedCharSequence line : lines) {
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 			context.text(font, line, x, y, 0xffffffff, false);
 			//# elif RENDERING == "GUI_GRAPHICS"
 			//- context.drawString(font, line, x, y, 0xffffffff, false);

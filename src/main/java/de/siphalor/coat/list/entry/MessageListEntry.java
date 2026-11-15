@@ -111,8 +111,10 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, boolean hovered) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# else
@@ -136,14 +138,18 @@ public class MessageListEntry extends ConfigContainerCompoundEntry {
 		int jumpButtonX = x + entryWidth - jumpButton.getWidth() - CoatUtil.DOUBLE_MARGIN;
 		CoatUtil.setButtonPosition(jumpButton, jumpButtonX, y);
 
-		//# if MC_VERSION_NUMBER >= 260100
-		jumpButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		jumpButton.extractRenderState(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- jumpButton.extractRenderState(graphics, mouseX, mouseY, tickDelta);
 		//# else
 		//- jumpButton.render(graphics, mouseX, mouseY, tickDelta);
 		//# end
 
-		//# if MC_VERSION_NUMBER >= 12108
-		tooltipHolder.refreshTooltipForNextRenderPass(graphics, mouseX, mouseY, hovered, isFocused(), nameRect);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		tooltipHolder.refreshTooltipForNextRenderPass(graphics, graphics.mouseX(), graphics.mouseY(), hovered, isFocused(), nameRect);
+		//# elif MC_VERSION_NUMBER >= 12108
+		//- tooltipHolder.refreshTooltipForNextRenderPass(graphics, mouseX, mouseY, hovered, isFocused(), nameRect);
 		//# else
 		//- if (hovered && mouseX < jumpButtonX) {
 		//- 	//# if RENDERING == "GUI_GRAPHICS"

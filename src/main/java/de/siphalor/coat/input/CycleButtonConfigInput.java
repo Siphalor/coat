@@ -155,36 +155,47 @@ public class CycleButtonConfigInput<T> extends AbstractContainerEventHandler imp
 
 	@Override
 	public void render(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-			GuiGraphicsExtractor context,
-			//# elif RENDERING == "GUI_GRAPHICS"
-			//- GuiGraphics context,
-			//# else
-			//- PoseStack context,
-			//# end
-			int x,
-			int y,
-			int width,
-			int entryHeight,
-			int mouseX,
-			int mouseY,
-			boolean hovered,
-			float tickDelta
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		GuiGraphicsExtractor context,
+		//# elif RENDERING == "GUI_GRAPHICS"
+		//- GuiGraphics context,
+		//# else
+		//- PoseStack context,
+		//# end
+		int x,
+		int y,
+		int width,
+		int entryHeight,
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		boolean hovered
+		//# else
+		//- int mouseX,
+		//- int mouseY,
+		//- boolean hovered,
+		//- float tickDelta
+		//# end
 	) {
 		CoatUtil.setButtonPosition(button, x, y);
 		button.setWidth(width);
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-		extractRenderState(context, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		extractRenderState(context);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- extractRenderState(context, mouseX, mouseY, tickDelta);
 		//# else
 		//- render(context, mouseX, mouseY, tickDelta);
 		//# end
 	}
 
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float tickDelta) {
-		button.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+	public void extractRenderState(GuiGraphicsExtractor graphics) {
+		button.extractRenderState(graphics);
 	}
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- @Override
+	//- public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float tickDelta) {
+	//- 	button.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+	//- }
 	//# else
 	//- @Override
 	//- public void render(

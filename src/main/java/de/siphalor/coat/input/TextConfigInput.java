@@ -73,8 +73,10 @@ public class TextConfigInput extends EditBox implements ConfigInput<String> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, boolean hovered) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "POSE_STACK"
@@ -82,8 +84,10 @@ public class TextConfigInput extends EditBox implements ConfigInput<String> {
 	//# end
 		setPosition(x + AUTO_PADDING, y);
 		this.width = width - AUTO_PADDING * 2;
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-		extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		extractRenderState(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- extractRenderState(graphics, mouseX, mouseY, tickDelta);
 		//# else
 		//- render(graphics, mouseX, mouseY, tickDelta);
 		//# end

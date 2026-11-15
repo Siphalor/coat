@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
 //- import net.minecraft.network.chat.TextComponent;
-import net.minecraft.util.Mth;
+//- import net.minecraft.util.Mth;
 
 import java.text.NumberFormat;
 
@@ -59,7 +59,11 @@ public class SliderConfigInput<N extends Number> extends AbstractSliderButton im
 	}
 
 	protected static double toInternalValue(Number value, Number min, Number max) {
-		return Mth.clamp(
+		//# if MC_VERSION_NUMBER >= 260400
+		return Math.clamp(
+		//# else
+		//- return Mth.clamp(
+		//# end
 				(value.doubleValue() - min.doubleValue()) / (max.doubleValue() - min.doubleValue()),
 				0D, 1D
 		);
@@ -103,8 +107,10 @@ public class SliderConfigInput<N extends Number> extends AbstractSliderButton im
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, boolean hovered) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "POSE_STACK"
@@ -113,8 +119,10 @@ public class SliderConfigInput<N extends Number> extends AbstractSliderButton im
 		setPosition(x, y);
 		setWidth(width);
 
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-		extractRenderState(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		extractRenderState(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- extractRenderState(graphics, mouseX, mouseY, tickDelta);
 		//# else
 		//- render(graphics, mouseX, mouseY, tickDelta);
 		//# end

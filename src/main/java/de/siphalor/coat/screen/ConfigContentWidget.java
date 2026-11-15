@@ -39,12 +39,18 @@ public interface ConfigContentWidget
 	/**
 	 * @deprecated Override and use {@link #renderWidget} instead.
 	 */
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
 	@Deprecated
-	default void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-		renderWidget(graphics, mouseX, mouseY, delta);
+	default void render(GuiGraphicsExtractor graphics) {
+		renderWidget(graphics);
 	}
-	default void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {}
+	default void renderWidget(GuiGraphicsExtractor graphics) {}
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- @Deprecated
+	//- default void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//- 	renderWidget(graphics, mouseX, mouseY, delta);
+	//- }
+	//- default void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {}
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- @Deprecated
 	//- default void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {

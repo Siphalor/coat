@@ -76,8 +76,10 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 	}
 
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, boolean hovered) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int width, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "POSE_STACK"
@@ -85,15 +87,21 @@ public class CheckBoxConfigInput extends Checkbox implements ConfigInput<Boolean
 	//# end
 		setPosition(x + width - getWidth(), y);
 
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-		extractContents(graphics, mouseX, mouseY, tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		extractContents(graphics);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- extractContents(graphics, mouseX, mouseY, tickDelta);
 		//# else
 		//- render(graphics, mouseX, mouseY, tickDelta);
 		//# end
 
 		//# if MC_VERSION_NUMBER >= 12110
 		if (visible) {
-			isHovered = graphics.containsPointInScissor(mouseX, mouseY) && getRectangle().containsPoint(mouseX, mouseY);
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+			isHovered = graphics.containsPointInScissor(graphics.mouseX(), graphics.mouseY()) && getRectangle().containsPoint(graphics.mouseX(), graphics.mouseY());
+			//# else
+			//- isHovered = graphics.containsPointInScissor(mouseX, mouseY) && getRectangle().containsPoint(mouseX, mouseY);
+			//# end
 			if (isHovered) {
 				if (active) {
 					graphics.requestCursor(CursorTypes.POINTING_HAND);

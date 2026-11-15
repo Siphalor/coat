@@ -36,10 +36,11 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 //- import net.minecraft.client.renderer.ShaderProgram;
 //- import net.minecraft.client.renderer.RenderType;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.Identifier;
 //- import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+//- import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 //- import org.lwjgl.opengl.GL11;
@@ -393,28 +394,36 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	}
 
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void extractRenderState(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# else
 	//- public void render(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
-		renderWidget(graphics, mouseX, mouseY, delta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		renderWidget(graphics);
+		//# else
+		//- renderWidget(graphics, mouseX, mouseY, delta);
+		//# end
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void renderWidget(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# else
 	//- public void renderWidget(PoseStack graphics, int mouseX, int mouseY, float delta) {
 	//# end
 
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 		renderBackground(graphics);
 		renderScrollbar(graphics);
 		//# else
@@ -422,7 +431,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//- renderScrollbar();
 		//# end
 
-		this.renderList(graphics, mouseX, mouseY, delta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		this.renderList(graphics);
+		//# else
+		//- this.renderList(graphics, mouseX, mouseY, delta);
+		//# end
 
 		// render top shadow
 		//# if RENDERING == "GUI_GRAPHICS"
@@ -435,8 +448,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	/**
 	 * Renders the background of this widget.
 	 */
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
 	protected void renderBackground(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- protected void renderBackground(GuiGraphicsExtractor graphics) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- protected void renderBackground(GuiGraphics graphics) {
 	//# else
@@ -447,7 +462,7 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		//- CoatColor backgroundTint = CoatColor.rgb(colorPart, colorPart, colorPart);
 		//# end
 
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 		//# if MC_VERSION_NUMBER < 12108
 		//- RenderSystem.enableBlend();
 		//# end
@@ -503,14 +518,19 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	//# end
 		//# if TRANSPARENT_MENUS
 		return this.minecraft.level == null
-				? AbstractSelectionList.MENU_LIST_BACKGROUND
-				: AbstractSelectionList.INWORLD_MENU_LIST_BACKGROUND;
+				//# if MC_VERSION_NUMBER >= 260400
+				? Screen.MENU_LIST_BACKGROUND
+				: Screen.INWORLD_MENU_LIST_BACKGROUND;
+				//# else
+				//- ? AbstractSelectionList.MENU_LIST_BACKGROUND
+				//- : AbstractSelectionList.INWORLD_MENU_LIST_BACKGROUND;
+				//# end
 		//# else
 		//- return background;
 		//# end
 	}
 
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 	private void renderScrollbar(GuiGraphicsExtractor graphics) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- private void renderScrollbar(GuiGraphics graphics) {
@@ -527,7 +547,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		int scrollbarRight = scrollbarLeft + SCROLLBAR_WIDTH;
 
 		int handleHeight = (int) ((float) (this.height * this.height) / (float) this.getMaxPosition());
-		handleHeight = Mth.clamp(handleHeight, 32, this.height - 8);
+		//# if MC_VERSION_NUMBER >= 260400
+		handleHeight = Math.clamp(handleHeight, 32, this.height - 8);
+		//# else
+		//- handleHeight = Mth.clamp(handleHeight, 32, this.height - 8);
+		//# end
 		int scrollableRange = this.height - handleHeight;
 		int handleTop = (int) this.getScrollYOffset() * scrollableRange / maxScroll + this.top;
 		if (handleTop < this.top) {
@@ -584,8 +608,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @param mouseY   The current mouse y position
 	 * @param delta    The tick delta
 	 */
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void renderList(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void renderList(GuiGraphicsExtractor graphics) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void renderList(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void renderList(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 	//# else
@@ -606,7 +632,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			}
 		}
 
-		E hoveredEntry = getEntryAtPosition(mouseX, mouseY);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		E hoveredEntry = getEntryAtPosition(graphics.mouseX(), graphics.mouseY());
+		//# else
+		//- E hoveredEntry = getEntryAtPosition(mouseX, mouseY);
+		//# end
 
 		int rowWidth = getEntryWidth();
 		int rowLeft = getEntryLeft();
@@ -617,7 +647,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 
 			int rowTop = relTop + entryAreaTop;
 
-			entry.render(graphics, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+			entry.render(graphics, rowLeft, rowTop, rowWidth, relBottom - relTop, hoveredEntry == entry);
+			//# else
+			//- entry.render(graphics, rowLeft, rowTop, rowWidth, relBottom - relTop, mouseX, mouseY, hoveredEntry == entry, delta);
+			//# end
 
 			if (bottomIter.hasNext()) {
 				relTop = relBottom;
@@ -674,7 +708,11 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 	 * @param amount The new scroll position
 	 */
 	public void setScrollYOffset(double amount) {
-		this.scrollYOffset = Mth.clamp(amount, 0.0D, this.getMaxScroll());
+		//# if MC_VERSION_NUMBER >= 260400
+		this.scrollYOffset = Math.clamp(amount, 0.0D, this.getMaxScroll());
+		//# else
+		//- this.scrollYOffset = Mth.clamp(amount, 0.0D, this.getMaxScroll());
+		//# end
 	}
 
 	/**
@@ -772,7 +810,15 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 			} else {
 				double d = Math.max(1, this.getMaxScroll());
 				int i = this.bottom - this.top;
-				int j = Mth.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
+				//# if MC_VERSION_NUMBER >= 260400
+				int j = Math.clamp(
+				//# else
+				//- int j = Mth.clamp(
+				//# end
+						(int) ((float) (i * i) / (float) this.getMaxPosition()),
+						32,
+						i - 8
+				);
 				double e = Math.max(1.0D, d / (double) (i - j));
 				this.setScrollYOffset(this.getScrollYOffset() + deltaY * e);
 			}
@@ -1043,8 +1089,10 @@ public class DynamicEntryListWidget<E extends DynamicEntryListWidget.Entry> exte
 		 * @param mouseY      the Y coordinate of the mouse
 		 * @param hovered     whether the mouse is hovering over the entry
 		 */
-		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-		public abstract void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
+		//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+		public abstract void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, boolean hovered);
+		//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+		//- public abstract void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 		//# elif RENDERING == "GUI_GRAPHICS"
 		//- public abstract void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta);
 		//# elif RENDERING == "POSE_STACK"

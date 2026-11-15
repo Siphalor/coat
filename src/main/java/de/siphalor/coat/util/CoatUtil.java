@@ -17,15 +17,17 @@ import net.minecraft.client.gui.Font;
 //- import net.minecraft.client.gui.GuiGraphics;
 //- import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.Button;
 //- import net.minecraft.client.renderer.GameRenderer;
 //- import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
+//- import net.minecraft.client.renderer.RenderPipelines;
 //- import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.AbstractTexture;
+//- import net.minecraft.client.renderer.texture.AbstractTexture;
+//- import net.minecraft.client.renderer.texture.TextureHandle;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
@@ -92,16 +94,16 @@ public class CoatUtil {
 	 * Renders a string either scrolling or left-aligned depending on the width.
 	 */
 	public static void drawLeftAlignedText(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-			GuiGraphicsExtractor graphics,
-			//# else
-			//- GuiGraphics graphics,
-			//# end
-			Font font,
+ 			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+ 			GuiGraphicsExtractor graphics,
+ 			//# else
+ 			//- GuiGraphics graphics,
+ 			//# end
+ 			Font font,
 			Component text,
 			ScreenRectangle rect,
 			CoatColor color
-	) {
+ 	) {
 		int textWidth = font.width(text);
 		if (textWidth <= rect.width()) {
 			//# if MC_VERSION_NUMBER >= 260100
@@ -216,7 +218,7 @@ public class CoatUtil {
 	 * Draws the outline of a rectangle.
 	 * @param color  The color to draw with
 	 */
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 	public static void drawOutline(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, CoatColor color) {
 		graphics.outline(x1, y1, x2 - x1, y2 - y1, color.getArgb());
 	}
@@ -273,7 +275,7 @@ public class CoatUtil {
 	//# end
 
 	public static void drawHorizontalGradient(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 			GuiGraphicsExtractor graphics,
 			//# elif RENDERING == "GUI_GRAPHICS"
 			//- GuiGraphics graphics,
@@ -290,7 +292,11 @@ public class CoatUtil {
 		CoatGuiGraphics coatGraphics = (CoatGuiGraphics) graphics;
 		coatGraphics.coat_submitGuiRenderState(
 				new IndividuallyColoredRectangleRenderState(
-						RenderPipelines.GUI,
+						//# if MC_VERSION_NUMBER >= 260400
+						GuiPipeline.DEFAULT,
+						//# else
+						//- RenderPipelines.GUI,
+						//# end
 						TextureSetup.noTexture(),
 						new Matrix3x2f(graphics.pose()),
 						rect,
@@ -333,25 +339,36 @@ public class CoatUtil {
 		//# end
 	}
 
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR" || RENDERING == "GUI_GRAPHICS"
 	public static void drawTexture(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 			GuiGraphicsExtractor graphics,
-			//# else
+			//# elif RENDERING == "GUI_GRAPHICS"
 			//- GuiGraphics graphics,
 			//# end
-			//# if MC_VERSION_NUMBER >= 12111
-			Identifier texture,
-			//# else
-			//- ResourceLocation texture,
-			//# end
-			int left,
-			int top,
-			int width,
-			int height
-	) {
-		//# if MC_VERSION_NUMBER >= 12108
-		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, left, top, width, height);
+ 			//# if MC_VERSION_NUMBER >= 12111
+ 			Identifier texture,
+ 			//# else
+ 			//- ResourceLocation texture,
+ 			//# end
+ 			int left,
+ 			int top,
+ 			int width,
+ 			int height
+ 	) {
+ 		//# if MC_VERSION_NUMBER >= 12108
+ 		graphics.blitSprite(
+				//# if MC_VERSION_NUMBER >= 260400
+				GuiPipeline.TEXTURED,
+				//# else
+				//- RenderPipelines.GUI_TEXTURED,
+				//# end
+				texture,
+				left,
+				top,
+				width,
+				height
+		);
 		//# elif MC_VERSION_NUMBER >= 12103
 		//- graphics.blitSprite(RenderType::guiTextured, texture, left, top, width, height);
 		//# elif MC_VERSION_NUMBER >= 12002
@@ -377,9 +394,9 @@ public class CoatUtil {
 	//# end
 
 	public static void drawTintedTiledTexture(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 			GuiGraphicsExtractor graphics,
-			//# else
+			//# elif RENDERING == "GUI_GRAPHICS"
 			//- GuiGraphics graphics,
 			//# end
 			//# if MC_VERSION_NUMBER >= 12111
@@ -399,8 +416,10 @@ public class CoatUtil {
 		int width = right - left;
 		int height = bottom - top;
 		graphics.blit(
-				//# if MC_VERSION_NUMBER >= 12108
-				RenderPipelines.GUI_TEXTURED,
+				//# if MC_VERSION_NUMBER >= 260400
+				GuiPipeline.TEXTURED,
+				//# elif MC_VERSION_NUMBER >= 12108
+				//- RenderPipelines.GUI_TEXTURED,
 				//# elif MC_VERSION_NUMBER >= 12103
 				//- RenderType::guiTextured,
 				//# end
@@ -423,9 +442,9 @@ public class CoatUtil {
 	}
 
 	public static void drawTiledTexture(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 			GuiGraphicsExtractor graphics,
-			//# else
+			//# elif RENDERING == "GUI_GRAPHICS"
 			//- GuiGraphics graphics,
 			//# end
 			//# if MC_VERSION_NUMBER >= 12111
@@ -443,8 +462,10 @@ public class CoatUtil {
 		int width = right - left;
 		int height = bottom - top;
 		graphics.blit(
-				//# if MC_VERSION_NUMBER >= 12108
-				RenderPipelines.GUI_TEXTURED,
+				//# if MC_VERSION_NUMBER >= 260400
+				GuiPipeline.TEXTURED,
+				//# elif MC_VERSION_NUMBER >= 12108
+				//- RenderPipelines.GUI_TEXTURED,
 				//#elif MC_VERSION_NUMBER >=12103
 				//- RenderType::guiTextured,
 				//# end
@@ -494,9 +515,9 @@ public class CoatUtil {
 
 	//# if MC_VERSION_NUMBER >= 12103
 	public static void drawInsetGradientTexture(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 			GuiGraphicsExtractor graphics,
-			//# else
+			//# elif RENDERING == "GUI_GRAPHICS"
 			//- GuiGraphics graphics,
 			//# end
 			//# if MC_VERSION_NUMBER >= 12111
@@ -524,10 +545,17 @@ public class CoatUtil {
 		ScreenRectangle bottomRight = new ScreenRectangle(right - middleOffset, top + middleOffset, middleOffset, middleOffset);
 
 		//# if MC_VERSION_NUMBER >= 12108
-		AbstractTexture loadedTexture = Minecraft.getInstance().getTextureManager().getTexture(texture);
+		var loadedTexture = Minecraft.getInstance().getTextureManager().getTexture(texture);
 		TextureSetup textureSetup = TextureSetup.singleTexture(
-				loadedTexture.getTextureView()
-				/*# if MC_VERSION_NUMBER >= 12111 */, loadedTexture.getSampler()/*# end */
+				//# if MC_VERSION_NUMBER >= 260400
+				loadedTexture.textureView(),
+				loadedTexture.sampler()
+				//# elif MC_VERSION_NUMBER >= 12111
+				//- loadedTexture.getTextureView(),
+				//- loadedTexture.getSampler()
+				//# else
+				//- loadedTexture.getTextureView()
+				//# end
 		);
 		submitIndividuallyColoredBlitRectable(
 				graphics, textureSetup, topLeft, textureScale, outerColor, outerColor, innerColor, outerColor
@@ -625,9 +653,9 @@ public class CoatUtil {
 
 	//# if MC_VERSION_NUMBER >= 12108
 	private static void submitIndividuallyColoredBlitRectable(
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 			GuiGraphicsExtractor graphics,
-			//# else
+			//# elif RENDERING == "GUI_GRAPHICS"
 			//- GuiGraphics graphics,
 			//# end
 			TextureSetup textureSetup,
@@ -640,7 +668,11 @@ public class CoatUtil {
 	) {
 		CoatGuiGraphics coatGraphics = (CoatGuiGraphics) graphics;
 		coatGraphics.coat_submitGuiRenderState(new IndividuallyColoredBlitRenderState(
-				RenderPipelines.GUI_TEXTURED,
+				//# if MC_VERSION_NUMBER >= 260400
+				GuiPipeline.TEXTURED,
+				//# else
+				//- RenderPipelines.GUI_TEXTURED,
+				//# end
 				textureSetup,
 				new Matrix3x2f(graphics.pose()),
 				rect,

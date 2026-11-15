@@ -52,15 +52,17 @@ public class ConfigListTextEntry extends ConfigContainerEntry {
 	 * {@inheritDoc}
 	 */
 	@Override
-	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
-	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+	//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE"
+	public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, boolean hovered) {
+	//# elif RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+	//- public void render(GuiGraphicsExtractor graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# elif RENDERING == "GUI_GRAPHICS"
 	//- public void render(GuiGraphics graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# else
 	//- public void render(PoseStack graphics, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 	//# end
 		for (int i = 0; i < multilineText.size(); i++) {
-			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR"
+			//# if RENDERING == "GUI_GRAPHICS_EXTRACTOR_PURE" || RENDERING == "GUI_GRAPHICS_EXTRACTOR"
 			graphics.text(font, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
 			//# elif RENDERING == "GUI_GRAPHICS"
 			//- graphics.drawString(font, multilineText.get(i), x, y + i * 9, CoatUtil.TEXT_COLOR.getArgb(), false);
