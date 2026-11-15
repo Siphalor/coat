@@ -25,7 +25,7 @@ plugins {
 }
 
 smcmtk {
-	fabricLoomVersion = "1.15-SNAPSHOT"
+	fabricLoomVersion = "1.19-SNAPSHOT"
 }
 
 rootProject.name = "coat"
